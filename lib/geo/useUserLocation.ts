@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { DISTRICT_CENTROIDS } from '@/lib/districts'
 import type { LatLng } from '@/lib/geo/haversine'
 
@@ -21,7 +21,13 @@ export function useUserLocation() {
     isFallback: true,
   })
 
+  const requestIdRef = useRef(0)
+
   const requestLocation = useCallback(() => {
+    // Increment request id to invalidate any pending callbacks from prior calls
+    requestIdRef.current += 1
+    const thisRequestId = requestIdRef.current
+
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setState({ status: 'unavailable', coordinate: MIRAFLORES_FALLBACK, isFallback: true })
       return
@@ -31,14 +37,20 @@ export function useUserLocation() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setState({
-          status: 'granted',
-          coordinate: { lat: position.coords.latitude, lng: position.coords.longitude },
-          isFallback: false,
-        })
+        // Only update state if this is still the most recent request
+        if (requestIdRef.current === thisRequestId) {
+          setState({
+            status: 'granted',
+            coordinate: { lat: position.coords.latitude, lng: position.coords.longitude },
+            isFallback: false,
+          })
+        }
       },
       () => {
-        setState({ status: 'denied', coordinate: MIRAFLORES_FALLBACK, isFallback: true })
+        // Only update state if this is still the most recent request
+        if (requestIdRef.current === thisRequestId) {
+          setState({ status: 'denied', coordinate: MIRAFLORES_FALLBACK, isFallback: true })
+        }
       },
       { enableHighAccuracy: true, timeout: 8000 }
     )
