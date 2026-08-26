@@ -13,7 +13,9 @@ export async function listSpaces(filters: SpaceFilters = {}): Promise<SpaceRecor
     query = query.eq(filter.column, filter.value)
   }
   if (descriptor.searchTerm) {
-    const term = `%${descriptor.searchTerm}%`
+    // Sanitize search term to prevent PostgREST filter injection by removing reserved characters
+    const sanitizedSearch = descriptor.searchTerm.replace(/[,()."*\\]/g, ' ')
+    const term = `%${sanitizedSearch}%`
     query = query.or(`name.ilike.${term},address.ilike.${term}`)
   }
 
