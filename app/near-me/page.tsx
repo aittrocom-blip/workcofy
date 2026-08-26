@@ -8,8 +8,16 @@ export const metadata = {
   description: 'Encuentra los cafés y espacios Work-Friendly más cercanos a tu ubicación.',
 }
 
-export default async function NearMePage() {
-  const spaces = await listSpaces()
+interface NearMePageProps {
+  searchParams: { q?: string; district?: string; category?: string; sort?: string }
+}
+
+export default async function NearMePage({ searchParams }: NearMePageProps) {
+  const spaces = await listSpaces({
+    search: searchParams.q,
+    district: searchParams.district,
+    category: searchParams.category,
+  })
 
   return (
     <div>

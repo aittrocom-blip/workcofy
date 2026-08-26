@@ -93,6 +93,7 @@ function toSeedInput(target: SeedTarget, placeId: string, details: GooglePlaceDe
       : null,
     photos,
     description: null,
+    data_source: 'google',
   }
 }
 
@@ -111,27 +112,46 @@ async function main() {
   const skipped: string[] = []
 
   for (const target of SEED_TARGETS) {
-    const placeId = await findPlaceId(target, apiKey)
-    if (!placeId) {
+    // One failing target (rate limit, transient network error, unexpected Places
+    // status) must never discard every space already resolved in this run.
+    try {
+      const placeId = await findPlaceId(target, apiKey)
+      if (!placeId) {
+        skipped.push(target.name)
+        continue
+      }
+      const details = await fetchPlaceDetails(placeId, apiKey)
+      resolved.push(toSeedInput(target, placeId, details))
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.warn(`Failed to resolve "${target.name}" — skipping: ${message}`)
       skipped.push(target.name)
+    }
+  }
+
+  // Upsert one record at a time rather than as a single batch: two SEED_TARGETS
+  // can be different branches of the same business in the same district, which
+  // findPlaceId cannot tell apart, so both may resolve to the same Google Place.
+  // The `google_place_id` unique constraint then rejects the second row — as a
+  // batch that would sink every other record with it.
+  let seeded = 0
+  for (const record of resolved) {
+    const { error } = await supabase.from('spaces').upsert(record, { onConflict: 'slug' })
+    if (error) {
+      console.warn(`Failed to upsert "${record.name}" — skipping: ${error.message}`)
+      skipped.push(record.name)
       continue
     }
-    const details = await fetchPlaceDetails(placeId, apiKey)
-    resolved.push(toSeedInput(target, placeId, details))
+    seeded += 1
   }
 
-  if (resolved.length > 0) {
-    const { error } = await supabase.from('spaces').upsert(resolved, { onConflict: 'slug' })
-    if (error) {
-      console.error('Failed to upsert resolved spaces:', error.message)
-      process.exit(1)
-    }
-  }
-
-  console.log(`Resolved and seeded ${resolved.length}/${SEED_TARGETS.length} spaces.`)
+  console.log(`Resolved and seeded ${seeded}/${SEED_TARGETS.length} spaces.`)
   if (skipped.length > 0) {
     console.warn(`Skipped (no confident match, resolve manually): ${skipped.join(', ')}`)
   }
 }
 
-main()
+main().catch((error) => {
+  console.error('Seeding failed:', error instanceof Error ? error.message : error)
+  process.exit(1)
+})

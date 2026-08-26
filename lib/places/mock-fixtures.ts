@@ -51,6 +51,7 @@ export function buildMockSpaceFixtures(): SeedSpaceInput[] {
       opening_hours: MOCK_OPENING_HOURS,
       photos: null,
       description: null,
+      data_source: 'mock',
     }
   })
 }

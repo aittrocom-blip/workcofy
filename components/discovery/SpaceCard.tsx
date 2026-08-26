@@ -3,6 +3,7 @@ import { formatDistanceKm } from '@/lib/geo/haversine'
 import { isOpenNow, formatPeriodForDay } from '@/lib/hours/openingHours'
 import { districtLabel } from '@/lib/districts'
 import { buildDirectionsUrl } from '@/lib/directions'
+import { getLimaNow } from '@/lib/geo/limaTime'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 interface SpaceCardProps {
@@ -13,7 +14,7 @@ interface SpaceCardProps {
 }
 
 export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceCardProps) {
-  const now = new Date()
+  const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayHours = formatPeriodForDay(space.opening_hours, now.getDay())
 
@@ -27,6 +28,11 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
       <div className="h-32 w-full rounded-xl bg-gray-100" />
       <h3 className="mt-2 font-semibold">{space.name}</h3>
       <p className="text-sm text-gray-500">{districtLabel(space.district)}</p>
+      {space.data_source === 'mock' && (
+        <span className="mt-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+          Datos de ejemplo
+        </span>
+      )}
       <div className="mt-1 flex items-center gap-2 text-sm">
         {space.rating != null && <span>★ {space.rating.toFixed(1)}</span>}
         {space.distanceKm != null && <span>{formatDistanceKm(space.distanceKm)}</span>}

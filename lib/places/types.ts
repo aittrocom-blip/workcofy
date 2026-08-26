@@ -20,4 +20,5 @@ export interface SeedSpaceInput {
   opening_hours: OpeningHours | null
   photos: SpacePhoto[] | null
   description: string | null
+  data_source: 'mock' | 'google'
 }

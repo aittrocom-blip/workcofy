@@ -40,6 +40,8 @@ export interface SpaceRecord {
   workcofy_score: number | null
   workcofy_notes: string | null
   partner_status: string
+  /** Provenance of this row: fabricated dev fixtures vs. real Google Places data. */
+  data_source: 'mock' | 'google'
   active: boolean
 }
 

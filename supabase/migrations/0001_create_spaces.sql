@@ -39,6 +39,12 @@ create table if not exists spaces (
   workcofy_notes text,
   partner_status text not null default 'none' check (partner_status in ('none', 'partner')),
 
+  -- Provenance of this row's data: 'mock' = fabricated dev/demo fixtures
+  -- (lib/places/mock-fixtures.ts), 'google' = resolved from the Google Places
+  -- API (scripts/seed-google-places.ts). Surfaced in the UI so fabricated
+  -- ratings/hours are never presented as real business data.
+  data_source text not null default 'mock' check (data_source in ('mock', 'google')),
+
   active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -47,3 +53,16 @@ create table if not exists spaces (
 create index if not exists spaces_district_idx on spaces (district);
 create index if not exists spaces_category_idx on spaces (category);
 create index if not exists spaces_active_idx on spaces (active);
+
+-- Row Level Security. The browser client authenticates with the public anon key
+-- (NEXT_PUBLIC_SUPABASE_ANON_KEY, which ships in the client bundle), so without
+-- RLS the table would be readable AND writable by anyone who extracts that key,
+-- and listSpaces()'s `.eq('active', true)` filter would be trivially bypassed by
+-- a raw PostgREST call. The only public grant is read access to active rows;
+-- writes remain limited to the service-role key used by the seed scripts.
+alter table spaces enable row level security;
+
+create policy "Public can read active spaces"
+  on spaces for select
+  to anon
+  using (active = true);

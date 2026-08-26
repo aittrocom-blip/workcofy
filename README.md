@@ -55,7 +55,7 @@ npm test
 
 ## Nota importante: zona horaria del servidor
 
-El estado "Abierto ahora" / "Cerrado" y el resaltado del horario de hoy en la página de detalle del espacio se calculan usando la hora del sistema del servidor, así que dependen de que ese servidor tenga configurada la zona horaria de Lima (`America/Lima`, UTC-5, sin horario de verano). Al desplegar (por ejemplo en Vercel), configura la variable de entorno `TZ` con el valor `America/Lima` para que el estado de apertura/cierre y el resaltado del horario de hoy, calculados en el servidor, sean correctos para visitantes en Lima. Sin este ajuste, los hosts que por defecto usan UTC mostrarán un estado de apertura/cierre incorrecto y pasarán al día siguiente varias horas antes de tiempo.
+Esto ya está resuelto en el código: `getLimaNow()` (`lib/geo/limaTime.ts`) calcula internamente la hora local de Lima (`America/Lima`, UTC-5, sin horario de verano) con `Intl.DateTimeFormat`, sin importar la zona horaria del sistema del servidor. El estado "Abierto ahora" / "Cerrado", el orden por "Abierto ahora" y el resaltado del horario de hoy son correctos para visitantes en Lima incluso en hosts que por defecto usan UTC, así que **no** es necesario configurar la variable de entorno `TZ` al desplegar (configurarla tampoco causa problemas).
 
 ## Próximos pasos recomendados
 

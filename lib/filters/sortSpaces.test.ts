@@ -11,7 +11,8 @@ function makeSpace(overrides: Partial<SpaceWithDistance>): SpaceWithDistance {
     wifi_available: null, power_outlets: null, laptop_friendly: null, meeting_friendly: null,
     workshop_friendly: null, event_friendly: null, noise_level: null, seating_capacity: null,
     private_rooms: null, outdoor_seating: null, parking: null, recommended_stay_minutes: null,
-    workcofy_score: null, workcofy_notes: null, partner_status: 'none', active: true,
+    workcofy_score: null, workcofy_notes: null, partner_status: 'none',
+    data_source: 'mock', active: true,
     distanceKm: null,
     ...overrides,
   }
@@ -25,6 +26,18 @@ describe('sortSpaces', () => {
       makeSpace({ id: 'c', distanceKm: 0.5 }),
     ]
     expect(sortSpaces(spaces, 'distance').map((s) => s.id)).toEqual(['c', 'a', 'b'])
+  })
+
+  it('preserves the incoming order when no space has a real distance', () => {
+    // Before the user grants geolocation, DiscoveryView leaves every distanceKm
+    // null rather than measuring from the Miraflores fallback, so the 'distance'
+    // sort must degrade to a stable no-op instead of shuffling the list.
+    const spaces = [
+      makeSpace({ id: 'a', distanceKm: null }),
+      makeSpace({ id: 'b', distanceKm: null }),
+      makeSpace({ id: 'c', distanceKm: null }),
+    ]
+    expect(sortSpaces(spaces, 'distance').map((s) => s.id)).toEqual(['a', 'b', 'c'])
   })
 
   it('sorts by rating descending, with nulls last', () => {

@@ -15,14 +15,29 @@ import {
   type SortOption,
 } from '@/lib/filters/discoveryFilters'
 import { sortSpaces } from '@/lib/filters/sortSpaces'
+import { districtSlugFromValue } from '@/lib/districts'
 
 interface DiscoveryViewProps {
   spaces: SpaceRecord[]
   autoRequestLocation?: boolean
   initialSort?: SortOption
+  /**
+   * Set on a dedicated district route (/miraflores, ...), where the route itself
+   * determines the district. The chip bar then reflects that district and
+   * navigates between district routes instead of writing a `?district=` param
+   * the server page deliberately ignores.
+   */
+  lockedDistrict?: string
 }
 
-export function DiscoveryView({ spaces, autoRequestLocation = false, initialSort }: DiscoveryViewProps) {
+const LOCATION_PROMPT = 'Permite tu ubicación para encontrar espacios cerca de ti.'
+
+export function DiscoveryView({
+  spaces,
+  autoRequestLocation = false,
+  initialSort,
+  lockedDistrict,
+}: DiscoveryViewProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { coordinate, status, requestLocation } = useUserLocation()
@@ -30,11 +45,10 @@ export function DiscoveryView({ spaces, autoRequestLocation = false, initialSort
 
   const filters: DiscoveryFilterState = useMemo(() => {
     const parsed = parseDiscoveryFilters(searchParams)
-    if (!searchParams.get('sort') && initialSort) {
-      return { ...parsed, sort: initialSort }
-    }
-    return parsed
-  }, [searchParams, initialSort])
+    const withSort =
+      !searchParams.get('sort') && initialSort ? { ...parsed, sort: initialSort } : parsed
+    return lockedDistrict ? { ...withSort, district: lockedDistrict } : withSort
+  }, [searchParams, initialSort, lockedDistrict])
 
   useEffect(() => {
     if (autoRequestLocation && status === 'idle') {
@@ -42,21 +56,40 @@ export function DiscoveryView({ spaces, autoRequestLocation = false, initialSort
     }
   }, [autoRequestLocation, status, requestLocation])
 
+  // Only a real, user-granted position yields a real distance. Before the user
+  // grants geolocation `coordinate` is the Miraflores fallback, and measuring
+  // from it would present an invented distance as fact — so distanceKm stays
+  // null, matching how `userLocation` and `origin` are already gated below.
+  const hasRealLocation = status === 'granted'
+
   const withDistance = useMemo(
     () =>
       spaces.map((space) => ({
         ...space,
         distanceKm:
-          space.latitude != null && space.longitude != null
+          hasRealLocation && space.latitude != null && space.longitude != null
             ? haversineDistanceKm(coordinate, { lat: space.latitude, lng: space.longitude })
             : null,
       })),
-    [spaces, coordinate]
+    [spaces, coordinate, hasRealLocation]
   )
 
   const sorted = useMemo(() => sortSpaces(withDistance, filters.sort), [withDistance, filters.sort])
 
+  const locationUnavailable = status === 'denied' || status === 'unavailable'
+
   function updateFilters(partial: Partial<DiscoveryFilterState>) {
+    // On a district route the district comes from the path, not the query.
+    if (lockedDistrict && partial.district !== undefined) {
+      const slug = partial.district ? districtSlugFromValue(partial.district) : null
+      const query = serializeDiscoveryFilters({
+        ...filters,
+        ...partial,
+        district: null,
+      })
+      router.push(slug ? `/${slug}${query ? `?${query}` : ''}` : `/${query ? `?${query}` : ''}`)
+      return
+    }
     const query = serializeDiscoveryFilters({ ...filters, ...partial })
     router.push(`?${query}`)
   }
@@ -83,6 +116,11 @@ export function DiscoveryView({ spaces, autoRequestLocation = false, initialSort
       </div>
       <div className="order-2 md:order-1 md:w-2/5 md:overflow-y-auto">
         <FiltersBar filters={filters} onChange={updateFilters} onRequestLocation={requestLocation} />
+        {locationUnavailable && (
+          <p className="border-b border-gray-200 px-4 py-3 text-xs text-gray-500">
+            {LOCATION_PROMPT}
+          </p>
+        )}
         <SpaceList
           spaces={sorted}
           selectedId={selectedId}

@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 
 interface DistrictPageProps {
   params: { district: string }
+  searchParams: { q?: string; district?: string; category?: string; sort?: string }
 }
 
 export function generateMetadata({ params }: DistrictPageProps) {
@@ -19,11 +20,18 @@ export function generateMetadata({ params }: DistrictPageProps) {
   }
 }
 
-export default async function DistrictPage({ params }: DistrictPageProps) {
+export default async function DistrictPage({ params, searchParams }: DistrictPageProps) {
   const districtValue = districtValueFromSlug(params.district)
   if (!districtValue) notFound()
 
-  const spaces = await listSpaces({ district: districtValue })
+  // The route itself IS the district, so it always wins over an incoming
+  // `?district=` param — a dedicated district route never lists other districts.
+  // Category and search from the URL still narrow the results within it.
+  const spaces = await listSpaces({
+    district: districtValue,
+    category: searchParams.category,
+    search: searchParams.q,
+  })
   const label = districtLabel(districtValue)
 
   return (
@@ -35,7 +43,7 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
           en {label}.
         </p>
       </section>
-      <DiscoveryView spaces={spaces} />
+      <DiscoveryView spaces={spaces} lockedDistrict={districtValue} />
     </div>
   )
 }

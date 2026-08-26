@@ -1,11 +1,14 @@
 import { isOpenNow } from '@/lib/hours/openingHours'
+import { getLimaNow } from '@/lib/geo/limaTime'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 import type { SortOption } from '@/lib/filters/discoveryFilters'
 
 export function sortSpaces(
   spaces: SpaceWithDistance[],
   sort: SortOption,
-  now: Date = new Date()
+  // Defaults to Lima wall-clock time so "abierto ahora" ordering is correct
+  // regardless of the host's system timezone. Tests inject an explicit clock.
+  now: Date = getLimaNow()
 ): SpaceWithDistance[] {
   const copy = [...spaces]
 
