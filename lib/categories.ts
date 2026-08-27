@@ -18,7 +18,8 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'cafe', label: 'Cafés', active: true },
   { value: 'work_cafe', label: 'Work Cafés', active: true },
   { value: 'coworking', label: 'Coworking', active: false },
-  { value: 'meeting_room', label: 'Reuniones', active: false },
+  { value: 'meeting_room', label: 'Salas de reunión', active: false },
+  { value: 'hotel', label: 'Hoteles', active: false },
   { value: 'workshop', label: 'Workshops', active: false },
   { value: 'event', label: 'Eventos', active: false },
 ]
