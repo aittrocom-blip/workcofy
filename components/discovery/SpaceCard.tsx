@@ -27,7 +27,7 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
   return (
     <div
       onClick={onSelect}
-      className={`group cursor-pointer rounded-2xl border p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.14)] ${
+      className={`group cursor-pointer rounded-2xl border bg-white p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.14)] ${
         isSelected ? 'border-black' : 'border-transparent'
       }`}
     >
