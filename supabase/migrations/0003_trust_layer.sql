@@ -42,6 +42,7 @@ create table if not exists space_benefits (
 
 alter table space_benefits enable row level security;
 
+drop policy if exists "Public can read benefits of active spaces" on space_benefits;
 create policy "Public can read benefits of active spaces"
   on space_benefits for select
   to anon
@@ -60,6 +61,7 @@ create table if not exists coin_rules (
 
 alter table coin_rules enable row level security;
 
+drop policy if exists "Public can read active coin rules" on coin_rules;
 create policy "Public can read active coin rules"
   on coin_rules for select
   to anon
@@ -86,6 +88,7 @@ create table if not exists coin_redemptions (
 
 alter table coin_redemptions enable row level security;
 
+drop policy if exists "Public can read active coin redemptions" on coin_redemptions;
 create policy "Public can read active coin redemptions"
   on coin_redemptions for select
   to anon
