@@ -1,9 +1,13 @@
+'use client'
+
 import Link from 'next/link'
 import { formatDistanceKm } from '@/lib/geo/haversine'
 import { isOpenNow, formatPeriodForDay } from '@/lib/hours/openingHours'
 import { districtLabel } from '@/lib/districts'
 import { buildDirectionsUrl } from '@/lib/directions'
 import { getLimaNow } from '@/lib/geo/limaTime'
+import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
+import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 interface SpaceCardProps {
@@ -17,6 +21,8 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayHours = formatPeriodForDay(space.opening_hours, now.getDay())
+  const score = computeWorkcofyScore(space)
+  const coverPhoto = space.photos?.find((photo) => photo.url)
 
   return (
     <div
@@ -25,7 +31,17 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
         isSelected ? 'border-black' : 'border-transparent'
       }`}
     >
-      <div className="h-32 w-full overflow-hidden rounded-xl bg-gray-100 transition-transform duration-200 group-hover:scale-[1.02]" />
+      <div className="relative h-32 w-full overflow-hidden rounded-xl bg-gray-100 transition-transform duration-200 group-hover:scale-[1.02]">
+        {coverPhoto && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={coverPhoto.url} alt={space.name} className="h-full w-full object-cover" />
+        )}
+        {space.verified && (
+          <div className="absolute left-2 top-2">
+            <VerifiedBadge />
+          </div>
+        )}
+      </div>
       <h3 className="mt-3 font-semibold tracking-tight">{space.name}</h3>
       <p className="text-sm text-gray-500">{districtLabel(space.district)}</p>
       {space.data_source === 'mock' && (
@@ -37,6 +53,11 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
         {space.rating != null && <span>★ {space.rating.toFixed(1)}</span>}
         {space.distanceKm != null && <span>{formatDistanceKm(space.distanceKm)}</span>}
       </div>
+      {score != null && (
+        <p className="mt-1 text-xs font-semibold">
+          Workcofy Score <span className="text-workcofy-yellow">{score}</span>
+        </p>
+      )}
       <p className="mt-1 text-xs text-gray-500">{openNow ? `Abierto · ${todayHours}` : 'Cerrado'}</p>
       <div className="mt-3.5 flex gap-2">
         <Link

@@ -6,6 +6,7 @@ import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { MapView } from '@/components/map/MapView'
 import { SpaceList } from '@/components/discovery/SpaceList'
 import { FiltersBar } from '@/components/discovery/FiltersBar'
+import { SpaceCard } from '@/components/discovery/SpaceCard'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import { haversineDistanceKm } from '@/lib/geo/haversine'
 import {
@@ -76,6 +77,8 @@ export function DiscoveryView({
 
   const sorted = useMemo(() => sortSpaces(withDistance, filters.sort), [withDistance, filters.sort])
 
+  const selectedSpace = sorted.find((space) => space.id === selectedId) ?? null
+
   const locationUnavailable = status === 'denied' || status === 'unavailable'
 
   function updateFilters(partial: Partial<DiscoveryFilterState>) {
@@ -105,7 +108,7 @@ export function DiscoveryView({
   return (
     <div className="md:px-8">
       <div className="mx-auto flex max-w-7xl flex-col overflow-hidden md:h-[70vh] md:flex-row md:rounded-3xl md:border md:border-gray-100 md:shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
-        <div className="order-1 h-[45vh] md:order-2 md:h-full md:w-3/5">
+        <div className="relative order-1 h-[45vh] md:order-2 md:h-full md:w-3/5">
           <MapView
             center={coordinate}
             zoom={14}
@@ -114,6 +117,18 @@ export function DiscoveryView({
             onMarkerSelect={setSelectedId}
             userLocation={status === 'granted' ? coordinate : null}
           />
+          {selectedSpace && (
+            <div className="pointer-events-none absolute inset-0 z-10 hidden items-end justify-end p-4 md:flex">
+              <div className="pointer-events-auto w-80">
+                <SpaceCard
+                  space={selectedSpace}
+                  isSelected
+                  onSelect={() => {}}
+                  origin={status === 'granted' ? coordinate : null}
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div className="order-2 border-t border-gray-100 md:order-1 md:w-2/5 md:overflow-y-auto md:border-r md:border-t-0">
           <FiltersBar filters={filters} onChange={updateFilters} onRequestLocation={requestLocation} />

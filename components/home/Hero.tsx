@@ -4,13 +4,13 @@ import { SearchBox } from '@/components/home/SearchBox'
 export function Hero() {
   return (
     <section className="px-4 py-16 text-center md:px-8 md:py-24">
-      <h1 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-6xl">
-        Encuentra dónde trabajar, reunirte y crear.
+      <h1 className="mx-auto max-w-3xl text-5xl font-black tracking-tight md:text-7xl">
+        Encuentra tu mejor lugar para <span className="text-workcofy-yellow">trabajar</span>.
       </h1>
       <p className="mx-auto mt-4 max-w-xl text-base text-gray-500 md:text-lg">
-        Descubre cafés y espacios Work-Friendly cerca de ti.
+        Espacios descubiertos, evaluados y verificados por nuestra comunidad.
       </p>
-      <div className="mx-auto mt-8 max-w-xl">
+      <div className="mx-auto mt-6 max-w-xl">
         <SearchBox />
       </div>
       <div className="mt-5 flex flex-wrap justify-center gap-2 text-sm">

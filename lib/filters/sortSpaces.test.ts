@@ -1,18 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { sortSpaces } from './sortSpaces'
+import { DEFAULT_AMENITIES } from '@/lib/amenities/types'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 function makeSpace(overrides: Partial<SpaceWithDistance>): SpaceWithDistance {
   return {
     id: '1', name: 'Test', slug: 'test', category: 'cafe', district: 'miraflores',
     address: null, latitude: null, longitude: null, google_place_id: null,
-    google_maps_url: null, phone: null, website: null, rating: null, review_count: null,
-    price_level: null, opening_hours: null, photos: null, description: null,
-    wifi_available: null, power_outlets: null, laptop_friendly: null, meeting_friendly: null,
-    workshop_friendly: null, event_friendly: null, noise_level: null, seating_capacity: null,
-    private_rooms: null, outdoor_seating: null, parking: null, recommended_stay_minutes: null,
-    workcofy_score: null, workcofy_notes: null, partner_status: 'none',
-    data_source: 'mock', active: true,
+    google_maps_url: null, phone: null, website: null, instagram_url: null,
+    rating: null, review_count: null, price_level: null, opening_hours: null,
+    photos: null, description: null, amenities: DEFAULT_AMENITIES,
+    noise_level: null, seating_capacity: null, recommended_stay_minutes: null,
+    workcofy_score: null, workcofy_notes: null,
+    verified: false, verified_at: null, verified_amenities: [],
+    partner_status: 'none', data_source: 'mock', active: true,
     distanceKm: null,
     ...overrides,
   }

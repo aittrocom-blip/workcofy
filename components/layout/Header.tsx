@@ -53,6 +53,9 @@ export function Header() {
           <Link href="/miraflores" className="transition-colors hover:text-black">
             Distritos
           </Link>
+          <Link href="/#coins" className="transition-colors hover:text-black">
+            Workcofy Coins
+          </Link>
         </nav>
 
         <Link
@@ -85,6 +88,13 @@ export function Header() {
             className="rounded-lg px-2 py-2.5 transition-colors hover:bg-gray-50"
           >
             Distritos
+          </Link>
+          <Link
+            href="/#coins"
+            onClick={() => setMobileMenuOpen(false)}
+            className="rounded-lg px-2 py-2.5 transition-colors hover:bg-gray-50"
+          >
+            Workcofy Coins
           </Link>
         </nav>
       )}

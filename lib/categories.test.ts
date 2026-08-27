@@ -10,4 +10,14 @@ describe('categories', () => {
     const coworking = CATEGORY_OPTIONS.find((c) => c.value === 'coworking')
     expect(coworking?.active).toBe(false)
   })
+
+  it('includes an inactive hotel option labeled Hoteles', () => {
+    const hotel = CATEGORY_OPTIONS.find((option) => option.value === 'hotel')
+    expect(hotel).toEqual({ value: 'hotel', label: 'Hoteles', active: false })
+  })
+
+  it('labels meeting_room as Salas de reunión', () => {
+    const meetingRoom = CATEGORY_OPTIONS.find((option) => option.value === 'meeting_room')
+    expect(meetingRoom?.label).toBe('Salas de reunión')
+  })
 })
