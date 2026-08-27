@@ -87,9 +87,14 @@ inferred):
 }
 ```
 
-`lib/places/*` seed scripts populate `para_trabajar.wifi`, `para_trabajar.enchufes`, and
-`para_llamadas.zona_tranquila` from whatever Google Places signal is available (best-effort);
-every other leaf stays `null` until Fase B community data or manual entry fills it in.
+**Correction after further checking**: Google Places API — classic or New — has no wifi,
+power-outlet, or noise-level field for any place type (verified against the current field-data
+docs; the New API's closest fields are `restroom` and `outdoorSeating`, neither of which this
+project's scripts currently request, and neither maps to our taxonomy anyway). Seed scripts do
+**not** attempt to infer any `amenities` leaf from Google — every space's `amenities` starts
+entirely `null` (the column default) regardless of source, and stays that way until Fase B
+community data or manual entry fills it in. This keeps "never invent data" honest rather than
+disguising a guess as a real signal.
 
 ### 3.2 Workcofy Score — computed, not stored as truth
 
@@ -103,15 +108,21 @@ computes it at read time:
 export function computeWorkcofyScore(space: SpaceRecord): number | null
 ```
 
-Formula:
-- **60%** — Google rating (0-5 → 0-100) discounted by review-count confidence (a 5.0 with 2
-  reviews must not outweigh a 4.6 with 300; confidence scales toward 1 as `review_count` grows,
-  e.g. `confidence = min(1, log10(review_count + 1) / log10(50))`).
-- **40%** — average of the four `para_trabajar` amenity booleans, counting only the non-null
-  ones (never penalize unknown data).
+Formula — two components, each optional, re-weighted to whatever is actually known so a space is
+never punished for missing data it was never given the chance to have:
+
+- **Rating component** (weight 60 when both components are present): Google rating (0-5 → 0-100)
+  discounted by review-count confidence (a 5.0 with 2 reviews must not outweigh a 4.6 with 300;
+  confidence scales toward 1 as `review_count` grows, e.g.
+  `confidence = min(1, log10(review_count + 1) / log10(50))`).
+- **Amenities component** (weight 40 when both components are present): average of the four
+  `para_trabajar` amenity booleans, counting only the non-null ones.
+- If only one component has data (this is the common case at launch: Google seed scripts never
+  populate `amenities`, see the correction above — so almost every space starts with a rating
+  but zero known amenities), that component alone determines the score at its full weight — a
+  rating-only space is **not** capped near 60. If neither component has data, the function
+  returns `null` and the UI shows "Score próximamente" — never a fabricated number.
 - Manual `workcofy_score` override, if set, replaces the computed value entirely.
-- If there is **no** Google rating **and** no known `para_trabajar` amenity, the function returns
-  `null` and the UI shows "Score próximamente" — never a fabricated number.
 
 Score and Verified are independent signals by design (Score = "how good to work here",
 Verified = "Workcofy checked it") — Verified status does not feed into the Score formula, to
