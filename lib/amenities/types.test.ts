@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_AMENITIES, averageKnownAmenities } from './types'
+import { DEFAULT_AMENITIES, averageKnownAmenities, parseAmenities } from './types'
 
 describe('DEFAULT_AMENITIES', () => {
   it('has all three groups with every leaf null', () => {
@@ -30,5 +30,26 @@ describe('averageKnownAmenities', () => {
 
   it('returns 0 when every known leaf is false', () => {
     expect(averageKnownAmenities({ a: false, b: false })).toBe(0)
+  })
+})
+
+describe('parseAmenities', () => {
+  it('returns an all-null shape for an empty object (the real DB default today)', () => {
+    expect(parseAmenities({})).toEqual(DEFAULT_AMENITIES)
+  })
+
+  it('returns an all-null shape for null or undefined', () => {
+    expect(parseAmenities(null)).toEqual(DEFAULT_AMENITIES)
+    expect(parseAmenities(undefined)).toEqual(DEFAULT_AMENITIES)
+  })
+
+  it('preserves known booleans and nulls out anything missing or non-boolean', () => {
+    const raw = { para_trabajar: { wifi: true, enchufes: 'yes' }, servicios: { banos: false } }
+    const result = parseAmenities(raw)
+    expect(result.para_trabajar.wifi).toBe(true)
+    expect(result.para_trabajar.enchufes).toBeNull()
+    expect(result.para_trabajar.mesas_comodas).toBeNull()
+    expect(result.servicios.banos).toBe(false)
+    expect(result.para_llamadas).toEqual(DEFAULT_AMENITIES.para_llamadas)
   })
 })

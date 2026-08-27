@@ -1,4 +1,4 @@
-import { AMENITY_GROUP_LABELS, AMENITY_LABELS, type AmenitiesData } from './types'
+import { AMENITY_GROUP_LABELS, AMENITY_LABELS, DEFAULT_AMENITIES, type AmenitiesData } from './types'
 
 export interface AmenityEntry {
   key: string
@@ -13,10 +13,11 @@ export interface AmenityGroupEntries {
 }
 
 export function groupedAmenityEntries(amenities: AmenitiesData): AmenityGroupEntries[] {
-  return (Object.keys(amenities) as (keyof AmenitiesData)[]).map((groupKey) => ({
+  const safe = amenities ?? DEFAULT_AMENITIES
+  return (Object.keys(DEFAULT_AMENITIES) as (keyof AmenitiesData)[]).map((groupKey) => ({
     groupKey,
     groupLabel: AMENITY_GROUP_LABELS[groupKey],
-    entries: Object.entries(amenities[groupKey]).map(([key, value]) => ({
+    entries: Object.entries(safe[groupKey] ?? DEFAULT_AMENITIES[groupKey]).map(([key, value]) => ({
       key,
       label: AMENITY_LABELS[key] ?? key,
       value: value as boolean | null,

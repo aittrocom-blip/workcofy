@@ -1,4 +1,5 @@
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
+import { averageKnownAmenities } from '@/lib/amenities/types'
 
 const RATING_WEIGHT = 60
 const AMENITIES_WEIGHT = 40
@@ -17,12 +18,7 @@ function ratingComponent(rating: number, reviewCount: number): number {
 }
 
 function amenitiesComponent(space: SpaceRecord): number | null {
-  const known = Object.values(space.amenities.para_trabajar).filter(
-    (value): value is boolean => value !== null
-  )
-  if (known.length === 0) return null
-  const trueCount = known.filter(Boolean).length
-  return (trueCount / known.length) * 100
+  return averageKnownAmenities(space.amenities?.para_trabajar ?? {})
 }
 
 export function computeWorkcofyScore(space: SpaceRecord): number | null {

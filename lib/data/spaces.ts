@@ -1,8 +1,13 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { buildSpaceQueryDescriptor, type SpaceFilters } from '@/lib/data/spaceQueryBuilder'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
+import { parseAmenities } from '@/lib/amenities/types'
 
 export type { SpaceFilters }
+
+function normalizeSpace(row: Record<string, unknown>): SpaceRecord {
+  return { ...row, amenities: parseAmenities(row.amenities) } as SpaceRecord
+}
 
 export async function listSpaces(filters: SpaceFilters = {}): Promise<SpaceRecord[]> {
   const supabase = createServerSupabaseClient()
@@ -21,7 +26,7 @@ export async function listSpaces(filters: SpaceFilters = {}): Promise<SpaceRecor
 
   const { data, error } = await query.order('name', { ascending: true })
   if (error) throw new Error(`Failed to list spaces: ${error.message}`)
-  return (data ?? []) as SpaceRecord[]
+  return (data ?? []).map(normalizeSpace)
 }
 
 export async function getSpaceBySlug(slug: string): Promise<SpaceRecord | null> {
@@ -34,5 +39,5 @@ export async function getSpaceBySlug(slug: string): Promise<SpaceRecord | null> 
     .maybeSingle()
 
   if (error) throw new Error(`Failed to load space "${slug}": ${error.message}`)
-  return data as SpaceRecord | null
+  return data ? normalizeSpace(data) : null
 }

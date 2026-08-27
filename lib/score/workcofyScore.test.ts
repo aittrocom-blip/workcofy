@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { computeWorkcofyScore } from './workcofyScore'
 import { DEFAULT_AMENITIES } from '@/lib/amenities/types'
+import type { AmenitiesData } from '@/lib/amenities/types'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 
 function makeSpace(overrides: Partial<SpaceRecord>): SpaceRecord {
@@ -61,5 +62,11 @@ describe('computeWorkcofyScore', () => {
     const scoreBoth = computeWorkcofyScore(both) as number
     // All amenities false pulls the blended score down from the rating-only score.
     expect(scoreBoth).toBeLessThan(scoreRatingOnly)
+  })
+
+  it('does not throw when amenities is the raw {} shape real DB rows have before normalization', () => {
+    const space = makeSpace({ rating: 4.6, review_count: 300, amenities: {} as AmenitiesData })
+    expect(() => computeWorkcofyScore(space)).not.toThrow()
+    expect(computeWorkcofyScore(space)).not.toBeNull()
   })
 })
