@@ -63,7 +63,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
         Cómo llegar
       </a>
 
-      <WorkcofyScoreBadge score={space.workcofy_score} />
+      <WorkcofyScoreBadge space={space} />
 
       <h2 className="mt-8 text-lg font-semibold">Horario</h2>
       <ul className="mt-2 text-sm">
