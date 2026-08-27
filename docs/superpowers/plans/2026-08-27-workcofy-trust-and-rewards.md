@@ -1848,8 +1848,127 @@ git commit -m "feat: restyle hero headline with heavier weight and yellow accent
 **Note on `DiscoveryView`/`FiltersBar`:** the spec called for a "restyle
 visual" on the map+list block, but its existing black/white/rounded chip
 styling already matches this design's direction (black = primary, yellow =
-sparse accent, never a large fill) — there's no concrete change to make
-without inventing an unrequested redesign, so no task touches those files.
+sparse accent, never a large fill) — there's no concrete change to make on
+that front without inventing an unrequested redesign. Task 16 below does
+touch `DiscoveryView.tsx`, but for an unrelated reason (a new interaction,
+not a visual restyle).
+
+---
+
+### Task 16: Floating space card on marker selection
+
+**Files:**
+- Modify: `components/discovery/DiscoveryView.tsx`
+
+**Interfaces:**
+- Consumes: `SpaceCard` (Task 10) — reused as-is, no new component. `SpaceCard`
+  already renders `Abierto · <today's hours range>` or `Cerrado` (see
+  `lib/hours/openingHours.ts`'s `formatPeriodForDay`), so the closing time
+  this task's user request asked for ("indicar si está abierto... y en
+  cuánto cierran") is already produced by existing code — this task is
+  purely about *where* that card appears, not new data.
+
+Added mid-plan at the user's request, after seeing the reference screenshot
+again: when a map marker is selected, its `SpaceCard` should float over the
+map (like the reference's "Kaldis Specialty Coffee" card), not only
+highlight in the side list as it does today.
+
+**Scope decision:** anchoring the card to the marker's exact on-screen pixel
+position would require adapter-specific positioning code for both
+`GoogleMapAdapter` (Google Maps `OverlayView`) and `MockMapAdapter`
+(MapLibre marker DOM tracking) — real work, and a second implementation to
+keep in sync. Instead, the card floats at a fixed corner of the map panel
+(bottom-right on desktop) whenever a space is selected, regardless of which
+adapter is rendering. This delivers the same "click a pin, see its card
+over the map" behavior the user asked for without doubling the positioning
+logic. Desktop only (`md:` breakpoint) — on mobile the map is a short 45vh
+strip directly above the full list, so a floating card there would cover
+most of the map and duplicate the list item right below it.
+
+No test: this is a presentational/layout change to an existing component,
+consistent with the rest of `components/discovery/`, which has no test
+files today (its logic lives in tested `lib/filters/*` modules instead).
+
+- [ ] **Step 1: Add the floating card**
+
+In `components/discovery/DiscoveryView.tsx`, the map sits in this wrapper
+(existing code, near the top of the returned JSX):
+
+```tsx
+<div className="order-1 h-[45vh] md:order-2 md:h-full md:w-3/5">
+  <MapView
+    center={coordinate}
+    zoom={14}
+    markers={markers}
+    selectedMarkerId={selectedId}
+    onMarkerSelect={setSelectedId}
+    userLocation={status === 'granted' ? coordinate : null}
+  />
+</div>
+```
+
+Change it to add a `relative` wrapper and the floating card, using the
+already-computed `sorted` array to look up the selected space:
+
+```tsx
+<div className="relative order-1 h-[45vh] md:order-2 md:h-full md:w-3/5">
+  <MapView
+    center={coordinate}
+    zoom={14}
+    markers={markers}
+    selectedMarkerId={selectedId}
+    onMarkerSelect={setSelectedId}
+    userLocation={status === 'granted' ? coordinate : null}
+  />
+  {selectedSpace && (
+    <div className="pointer-events-none absolute inset-0 z-10 hidden items-end justify-end p-4 md:flex">
+      <div className="pointer-events-auto w-80">
+        <SpaceCard
+          space={selectedSpace}
+          isSelected
+          onSelect={() => {}}
+          origin={status === 'granted' ? coordinate : null}
+        />
+      </div>
+    </div>
+  )}
+</div>
+```
+
+Add the import and the lookup near the other `useMemo`s:
+
+```tsx
+import { SpaceCard } from '@/components/discovery/SpaceCard'
+```
+
+```tsx
+const selectedSpace = sorted.find((space) => space.id === selectedId) ?? null
+```
+
+(`sorted` already exists in this file — it's the `useMemo` that calls
+`sortSpaces(withDistance, filters.sort)`. Add the `selectedSpace` line right
+after it.)
+
+- [ ] **Step 2: Type-check**
+
+Run: `npx tsc --noEmit`
+Expected: no errors.
+
+- [ ] **Step 3: Manually verify in the browser**
+
+Run `npm run dev`, open `/` or `/near-me` on a desktop-width viewport, click
+a marker on the map. Confirm: the corresponding `SpaceCard` appears floating
+in the bottom-right of the map, showing the open/closed line with today's
+hours; the same card in the side list is highlighted (existing behavior,
+unchanged); clicking a different marker swaps the floating card; resizing
+to a mobile width hides the floating card (list-only, as before).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add components/discovery/DiscoveryView.tsx
+git commit -m "feat: float selected space's card over the map on marker click"
+```
 
 ## Post-plan checklist
 
