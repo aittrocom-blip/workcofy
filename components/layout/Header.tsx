@@ -46,6 +46,9 @@ export function Header() {
           <Link href="/">Explorar</Link>
           <Link href="/near-me">Cerca de mí</Link>
           <Link href="/miraflores">Distritos</Link>
+          <Link href="/#coins" className="transition-colors hover:text-black">
+            Workcofy Coins
+          </Link>
         </nav>
 
         <Link href="/near-me" className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white">
@@ -63,6 +66,13 @@ export function Header() {
           </Link>
           <Link href="/miraflores" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-2 py-2">
             Distritos
+          </Link>
+          <Link
+            href="/#coins"
+            onClick={() => setMobileMenuOpen(false)}
+            className="rounded-lg px-2 py-2.5 transition-colors hover:bg-gray-50"
+          >
+            Workcofy Coins
           </Link>
         </nav>
       )}
