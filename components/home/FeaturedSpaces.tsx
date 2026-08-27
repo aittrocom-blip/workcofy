@@ -1,3 +1,5 @@
+'use client'
+
 import { selectFeaturedSpaces } from '@/lib/discovery/selectFeaturedSpaces'
 import { SpaceCard } from '@/components/discovery/SpaceCard'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
