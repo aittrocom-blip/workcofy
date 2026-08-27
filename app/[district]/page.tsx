@@ -36,9 +36,9 @@ export default async function DistrictPage({ params, searchParams }: DistrictPag
 
   return (
     <div>
-      <section className="px-4 py-8 md:px-8">
-        <h1 className="text-2xl font-bold">Cafés Work-Friendly en {label}</h1>
-        <p className="mt-2 text-gray-600">
+      <section className="px-4 py-10 md:px-8 md:py-12">
+        <h1 className="text-3xl font-extrabold tracking-tight">Cafés Work-Friendly en {label}</h1>
+        <p className="mt-2 max-w-xl text-gray-500">
           Descubre cafés y espacios donde puedes trabajar, reunirte o pasar unas horas con tu laptop
           en {label}.
         </p>

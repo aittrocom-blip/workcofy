@@ -21,8 +21,8 @@ export default async function NearMePage({ searchParams }: NearMePageProps) {
 
   return (
     <div>
-      <section className="px-4 py-8 md:px-8">
-        <h1 className="text-2xl font-bold">Espacios cerca de ti</h1>
+      <section className="px-4 py-10 md:px-8 md:py-12">
+        <h1 className="text-3xl font-extrabold tracking-tight">Espacios cerca de ti</h1>
       </section>
       <DiscoveryView spaces={spaces} autoRequestLocation initialSort="distance" />
     </div>

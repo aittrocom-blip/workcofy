@@ -1,7 +1,12 @@
 import type { OpeningHours } from '@/lib/hours/openingHours'
 
 export interface SpacePhoto {
-  photo_reference: string
+  // Lima entries (scripts/seed-google-places.ts) store the raw Google
+  // Places photo_reference. Expansion entries (seed-google-places-expansion.ts)
+  // download the photo once and store our own Supabase Storage URL instead,
+  // since a bare photo_reference can expire and isn't directly renderable.
+  photo_reference?: string
+  url?: string
   width: number
   height: number
 }

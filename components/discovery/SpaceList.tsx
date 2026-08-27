@@ -11,14 +11,14 @@ interface SpaceListProps {
 export function SpaceList({ spaces, selectedId, onSelect, origin = null }: SpaceListProps) {
   if (spaces.length === 0) {
     return (
-      <p className="p-6 text-center text-sm text-gray-500">
+      <p className="p-8 text-center text-sm text-gray-500">
         No encontramos espacios con estos filtros. Prueba con otro distrito o búsqueda.
       </p>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-4 p-4">
       {spaces.map((space) => (
         <SpaceCard
           key={space.id}

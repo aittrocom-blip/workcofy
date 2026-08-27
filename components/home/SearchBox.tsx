@@ -14,14 +14,21 @@ export function SearchBox() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex overflow-hidden rounded-full border border-gray-300">
+    <form
+      onSubmit={handleSubmit}
+      className="flex overflow-hidden rounded-full border border-gray-200 bg-white shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-black/10"
+    >
       <input
         value={value}
         onChange={(event) => setValue(event.target.value)}
         placeholder="¿Dónde quieres trabajar?"
-        className="flex-1 px-4 py-2 text-sm outline-none"
+        aria-label="¿Dónde quieres trabajar?"
+        className="flex-1 px-5 py-3 text-sm outline-none"
       />
-      <button type="submit" className="bg-black px-5 py-2 text-sm font-medium text-white">
+      <button
+        type="submit"
+        className="bg-black px-6 py-3 text-sm font-semibold text-white transition-transform active:scale-[0.97]"
+      >
         Buscar
       </button>
     </form>

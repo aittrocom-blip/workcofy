@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed:mock": "tsx scripts/seed-mock.ts",
-    "seed:google": "tsx scripts/seed-google-places.ts"
+    "seed:google": "tsx scripts/seed-google-places.ts",
+    "seed:expansion": "tsx scripts/seed-google-places-expansion.ts"
   },
   "dependencies": {
     "next": "^14.2.5",

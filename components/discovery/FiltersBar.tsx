@@ -17,14 +17,16 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ]
 
 export function FiltersBar({ filters, onChange, onRequestLocation }: FiltersBarProps) {
+  const chipBase = 'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all'
+  const chipActive = 'bg-black text-white shadow-sm'
+  const chipInactive = 'border border-gray-200 text-gray-700 hover:border-black hover:text-black'
+
   return (
-    <div className="flex flex-col gap-3 border-b border-gray-200 p-4">
+    <div className="flex flex-col gap-3 border-b border-gray-100 p-4">
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => onChange({ category: null })}
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
-            !filters.category ? 'bg-black text-white' : 'border border-gray-300'
-          }`}
+          className={`${chipBase} ${!filters.category ? chipActive : chipInactive}`}
         >
           Todos
         </button>
@@ -33,9 +35,9 @@ export function FiltersBar({ filters, onChange, onRequestLocation }: FiltersBarP
             key={option.value}
             disabled={!option.active}
             onClick={() => option.active && onChange({ category: option.value })}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
-              filters.category === option.value ? 'bg-black text-white' : 'border border-gray-300'
-            } ${!option.active ? 'cursor-not-allowed opacity-40' : ''}`}
+            className={`${chipBase} ${
+              filters.category === option.value ? chipActive : chipInactive
+            } ${!option.active ? 'cursor-not-allowed opacity-40 hover:border-gray-200 hover:text-gray-700' : ''}`}
           >
             {option.label}
             {!option.active && ' · Próximamente'}
@@ -49,9 +51,7 @@ export function FiltersBar({ filters, onChange, onRequestLocation }: FiltersBarP
             onClick={() =>
               onChange({ district: filters.district === district.value ? null : district.value })
             }
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
-              filters.district === district.value ? 'bg-black text-white' : 'border border-gray-300'
-            }`}
+            className={`${chipBase} ${filters.district === district.value ? chipActive : chipInactive}`}
           >
             {district.label}
           </button>
@@ -65,9 +65,7 @@ export function FiltersBar({ filters, onChange, onRequestLocation }: FiltersBarP
               onChange({ sort: option.value })
               if (option.value === 'distance') onRequestLocation()
             }}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
-              filters.sort === option.value ? 'bg-black text-white' : 'border border-gray-300'
-            }`}
+            className={`${chipBase} ${filters.sort === option.value ? chipActive : chipInactive}`}
           >
             {option.label}
           </button>

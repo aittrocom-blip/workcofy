@@ -7,33 +7,30 @@ import type { MapViewProps } from '@/lib/map/types'
 
 const OSM_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 
-const SVG_NS = 'http://www.w3.org/2000/svg'
-const CUP_ICON_PATHS = [
-  'M3 8h14v5a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8Z',
-  'M17 9h1a2.5 2.5 0 0 1 0 5h-1',
-  'M6 2c0 .8-.5 1-1 1.5S4 4.5 4 5',
-  'M10 2c0 .8-.5 1-1 1.5S8 4.5 8 5',
-]
+// The official Workcofy isotype (pin + cup + wifi) doubles as the map pin
+// itself — used as-is, undistorted, instead of a synthetic marker shape.
+const MARK_SRC = '/logo-solo-alpha.png'
+const MARK_HEIGHT = 34
 
-function createCupIcon(): SVGSVGElement {
-  const svg = document.createElementNS(SVG_NS, 'svg')
-  svg.setAttribute('viewBox', '0 0 24 24')
-  svg.setAttribute('width', '14')
-  svg.setAttribute('height', '14')
-  svg.setAttribute('fill', 'none')
-  svg.setAttribute('stroke', 'white')
-  svg.setAttribute('stroke-width', '2')
-  svg.setAttribute('stroke-linecap', 'round')
-  svg.setAttribute('stroke-linejoin', 'round')
-  svg.style.transform = 'rotate(45deg)'
+function createMarkerElement(isSelected: boolean, onSelect: () => void): HTMLElement {
+  const el = document.createElement('div')
+  el.style.cursor = 'pointer'
+  el.style.transition = 'transform 0.15s ease, filter 0.15s ease'
+  el.style.transform = isSelected ? 'scale(1.18)' : 'scale(1)'
+  el.style.filter = isSelected
+    ? 'drop-shadow(0 6px 10px rgba(0,0,0,0.35))'
+    : 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))'
 
-  for (const d of CUP_ICON_PATHS) {
-    const path = document.createElementNS(SVG_NS, 'path')
-    path.setAttribute('d', d)
-    svg.appendChild(path)
-  }
+  const img = document.createElement('img')
+  img.src = MARK_SRC
+  img.alt = 'Workcofy'
+  img.style.height = `${MARK_HEIGHT}px`
+  img.style.width = 'auto'
+  img.style.display = 'block'
+  el.appendChild(img)
 
-  return svg
+  el.addEventListener('click', onSelect)
+  return el
 }
 
 export function MockMapAdapter({
@@ -72,21 +69,10 @@ export function MockMapAdapter({
     markerRefs.current.clear()
 
     markers.forEach((markerData) => {
-      const el = document.createElement('div')
-      el.style.width = '28px'
-      el.style.height = '28px'
-      el.style.borderRadius = '50% 50% 50% 0'
-      el.style.background = markerData.id === selectedMarkerId ? '#000000' : '#1a1a1a'
-      el.style.border = '2px solid white'
-      el.style.transform = 'rotate(-45deg)'
-      el.style.cursor = 'pointer'
-      el.style.display = 'flex'
-      el.style.alignItems = 'center'
-      el.style.justifyContent = 'center'
-      el.appendChild(createCupIcon())
-      el.addEventListener('click', () => onMarkerSelect(markerData.id))
+      const isSelected = markerData.id === selectedMarkerId
+      const el = createMarkerElement(isSelected, () => onMarkerSelect(markerData.id))
 
-      const marker = new maplibregl.Marker({ element: el })
+      const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat([markerData.position.lng, markerData.position.lat])
         .addTo(map)
 

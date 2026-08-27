@@ -28,18 +28,23 @@ export function GoogleMapAdapter({
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        {markers.map((marker) => (
-          <AdvancedMarker
-            key={marker.id}
-            position={marker.position}
-            onClick={() => onMarkerSelect(marker.id)}
-          >
-            <div
-              className="h-7 w-7 rounded-full border-2 border-white shadow-md"
-              style={{ background: marker.id === selectedMarkerId ? '#000000' : '#1a1a1a' }}
-            />
-          </AdvancedMarker>
-        ))}
+        {markers.map((marker) => {
+          const isSelected = marker.id === selectedMarkerId
+          return (
+            <AdvancedMarker
+              key={marker.id}
+              position={marker.position}
+              onClick={() => onMarkerSelect(marker.id)}
+            >
+              {/* The official Workcofy isotype doubles as the map pin itself. */}
+              <img
+                src="/logo-solo-alpha.png"
+                alt="Workcofy"
+                className={`h-[34px] w-auto transition-transform duration-150 ${isSelected ? 'scale-[1.18] drop-shadow-lg' : 'drop-shadow'}`}
+              />
+            </AdvancedMarker>
+          )
+        })}
       </GoogleMap>
     </APIProvider>
   )
