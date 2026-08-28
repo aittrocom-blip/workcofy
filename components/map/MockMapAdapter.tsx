@@ -13,17 +13,38 @@ const MARK_SRC = '/logo-solo-alpha.png'
 const MARK_HEIGHT = 34
 
 // Worky, the Workcofy mascot, marks the user's own position — matching
-// what GoogleMapAdapter renders so both map backends look consistent. A
-// plain blue dot blended in with the white-backed venue pins.
+// what GoogleMapAdapter renders so both map backends look consistent. The
+// yellow ping halo behind it is the same brand yellow as Verified pins,
+// radiating outward to draw the eye — a plain blue dot blended in with the
+// white-backed venue pins. z-index is kept high so Worky never ends up
+// buried under a venue pin.
 function createUserLocationElement(): HTMLElement {
+  const wrapper = document.createElement('div')
+  wrapper.style.position = 'relative'
+  wrapper.style.width = '36px'
+  wrapper.style.height = '36px'
+  wrapper.style.zIndex = '999'
+
+  const halo = document.createElement('div')
+  halo.style.position = 'absolute'
+  halo.style.inset = '0'
+  halo.style.borderRadius = '9999px'
+  halo.style.backgroundColor = '#F4B942'
+  halo.style.opacity = '0.6'
+  halo.style.animation = 'workcofy-marker-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite'
+  wrapper.appendChild(halo)
+
   const img = document.createElement('img')
   img.src = '/icons/worky-location.png'
   img.alt = 'Tu ubicación'
+  img.style.position = 'relative'
   img.style.height = '36px'
   img.style.width = '36px'
   img.style.display = 'block'
   img.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))'
-  return img
+  wrapper.appendChild(img)
+
+  return wrapper
 }
 
 function createMarkerElement(isSelected: boolean, verified: boolean, onSelect: () => void): HTMLElement {
@@ -117,9 +138,16 @@ export function MockMapAdapter({
     if (userLocationMarkerRef.current) {
       userLocationMarkerRef.current.setLngLat([userLocation.lng, userLocation.lat])
     } else {
-      userLocationMarkerRef.current = new maplibregl.Marker({ element: createUserLocationElement() })
+      const marker = new maplibregl.Marker({ element: createUserLocationElement() })
         .setLngLat([userLocation.lng, userLocation.lat])
         .addTo(map)
+      // z-index on our own element only wins against its own children — to
+      // out-rank *other* markers (whose venue pins get recreated on every
+      // filter change, and would otherwise re-append on top in DOM order),
+      // it has to go on maplibre's own wrapper, one level up.
+      const wrapperEl = marker.getElement().parentElement
+      if (wrapperEl) wrapperEl.style.zIndex = '999'
+      userLocationMarkerRef.current = marker
     }
   }, [userLocation])
 

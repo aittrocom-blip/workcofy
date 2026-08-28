@@ -1,7 +1,32 @@
 'use client'
 
-import { APIProvider, Map as GoogleMap, AdvancedMarker } from '@vis.gl/react-google-maps'
+import { useEffect, useRef } from 'react'
+import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
 import type { MapViewProps } from '@/lib/map/types'
+
+// Centers and zooms the camera on the user's position exactly once, the
+// first time a real (non-fallback) location becomes available — after
+// that the user is free to pan/zoom without the map fighting them. Must
+// live inside <GoogleMap> since useMap() needs that context.
+function CenterOnUserLocation({
+  userLocation,
+  zoom,
+}: {
+  userLocation: { lat: number; lng: number } | null
+  zoom: number
+}) {
+  const map = useMap()
+  const hasCenteredRef = useRef(false)
+
+  useEffect(() => {
+    if (!map || !userLocation || hasCenteredRef.current) return
+    map.panTo(userLocation)
+    map.setZoom(zoom)
+    hasCenteredRef.current = true
+  }, [map, userLocation, zoom])
+
+  return null
+}
 
 export function GoogleMapAdapter({
   center,
@@ -52,11 +77,25 @@ export function GoogleMapAdapter({
         })}
 
         {userLocation && (
-          <AdvancedMarker position={userLocation} zIndex={0}>
-            {/* Worky, the Workcofy mascot, marks the user's own position — a
-                plain blue dot blended in with the white-backed venue pins. */}
-            <img src="/icons/worky-location.png" alt="Tu ubicación" className="h-9 w-9 drop-shadow-md" />
-          </AdvancedMarker>
+          <>
+            <CenterOnUserLocation userLocation={userLocation} zoom={zoom} />
+            {/* zIndex kept high so Worky never ends up buried under a venue
+                pin — venue markers above have no explicit zIndex. */}
+            <AdvancedMarker position={userLocation} zIndex={999}>
+              {/* Worky, the Workcofy mascot, marks the user's own position —
+                  a plain blue dot blended in with the white-backed venue
+                  pins. The ping halo behind it is the same brand yellow as
+                  Verified pins, radiating outward to draw the eye. */}
+              <span className="relative flex h-9 w-9 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-workcofy-yellow opacity-60" />
+                <img
+                  src="/icons/worky-location.png"
+                  alt="Tu ubicación"
+                  className="relative h-9 w-9 drop-shadow-md"
+                />
+              </span>
+            </AdvancedMarker>
+          </>
         )}
       </GoogleMap>
     </APIProvider>

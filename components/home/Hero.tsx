@@ -24,18 +24,6 @@ export function Hero() {
           priority
           className="h-auto w-full"
         />
-        <div className="absolute left-8 top-8 hidden -translate-y-5 text-left md:block">
-          <p className="font-mono text-base font-semibold text-workcofy-black md:text-2xl">
-            <span className="typewriter-line-1">
-              Flexibilidad para todos<span className="typewriter-caret">_</span>
-            </span>
-          </p>
-          <p className="font-mono text-base font-semibold text-workcofy-black md:text-2xl">
-            <span className="typewriter-line-2">
-              Personas y empresas<span className="typewriter-caret">_</span>
-            </span>
-          </p>
-        </div>
       </div>
 
       <p className="mt-4 text-xs font-medium uppercase tracking-wide text-gray-400 md:text-sm">

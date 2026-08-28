@@ -73,7 +73,7 @@ function LoginForm() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="tu@correo.com"
-            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -87,7 +87,7 @@ function LoginForm() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Tu contraseña"
-            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}

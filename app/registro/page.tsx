@@ -93,7 +93,7 @@ export default function RegistroPage() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Tu nombre"
-            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -107,7 +107,7 @@ export default function RegistroPage() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="tu@correo.com"
-            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -122,7 +122,7 @@ export default function RegistroPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Mínimo 6 caracteres"
-            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -134,7 +134,7 @@ export default function RegistroPage() {
             required
             value={country}
             onChange={(event) => setCountry(event.target.value)}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           >
             <option value="" disabled>
               Selecciona tu país
@@ -157,7 +157,7 @@ export default function RegistroPage() {
             value={city}
             onChange={(event) => setCity(event.target.value)}
             placeholder="Tu ciudad"
-            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -169,7 +169,7 @@ export default function RegistroPage() {
             required
             value={acquisitionSource}
             onChange={(event) => setAcquisitionSource(event.target.value)}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-black"
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           >
             <option value="" disabled>
               Selecciona una opción

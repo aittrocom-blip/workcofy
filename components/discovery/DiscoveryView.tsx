@@ -76,6 +76,10 @@ export function DiscoveryView({
   // null, matching how `userLocation` and `origin` are already gated below.
   const hasRealLocation = status === 'granted'
 
+  // Once we have a real position, zoom in to a neighborhood-level view
+  // (roughly a 500m radius) instead of the wider city-level fallback zoom.
+  const mapZoom = hasRealLocation ? 16 : 14
+
   const withDistance = useMemo(
     () =>
       spaces.map((space) => ({
@@ -172,7 +176,7 @@ export function DiscoveryView({
         <div className="absolute inset-0">
           <MapView
             center={coordinate}
-            zoom={14}
+            zoom={mapZoom}
             markers={markers}
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
@@ -272,7 +276,7 @@ export function DiscoveryView({
         <div className="relative order-1 h-[45vh] md:order-2 md:h-full md:w-3/5">
           <MapView
             center={coordinate}
-            zoom={14}
+            zoom={mapZoom}
             markers={markers}
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
