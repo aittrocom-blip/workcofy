@@ -10,6 +10,7 @@ import { formatPriceLevel } from '@/lib/priceLevel'
 import { WorkcofyScoreBadge } from '@/components/space/WorkcofyScoreBadge'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
+import { ShareButton } from '@/components/space/ShareButton'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { SocialLinks } from '@/components/space/SocialLinks'
 import { ReviewsSection } from '@/components/space/ReviewsSection'
@@ -143,6 +144,11 @@ export default async function SpacePage({ params }: SpacePageProps) {
         <FavoriteButton
           spaceId={space.id}
           className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
+        />
+        <ShareButton
+          spaceName={space.name}
+          slug={space.slug}
+          className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
         />
         <span
           className="inline-flex cursor-not-allowed items-center rounded-full border border-dashed border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400"

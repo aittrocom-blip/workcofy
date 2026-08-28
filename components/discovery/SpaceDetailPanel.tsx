@@ -9,6 +9,7 @@ import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
+import { ShareButton } from '@/components/space/ShareButton'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
@@ -128,6 +129,11 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           <FavoriteButton
             spaceId={space.id}
             className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
+          />
+          <ShareButton
+            spaceName={space.name}
+            slug={space.slug}
+            className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
           />
           <a
             href={`/spaces/${space.slug}`}
