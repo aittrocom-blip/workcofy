@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getSpaceBySlug, incrementViewCount } from '@/lib/data/spaces'
 import { listSpaceBenefits } from '@/lib/data/benefits'
+import { listReviewsForSpace, reviewStatsFrom } from '@/lib/data/reviews'
 import { districtLabel } from '@/lib/districts'
 import { isOpenNow, formatPeriodForDay, DAY_LABELS, WEEK_DISPLAY_ORDER } from '@/lib/hours/openingHours'
 import { buildDirectionsUrl } from '@/lib/directions'
@@ -11,7 +12,7 @@ import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { SocialLinks } from '@/components/space/SocialLinks'
-import { CommunityPreview } from '@/components/space/CommunityPreview'
+import { ReviewsSection } from '@/components/space/ReviewsSection'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
@@ -45,6 +46,8 @@ export default async function SpacePage({ params }: SpacePageProps) {
   incrementViewCount(space.id, space.view_count).catch(() => {})
 
   const benefits = await listSpaceBenefits(space.id)
+  const reviews = await listReviewsForSpace(space.id)
+  const reviewStats = reviewStatsFrom(reviews)
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayIndex = now.getDay()
@@ -88,7 +91,13 @@ export default async function SpacePage({ params }: SpacePageProps) {
           <span className="inline-flex items-center gap-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icons/nav-star.png" alt="" className="h-3.5 w-3.5" />
-            {space.rating.toFixed(1)} ({space.review_count ?? 0} reseñas)
+            {space.rating.toFixed(1)} ({space.review_count ?? 0} en Google)
+          </span>
+        )}
+        {reviewStats.count > 0 && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-workcofy-yellow/15 px-2 py-0.5 text-xs font-semibold">
+            <span className="text-workcofy-yellow">Workcofy {reviewStats.average!.toFixed(1)}</span>
+            <span className="text-gray-500">({reviewStats.count})</span>
           </span>
         )}
         <span className={`inline-flex items-center gap-1 ${openNow ? 'font-semibold text-black' : 'text-gray-500'}`}>
@@ -200,7 +209,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
         </>
       )}
 
-      <CommunityPreview spaceId={space.id} />
+      <ReviewsSection spaceId={space.id} initialReviews={reviews} initialStats={reviewStats} />
     </div>
   )
 }
