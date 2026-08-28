@@ -12,7 +12,7 @@ describe('groupedAmenityEntries', () => {
   it('labels each group and each entry', () => {
     const groups = groupedAmenityEntries(DEFAULT_AMENITIES)
     expect(groups[0].groupLabel).toBe('Para trabajar')
-    expect(groups[0].entries).toContainEqual({ key: 'wifi', label: 'WiFi', value: null })
+    expect(groups[0].entries).toContainEqual({ key: 'wifi', label: 'WiFi', value: true })
   })
 
   it('carries through known values unchanged', () => {
@@ -24,9 +24,12 @@ describe('groupedAmenityEntries', () => {
     expect(groups[0].entries).toContainEqual({ key: 'wifi', label: 'WiFi', value: true })
   })
 
-  it('treats an empty object as three all-unknown groups, not an empty result', () => {
+  it('treats an empty object as three full groups (defaults filled in), not an empty result', () => {
     const groups = groupedAmenityEntries({} as AmenitiesData)
     expect(groups.map((g) => g.groupKey)).toEqual(['para_trabajar', 'para_llamadas', 'servicios'])
-    expect(groups.every((g) => g.entries.every((e) => e.value === null))).toBe(true)
+    // wifi, cafe, agua, and banos default to true (table-stakes); everything else is unknown.
+    const assumedTrue = new Set(['wifi', 'cafe', 'agua', 'banos'])
+    const otherEntries = groups.flatMap((g) => g.entries).filter((e) => !assumedTrue.has(e.key))
+    expect(otherEntries.every((e) => e.value === null)).toBe(true)
   })
 })

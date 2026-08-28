@@ -1,26 +1,17 @@
-import { listSpaces } from '@/lib/data/spaces'
 import { listCoinRules, listCoinRedemptions } from '@/lib/data/coins'
 import { anySpaceHasBenefits } from '@/lib/data/benefits'
 import { Hero } from '@/components/home/Hero'
-import { DiscoveryView } from '@/components/discovery/DiscoveryView'
-import { FeaturedSpaces } from '@/components/home/FeaturedSpaces'
+import { ExplorarSection } from '@/components/home/ExplorarSection'
+import { EquiposSection } from '@/components/home/EquiposSection'
+import { EventosSection } from '@/components/home/EventosSection'
 import { VerifiedExplainer } from '@/components/home/VerifiedExplainer'
 import { CoinsSection } from '@/components/home/CoinsSection'
 import { BenefitsTeaser } from '@/components/home/BenefitsTeaser'
 
 export const dynamic = 'force-dynamic'
 
-interface HomePageProps {
-  searchParams: { q?: string; district?: string; category?: string; sort?: string }
-}
-
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const [spaces, coinRules, coinRedemptions, hasBenefits] = await Promise.all([
-    listSpaces({
-      search: searchParams.q,
-      district: searchParams.district,
-      category: searchParams.category,
-    }),
+export default async function HomePage() {
+  const [coinRules, coinRedemptions, hasBenefits] = await Promise.all([
     listCoinRules(),
     listCoinRedemptions(),
     anySpaceHasBenefits(),
@@ -29,8 +20,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <div>
       <Hero />
-      <DiscoveryView spaces={spaces} />
-      <FeaturedSpaces spaces={spaces} />
+      <ExplorarSection />
+      <EquiposSection />
+      <EventosSection />
       <VerifiedExplainer />
       <CoinsSection rules={coinRules} redemptions={coinRedemptions} />
       {hasBenefits && <BenefitsTeaser />}

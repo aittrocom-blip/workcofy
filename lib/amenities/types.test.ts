@@ -2,15 +2,17 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_AMENITIES, averageKnownAmenities, parseAmenities } from './types'
 
 describe('DEFAULT_AMENITIES', () => {
-  it('has all three groups with every leaf null', () => {
+  it('defaults table-stakes café amenities to true and everything else to null', () => {
     expect(DEFAULT_AMENITIES.para_trabajar).toEqual({
-      wifi: null, enchufes: null, mesas_comodas: null, iluminacion: null,
+      wifi: true, wifi_rapido: null, enchufes: null, mesas_comodas: null, iluminacion: null,
+      aire_acondicionado: null,
     })
     expect(DEFAULT_AMENITIES.para_llamadas).toEqual({
       videollamadas: null, zona_tranquila: null, booth: null,
     })
     expect(DEFAULT_AMENITIES.servicios).toEqual({
-      cafe: null, agua: null, banos: null, impresiones: null, pizarra: null, sala_reuniones: null,
+      cafe: true, agua: true, banos: true, impresiones: null, pizarra: null, sala_reuniones: null,
+      proyector: null, estacionamiento: null, terraza: null, pet_friendly: null, accesibilidad: null,
     })
   })
 })
@@ -34,11 +36,11 @@ describe('averageKnownAmenities', () => {
 })
 
 describe('parseAmenities', () => {
-  it('returns an all-null shape for an empty object (the real DB default today)', () => {
+  it('returns the default shape for an empty object (the real DB default today)', () => {
     expect(parseAmenities({})).toEqual(DEFAULT_AMENITIES)
   })
 
-  it('returns an all-null shape for null or undefined', () => {
+  it('returns the default shape for null or undefined', () => {
     expect(parseAmenities(null)).toEqual(DEFAULT_AMENITIES)
     expect(parseAmenities(undefined)).toEqual(DEFAULT_AMENITIES)
   })

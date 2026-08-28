@@ -1,12 +1,4 @@
-export type CategoryValue =
-  | 'cafe'
-  | 'work_cafe'
-  | 'coworking'
-  | 'meeting_room'
-  | 'hotel'
-  | 'workshop'
-  | 'event'
-  | 'corporate'
+export type CategoryValue = 'cafe' | 'work_cafe' | 'coworking' | 'meeting_room' | 'hotel' | 'corporate'
 
 export interface CategoryOption {
   value: CategoryValue
@@ -19,9 +11,7 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'work_cafe', label: 'Work Cafés', active: true },
   { value: 'coworking', label: 'Coworking', active: false },
   { value: 'meeting_room', label: 'Salas de reunión', active: false },
-  { value: 'hotel', label: 'Hoteles', active: false },
-  { value: 'workshop', label: 'Workshops', active: false },
-  { value: 'event', label: 'Eventos', active: false },
+  { value: 'hotel', label: 'Lobby Café', active: true },
 ]
 
 export const ACTIVE_CATEGORY_VALUES: CategoryValue[] = CATEGORY_OPTIONS.filter(

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
+import { translateAuthError, NETWORK_ERROR_MESSAGE } from '@/lib/supabase/authErrors'
 
 export default function RegistroPage() {
   const [email, setEmail] = useState('')
@@ -15,19 +16,24 @@ export default function RegistroPage() {
     setStatus('loading')
     setError(null)
 
-    const supabase = createBrowserSupabaseClient()
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    })
+    try {
+      const supabase = createBrowserSupabaseClient()
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      })
 
-    if (signUpError) {
-      setError(signUpError.message)
-      setStatus('idle')
-      return
+      if (signUpError) {
+        setError(translateAuthError(signUpError))
+        return
+      }
+      setStatus('sent')
+    } catch {
+      setError(NETWORK_ERROR_MESSAGE)
+    } finally {
+      setStatus((current) => (current === 'sent' ? current : 'idle'))
     }
-    setStatus('sent')
   }
 
   if (status === 'sent') {
@@ -45,23 +51,35 @@ export default function RegistroPage() {
     <div className="mx-auto max-w-sm px-4 py-16">
       <h1 className="text-2xl font-bold tracking-tight">Crear cuenta</h1>
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Correo"
-          className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
-        />
-        <input
-          type="password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Contraseña"
-          className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
-        />
+        <div className="flex flex-col gap-1">
+          <label htmlFor="email" className="text-xs font-medium text-gray-500">
+            Correo
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="tu@correo.com"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="password" className="text-xs font-medium text-gray-500">
+            Contraseña
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Mínimo 6 caracteres"
+            className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+          />
+        </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"

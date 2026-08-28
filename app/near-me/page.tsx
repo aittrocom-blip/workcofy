@@ -9,22 +9,18 @@ export const metadata = {
 }
 
 interface NearMePageProps {
-  searchParams: { q?: string; district?: string; category?: string; sort?: string }
+  searchParams: { q?: string; country?: string; district?: string; category?: string; sort?: string }
 }
 
 export default async function NearMePage({ searchParams }: NearMePageProps) {
   const spaces = await listSpaces({
     search: searchParams.q,
+    country: searchParams.country,
     district: searchParams.district,
     category: searchParams.category,
   })
 
   return (
-    <div>
-      <section className="px-4 py-10 md:px-8 md:py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">Espacios cerca de ti</h1>
-      </section>
-      <DiscoveryView spaces={spaces} autoRequestLocation initialSort="distance" />
-    </div>
+    <DiscoveryView spaces={spaces} autoRequestLocation initialSort="distance" fullScreen />
   )
 }

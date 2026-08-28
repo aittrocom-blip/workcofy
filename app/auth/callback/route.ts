@@ -6,6 +6,13 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
 
+  // Supabase itself appends error/error_code instead of code when a
+  // confirmation link is expired or was already used — surface that on
+  // /login instead of silently redirecting home as if nothing happened.
+  if (searchParams.get('error')) {
+    return NextResponse.redirect(`${origin}/login?error=otp_expired`)
+  }
+
   if (code) {
     const cookieStore = cookies()
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -27,7 +34,10 @@ export async function GET(request: Request) {
         },
       },
     })
-    await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      return NextResponse.redirect(`${origin}/login?error=otp_expired`)
+    }
   }
 
   return NextResponse.redirect(`${origin}/`)

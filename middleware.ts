@@ -6,7 +6,9 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
-      const redirect = NextResponse.redirect(new URL('/login', request.url))
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('next', request.nextUrl.pathname)
+      const redirect = NextResponse.redirect(loginUrl)
       response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
       return redirect
     }

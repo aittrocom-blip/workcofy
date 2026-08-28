@@ -21,6 +21,16 @@ export function districtSlugFromValue(value: string): DistrictSlug | null {
   return DISTRICTS.find((d) => d.value === value)?.slug ?? null
 }
 
+// Falls back to a pretty-printed version of unlisted values (the expansion
+// districts in Chile and outside-Lima Perú aren't in DISTRICTS — that list
+// is only the 3 launch districts with dedicated routes) instead of the raw
+// snake_case slug.
 export function districtLabel(value: string): string {
-  return DISTRICTS.find((d) => d.value === value)?.label ?? value
+  const known = DISTRICTS.find((d) => d.value === value)?.label
+  if (known) return known
+  return value
+    .split('_')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }

@@ -19,6 +19,11 @@ describe('buildSpaceQueryDescriptor', () => {
     ])
   })
 
+  it('adds an eq filter for country', () => {
+    const result = buildSpaceQueryDescriptor({ country: 'cl' })
+    expect(result.eqFilters).toEqual([{ column: 'country', value: 'cl' }])
+  })
+
   it('trims and includes a search term', () => {
     expect(buildSpaceQueryDescriptor({ search: '  neira  ' }).searchTerm).toBe('neira')
   })

@@ -2,6 +2,7 @@ export interface MapMarkerData {
   id: string
   position: { lat: number; lng: number }
   label: string
+  verified: boolean
 }
 
 export interface MapViewProps {

@@ -1,8 +1,10 @@
 export interface ParaTrabajarAmenities {
   wifi: boolean | null
+  wifi_rapido: boolean | null
   enchufes: boolean | null
   mesas_comodas: boolean | null
   iluminacion: boolean | null
+  aire_acondicionado: boolean | null
   [key: string]: boolean | null
 }
 
@@ -20,6 +22,11 @@ export interface ServiciosAmenities {
   impresiones: boolean | null
   pizarra: boolean | null
   sala_reuniones: boolean | null
+  proyector: boolean | null
+  estacionamiento: boolean | null
+  terraza: boolean | null
+  pet_friendly: boolean | null
+  accesibilidad: boolean | null
   [key: string]: boolean | null
 }
 
@@ -30,18 +37,29 @@ export interface AmenitiesData {
 }
 
 export const DEFAULT_AMENITIES: AmenitiesData = {
-  para_trabajar: { wifi: null, enchufes: null, mesas_comodas: null, iluminacion: null },
+  // Every space is assumed to have basic wifi unless a space's own data
+  // explicitly says otherwise — near-universal in Lima/Santiago cafés.
+  // "Wifi rápido" is a stronger, unverified claim and stays unknown by default.
+  para_trabajar: {
+    wifi: true, wifi_rapido: null, enchufes: null, mesas_comodas: null, iluminacion: null,
+    aire_acondicionado: null,
+  },
   para_llamadas: { videollamadas: null, zona_tranquila: null, booth: null },
+  // Café, water, and a bathroom are basic table-stakes for any café — assumed
+  // true the same way wifi is, unless a space's own data says otherwise.
   servicios: {
-    cafe: null, agua: null, banos: null, impresiones: null, pizarra: null, sala_reuniones: null,
+    cafe: true, agua: true, banos: true, impresiones: null, pizarra: null, sala_reuniones: null,
+    proyector: null, estacionamiento: null, terraza: null, pet_friendly: null, accesibilidad: null,
   },
 }
 
 export const AMENITY_LABELS: Record<string, string> = {
   wifi: 'WiFi',
+  wifi_rapido: 'WiFi rápido',
   enchufes: 'Enchufes',
   mesas_comodas: 'Mesas cómodas',
   iluminacion: 'Buena iluminación',
+  aire_acondicionado: 'Aire acondicionado',
   videollamadas: 'Videollamadas',
   zona_tranquila: 'Zona tranquila',
   booth: 'Booth / espacio privado',
@@ -51,6 +69,11 @@ export const AMENITY_LABELS: Record<string, string> = {
   impresiones: 'Impresiones',
   pizarra: 'Pizarra',
   sala_reuniones: 'Sala de reuniones',
+  proyector: 'Proyector',
+  estacionamiento: 'Estacionamiento',
+  terraza: 'Terraza / aire libre',
+  pet_friendly: 'Pet friendly',
+  accesibilidad: 'Accesibilidad',
 }
 
 export const AMENITY_GROUP_LABELS: Record<keyof AmenitiesData, string> = {
@@ -72,7 +95,7 @@ export function parseAmenities(raw: unknown): AmenitiesData {
     const result = { ...defaults }
     for (const key of Object.keys(defaults) as (keyof T)[]) {
       const value = src[key as string]
-      result[key] = (typeof value === 'boolean' ? value : null) as T[keyof T]
+      result[key] = (typeof value === 'boolean' ? value : defaults[key]) as T[keyof T]
     }
     return result
   }

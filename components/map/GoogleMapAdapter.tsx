@@ -9,6 +9,7 @@ export function GoogleMapAdapter({
   markers,
   selectedMarkerId,
   onMarkerSelect,
+  userLocation,
 }: MapViewProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
 
@@ -36,15 +37,28 @@ export function GoogleMapAdapter({
               position={marker.position}
               onClick={() => onMarkerSelect(marker.id)}
             >
-              {/* The official Workcofy isotype doubles as the map pin itself. */}
-              <img
-                src="/logo-solo-alpha.png"
-                alt="Workcofy"
-                className={`h-[34px] w-auto transition-transform duration-150 ${isSelected ? 'scale-[1.18] drop-shadow-lg' : 'drop-shadow'}`}
-              />
+              {/* The official Workcofy isotype doubles as the map pin itself,
+                  backed by a colored disc: yellow for Workcofy Verified spaces,
+                  white for everything else discovered by the community. */}
+              <div
+                className={`flex items-center justify-center rounded-full p-1 shadow transition-transform duration-150 ${
+                  isSelected ? 'scale-[1.18] shadow-lg' : ''
+                } ${marker.verified ? 'bg-workcofy-yellow' : 'bg-white'}`}
+              >
+                <img src="/logo-solo-alpha.png" alt="Workcofy" className="h-[26px] w-auto" />
+              </div>
             </AdvancedMarker>
           )
         })}
+
+        {userLocation && (
+          <AdvancedMarker position={userLocation} zIndex={0}>
+            <span className="relative flex h-4 w-4">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
+              <span className="relative inline-flex h-4 w-4 rounded-full border-2 border-white bg-blue-500 shadow-md" />
+            </span>
+          </AdvancedMarker>
+        )}
       </GoogleMap>
     </APIProvider>
   )

@@ -9,7 +9,7 @@ const PLACES_TEXT_SEARCH_URL = 'https://maps.googleapis.com/maps/api/place/texts
 const PLACE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json'
 const PLACE_PHOTO_URL = 'https://maps.googleapis.com/maps/api/place/photo'
 const PHOTO_BUCKET = 'space-photos'
-const MAX_PHOTOS_PER_SPACE = 3
+const MAX_PHOTOS_PER_SPACE = 10
 
 const COUNTRY_LABEL: Record<LegacyTarget['country'], string> = { pe: 'Perú', cl: 'Chile' }
 
@@ -107,7 +107,7 @@ async function downloadPhotos(
 interface ExpansionSeedInput {
   name: string
   slug: string
-  category: 'work_cafe'
+  category: 'cafe' | 'work_cafe'
   country: LegacyTarget['country']
   district: string
   address: string | null
@@ -149,10 +149,14 @@ async function main() {
       const slug = generateSpaceSlug(target.name, `${target.country}-${target.localidad}`)
       const photos = await downloadPhotos(details.photos, apiKey, slug, supabase)
 
+      // Only the Banco Santander-branded "Work/Café" locations are the
+      // work_cafe category — every other legacy target is a regular café.
+      const category = target.name.toLowerCase().includes('santander') ? 'work_cafe' : 'cafe'
+
       resolved.push({
         name: target.name,
         slug,
-        category: 'work_cafe',
+        category,
         country: target.country,
         district: districtSlug,
         address: details.formatted_address ?? null,

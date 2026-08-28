@@ -1,3 +1,115 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MockMapAdapter's user-location marker is a raw DOM element (maplibre-gl
+   markers live outside React/Tailwind's tree), so its pulse needs a plain
+   CSS keyframe instead of Tailwind's animate-ping utility class. */
+@keyframes workcofy-user-location-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  75%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Full 15s loop: type line 1, pause, type line 2, hold, then reset. Each
+   line includes a trailing "_" character as literal text, so it appears as
+   the last "typed" character rather than a separate cursor element — the
+   underscore then blinks (via .typewriter-caret) once it's fully revealed. */
+@keyframes typing-line-1 {
+  0%,
+  3% {
+    width: 0;
+  }
+  3% {
+    animation-timing-function: steps(24, end);
+  }
+  13% {
+    width: 24ch;
+  }
+  93% {
+    width: 24ch;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes typing-line-2 {
+  0%,
+  17% {
+    width: 0;
+  }
+  17% {
+    animation-timing-function: steps(20, end);
+  }
+  28% {
+    width: 20ch;
+  }
+  93% {
+    width: 20ch;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.typewriter-line-1,
+.typewriter-line-2 {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  width: 0;
+}
+
+.typewriter-line-1 {
+  animation: typing-line-1 15s linear infinite;
+}
+
+.typewriter-line-2 {
+  animation: typing-line-2 15s linear infinite;
+}
+
+.typewriter-caret {
+  animation: caret-blink 0.8s step-end infinite;
+}

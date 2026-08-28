@@ -1,5 +1,6 @@
 import { isOpenNow } from '@/lib/hours/openingHours'
 import { getLimaNow } from '@/lib/geo/limaTime'
+import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 import type { SortOption } from '@/lib/filters/discoveryFilters'
 
@@ -16,6 +17,10 @@ export function sortSpaces(
     copy.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity))
   } else if (sort === 'rating') {
     copy.sort((a, b) => (b.rating ?? -Infinity) - (a.rating ?? -Infinity))
+  } else if (sort === 'workcofy_score') {
+    copy.sort((a, b) => (computeWorkcofyScore(b) ?? -1) - (computeWorkcofyScore(a) ?? -1))
+  } else if (sort === 'popular') {
+    copy.sort((a, b) => b.view_count - a.view_count)
   } else if (sort === 'open_now') {
     copy.sort(
       (a, b) => Number(isOpenNow(b.opening_hours, now)) - Number(isOpenNow(a.opening_hours, now))

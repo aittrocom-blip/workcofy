@@ -1,14 +1,21 @@
 import { notFound } from 'next/navigation'
-import { getSpaceBySlug } from '@/lib/data/spaces'
+import { getSpaceBySlug, incrementViewCount } from '@/lib/data/spaces'
 import { listSpaceBenefits } from '@/lib/data/benefits'
 import { districtLabel } from '@/lib/districts'
 import { isOpenNow, formatPeriodForDay, DAY_LABELS, WEEK_DISPLAY_ORDER } from '@/lib/hours/openingHours'
 import { buildDirectionsUrl } from '@/lib/directions'
 import { getLimaNow } from '@/lib/geo/limaTime'
+import { formatPriceLevel } from '@/lib/priceLevel'
 import { WorkcofyScoreBadge } from '@/components/space/WorkcofyScoreBadge'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
+import { SocialLinks } from '@/components/space/SocialLinks'
+import { CommunityPreview } from '@/components/space/CommunityPreview'
+import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
+import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
+
+export const dynamic = 'force-dynamic'
 
 interface SpacePageProps {
   params: { slug: string }
@@ -32,6 +39,10 @@ export default async function SpacePage({ params }: SpacePageProps) {
   const space = await getSpaceBySlug(params.slug)
   if (!space) notFound()
 
+  // Fire-and-forget: don't block the page render on the write, and a lost
+  // count on a rare failure is not worth a user-visible delay or error.
+  incrementViewCount(space.id, space.view_count).catch(() => {})
+
   const benefits = await listSpaceBenefits(space.id)
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
@@ -39,11 +50,12 @@ export default async function SpacePage({ params }: SpacePageProps) {
   const renderablePhotos = (space.photos ?? []).filter(
     (photo): photo is typeof photo & { url: string } => Boolean(photo.url)
   )
+  const priceLevel = formatPriceLevel(space.price_level)
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:px-8 md:py-14">
       {renderablePhotos.length > 0 ? (
-        <div className="flex gap-2 overflow-x-auto">
+        <HorizontalScroller className="gap-2">
           {renderablePhotos.map((photo, index) => (
             <img
               key={index}
@@ -52,12 +64,15 @@ export default async function SpacePage({ params }: SpacePageProps) {
               className="h-64 w-auto flex-none rounded-3xl object-cover shadow-[0_8px_24px_rgba(0,0,0,0.06)] md:h-80"
             />
           ))}
-        </div>
+        </HorizontalScroller>
       ) : (
         <div className="h-64 w-full rounded-3xl bg-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.06)] md:h-80" />
       )}
 
-      <div className="mt-5 flex flex-wrap items-center gap-2">
+      <div className="mt-5">
+        <VisitorAvatarsStrip spaceId={space.id} />
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <h1 className="text-3xl font-extrabold tracking-tight">{space.name}</h1>
         {space.verified && <VerifiedBadge />}
       </div>
@@ -69,12 +84,26 @@ export default async function SpacePage({ params }: SpacePageProps) {
       )}
       <div className="mt-3 flex items-center gap-3 text-sm">
         {space.rating != null && (
-          <span>
-            ★ {space.rating.toFixed(1)} ({space.review_count ?? 0} reseñas)
+          <span className="inline-flex items-center gap-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/nav-star.png" alt="" className="h-3.5 w-3.5" />
+            {space.rating.toFixed(1)} ({space.review_count ?? 0} reseñas)
           </span>
         )}
-        <span className={openNow ? 'font-semibold text-black' : 'text-gray-500'}>
+        <span className={`inline-flex items-center gap-1 ${openNow ? 'font-semibold text-black' : 'text-gray-500'}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={openNow ? '/icons/status-abierto.png' : '/icons/status-cerrado.png'}
+            alt=""
+            className="h-4 w-auto"
+          />
           {openNow ? 'Abierto ahora' : 'Cerrado'}
+        </span>
+        {priceLevel && <span className="text-gray-500">{priceLevel}</span>}
+        <span className="inline-flex items-center gap-1 text-gray-400">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-eye.png" alt="" className="h-3.5 w-3.5 opacity-60" />
+          {space.view_count + 1}
         </span>
       </div>
       {space.address && <p className="mt-2 text-sm text-gray-600">{space.address}</p>}
@@ -90,26 +119,29 @@ export default async function SpacePage({ params }: SpacePageProps) {
             Sitio web
           </a>
         )}
-        {space.instagram_url && (
-          <a href={space.instagram_url} target="_blank" rel="noreferrer" className="hover:text-black">
-            Instagram
-          </a>
-        )}
       </div>
 
-      <a
-        href={buildDirectionsUrl(space)}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-5 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
-      >
-        Cómo llegar
-      </a>
+      <div className="mt-5 flex flex-wrap gap-2">
+        <a
+          href={buildDirectionsUrl(space)}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+        >
+          Cómo llegar
+        </a>
+        <span
+          className="inline-flex cursor-not-allowed items-center rounded-full border border-dashed border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400"
+          title="Reserva de asiento o espacio — todavía no disponible"
+        >
+          Reservar · Próximamente
+        </span>
+      </div>
 
       <WorkcofyScoreBadge space={space} />
 
       {space.verified && space.verified_amenities.length > 0 && (
-        <div className="mt-6 rounded-2xl border border-workcofy-yellow/40 bg-workcofy-yellow/10 p-5">
+        <div className="mt-6 rounded-2xl border border-workcofy-green/40 bg-workcofy-green/10 p-5">
           <h2 className="text-sm font-semibold tracking-tight">Workcofy comprobó este espacio</h2>
           <ul className="mt-2 flex flex-col gap-1 text-sm">
             {space.verified_amenities.map((key) => (
@@ -142,7 +174,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
           <li
             key={dayIndex}
             className={`flex justify-between border-b border-gray-100 px-4 py-2.5 last:border-b-0 ${
-              dayIndex === todayIndex ? 'bg-gray-50 font-semibold' : ''
+              dayIndex === todayIndex ? 'bg-black font-semibold text-white' : ''
             }`}
           >
             <span>
@@ -153,6 +185,17 @@ export default async function SpacePage({ params }: SpacePageProps) {
           </li>
         ))}
       </ul>
+
+      {(space.instagram_url || space.tiktok_url) && (
+        <>
+          <h2 className="mt-10 text-xl font-bold tracking-tight">Redes sociales</h2>
+          <div className="mt-3">
+            <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
+          </div>
+        </>
+      )}
+
+      <CommunityPreview spaceId={space.id} />
     </div>
   )
 }

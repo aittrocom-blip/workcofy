@@ -1,75 +1,189 @@
 'use client'
 
+import { useState, type FormEvent } from 'react'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
-import { DISTRICTS } from '@/lib/districts'
-import type { DiscoveryFilterState, SortOption } from '@/lib/filters/discoveryFilters'
+import { COUNTRY_OPTIONS } from '@/lib/countries'
+import { CategoryIcon } from '@/components/discovery/CategoryIcon'
+import { FiltersPanel } from '@/components/discovery/FiltersPanel'
+import { SortDropdown } from '@/components/discovery/SortDropdown'
+import type { DiscoveryFilterState } from '@/lib/filters/discoveryFilters'
 
 interface FiltersBarProps {
   filters: DiscoveryFilterState
   onChange: (partial: Partial<DiscoveryFilterState>) => void
   onRequestLocation: () => void
+  resultCount: number
+  /** Districts available in the currently selected country — empty until one is chosen. */
+  availableDistricts: { value: string; label: string }[]
+  /** True on a dedicated district route (/[district]), which is already locked to one zone. */
+  hideLocationFilters?: boolean
+  /** Renders as a floating card over the full-screen map instead of a full-width top bar. */
+  floating?: boolean
+  /** True on the full-screen map, where browsing is location-driven and typed search is redundant. */
+  hideSearch?: boolean
 }
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'distance', label: 'Más cerca' },
-  { value: 'rating', label: 'Mejor valorados' },
-  { value: 'open_now', label: 'Abierto ahora' },
-]
+const TILE_ACTIVE = CATEGORY_OPTIONS.filter((option) => option.active)
+const TILE_MORE = CATEGORY_OPTIONS.filter((option) => !option.active)
 
-export function FiltersBar({ filters, onChange, onRequestLocation }: FiltersBarProps) {
-  const chipBase = 'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all'
+export function FiltersBar({
+  filters,
+  onChange,
+  onRequestLocation,
+  resultCount,
+  availableDistricts,
+  hideLocationFilters = false,
+  floating = false,
+  hideSearch = false,
+}: FiltersBarProps) {
+  const [searchValue, setSearchValue] = useState(filters.search ?? '')
+
+  function submitSearch(event: FormEvent) {
+    event.preventDefault()
+    const trimmed = searchValue.trim()
+    onChange({ search: trimmed || null })
+  }
+
+  const chipBase = 'flex-none rounded-full px-3.5 py-2.5 text-xs font-semibold whitespace-nowrap transition-all'
   const chipActive = 'bg-black text-white shadow-sm'
   const chipInactive = 'border border-gray-200 text-gray-700 hover:border-black hover:text-black'
 
   return (
-    <div className="flex flex-col gap-3 border-b border-gray-100 p-4">
-      <div className="flex flex-wrap gap-2">
+    <div
+      className={
+        floating
+          ? 'rounded-2xl border border-gray-100 bg-white/95 px-3 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.16)] backdrop-blur-sm'
+          : 'border-b border-gray-100 bg-white px-4 py-3 md:px-8'
+      }
+    >
+      {/* Piso 1 — buscar, explorar cerca, filtrar, ordenar */}
+      <div className="flex flex-wrap items-center gap-2">
+        {!hideSearch && (
+          <form onSubmit={submitSearch} className="min-w-0 flex-1 basis-full sm:min-w-[220px] sm:basis-auto">
+            <div className="flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 transition-colors focus-within:border-black">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/nav-search.png" alt="" className="h-4 w-4 flex-none opacity-50" />
+              <input
+                value={searchValue}
+                onChange={(event) => setSearchValue(event.target.value)}
+                placeholder="¿Dónde quieres trabajar?"
+                aria-label="¿Dónde quieres trabajar?"
+                className="min-w-0 flex-1 text-sm font-medium outline-none placeholder:font-semibold placeholder:text-black"
+              />
+            </div>
+          </form>
+        )}
+
         <button
-          onClick={() => onChange({ category: null })}
-          className={`${chipBase} ${!filters.category ? chipActive : chipInactive}`}
+          type="button"
+          onClick={onRequestLocation}
+          className={`${chipBase} flex items-center gap-1.5 ${chipInactive}`}
         >
-          Todos
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-3.5" />
+          Cerca de mí
         </button>
-        {CATEGORY_OPTIONS.map((option) => (
-          <button
-            key={option.value}
-            disabled={!option.active}
-            onClick={() => option.active && onChange({ category: option.value })}
-            className={`${chipBase} ${
-              filters.category === option.value ? chipActive : chipInactive
-            } ${!option.active ? 'cursor-not-allowed opacity-40 hover:border-gray-200 hover:text-gray-700' : ''}`}
-          >
-            {option.label}
-            {!option.active && ' · Próximamente'}
-          </button>
-        ))}
+
+        <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />
+
+        <span className="mx-0.5 hidden h-6 w-px flex-none self-center bg-gray-200 sm:block" />
+
+        <button
+          type="button"
+          onClick={() => onChange({ openNow: !filters.openNow })}
+          className={`${chipBase} flex items-center gap-1.5 ${filters.openNow ? chipActive : chipInactive}`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${filters.openNow ? 'bg-workcofy-yellow' : 'bg-green-500'}`} />
+          Abierto ahora
+        </button>
+
+        <SortDropdown value={filters.sort} onChange={(sort) => onChange({ sort })} />
       </div>
-      <div className="flex flex-wrap gap-2">
-        {DISTRICTS.map((district) => (
+
+      {/* Piso 2 — categorías y zonas populares */}
+      <div className="mt-2.5 flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap gap-1.5">
           <button
-            key={district.value}
-            onClick={() =>
-              onChange({ district: filters.district === district.value ? null : district.value })
-            }
-            className={`${chipBase} ${filters.district === district.value ? chipActive : chipInactive}`}
+            onClick={() => onChange({ category: null })}
+            className={`flex flex-none flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+              !filters.category ? chipActive : chipInactive
+            }`}
           >
-            {district.label}
+            <CategoryIcon name="todos" className={`h-4 w-4 ${!filters.category ? 'invert' : ''}`} />
+            Todos
           </button>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {SORT_OPTIONS.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => {
-              onChange({ sort: option.value })
-              if (option.value === 'distance') onRequestLocation()
-            }}
-            className={`${chipBase} ${filters.sort === option.value ? chipActive : chipInactive}`}
-          >
-            {option.label}
-          </button>
-        ))}
+          {TILE_ACTIVE.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onChange({ category: option.value })}
+              className={`flex flex-none flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+                filters.category === option.value ? chipActive : chipInactive
+              }`}
+            >
+              <CategoryIcon
+                name={option.value}
+                className={`h-4 w-4 ${filters.category === option.value ? 'invert' : ''}`}
+              />
+              {option.label}
+            </button>
+          ))}
+          {TILE_MORE.map((option) => (
+            <div
+              key={option.value}
+              title="Próximamente"
+              className="flex flex-none cursor-not-allowed flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold text-gray-300"
+            >
+              <CategoryIcon name={option.value} className="h-4 w-4 opacity-40" />
+              {option.label}
+            </div>
+          ))}
+        </div>
+
+        {!hideLocationFilters && (
+          <>
+            <div className="flex flex-wrap gap-1.5">
+              {COUNTRY_OPTIONS.map((country) => (
+                <button
+                  key={country.value}
+                  onClick={() =>
+                    onChange({ country: filters.country === country.value ? null : country.value })
+                  }
+                  className={`${chipBase} flex items-center gap-1 ${
+                    filters.country === country.value ? chipActive : chipInactive
+                  }`}
+                >
+                  <span aria-hidden="true">{country.flag}</span>
+                  {country.label}
+                </button>
+              ))}
+            </div>
+
+            {filters.country && availableDistricts.length > 0 && (
+              <>
+                <span className="hidden text-xs font-medium text-gray-400 sm:inline">
+                  Zonas populares:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {availableDistricts.map((district) => (
+                    <button
+                      key={district.value}
+                      onClick={() =>
+                        onChange({
+                          district: filters.district === district.value ? null : district.value,
+                        })
+                      }
+                      className={`${chipBase} ${
+                        filters.district === district.value ? chipActive : chipInactive
+                      }`}
+                    >
+                      {district.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

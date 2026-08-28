@@ -17,6 +17,7 @@ export interface SpaceRecord {
   name: string
   slug: string
   category: string
+  country: string
   district: string
   address: string | null
   latitude: number | null
@@ -26,6 +27,7 @@ export interface SpaceRecord {
   phone: string | null
   website: string | null
   instagram_url: string | null
+  tiktok_url: string | null
   rating: number | null
   review_count: number | null
   price_level: number | null
@@ -45,6 +47,7 @@ export interface SpaceRecord {
   /** Provenance of this row: fabricated dev fixtures vs. real Google Places data. */
   data_source: 'mock' | 'google'
   active: boolean
+  view_count: number
 }
 
 export type SpaceWithDistance = SpaceRecord & { distanceKm: number | null }

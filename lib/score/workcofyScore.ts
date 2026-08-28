@@ -18,7 +18,11 @@ function ratingComponent(rating: number, reviewCount: number): number {
 }
 
 function amenitiesComponent(space: SpaceRecord): number | null {
-  return averageKnownAmenities(space.amenities?.para_trabajar ?? {})
+  // wifi now defaults to true for every space (see DEFAULT_AMENITIES) — a
+  // constant assumption, not a differentiating signal, so it's excluded here
+  // to keep the score reflecting genuinely known/verified amenities.
+  const { wifi: _wifi, ...rest } = space.amenities?.para_trabajar ?? {}
+  return averageKnownAmenities(rest)
 }
 
 export function computeWorkcofyScore(space: SpaceRecord): number | null {
