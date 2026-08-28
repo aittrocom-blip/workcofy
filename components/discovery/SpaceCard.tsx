@@ -11,6 +11,7 @@ import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { CategoryIcon } from '@/components/discovery/CategoryIcon'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
+import { FavoriteButton } from '@/components/space/FavoriteButton'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 interface SpaceCardProps {
@@ -50,6 +51,10 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
           <CategoryIcon name={space.category} className="h-3.5 w-3.5" />
           {categoryLabel}
         </div>
+        <FavoriteButton
+          spaceId={space.id}
+          className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm transition-colors"
+        />
       </div>
       <h3 className="mt-3 font-semibold tracking-tight">{space.name}</h3>
       <p className="text-sm text-gray-500">{districtLabel(space.district)}</p>

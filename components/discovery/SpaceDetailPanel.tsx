@@ -8,6 +8,7 @@ import { formatDistanceKm } from '@/lib/geo/haversine'
 import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
+import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
@@ -115,7 +116,7 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           )}
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <a
             href={buildDirectionsUrl(space, origin)}
             target="_blank"
@@ -124,6 +125,10 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           >
             Cómo llegar
           </a>
+          <FavoriteButton
+            spaceId={space.id}
+            className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
+          />
           <a
             href={`/spaces/${space.slug}`}
             className="inline-block rounded-full border border-gray-200 px-5 py-2.5 text-sm font-semibold transition-colors hover:border-black"

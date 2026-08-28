@@ -30,6 +30,14 @@ export async function listSpaces(filters: SpaceFilters = {}): Promise<SpaceRecor
   return (data ?? []).map(normalizeSpace)
 }
 
+export async function getSpacesByIds(ids: string[]): Promise<SpaceRecord[]> {
+  if (ids.length === 0) return []
+  const supabase = createServerSupabaseClient()
+  const { data, error } = await supabase.from('spaces').select('*').in('id', ids).eq('active', true)
+  if (error) throw new Error(`Failed to load spaces by id: ${error.message}`)
+  return (data ?? []).map(normalizeSpace)
+}
+
 export async function getSpaceBySlug(slug: string): Promise<SpaceRecord | null> {
   const supabase = createServerSupabaseClient()
   const { data, error } = await supabase

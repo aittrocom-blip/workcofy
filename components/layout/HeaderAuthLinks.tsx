@@ -45,6 +45,16 @@ export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
   if (user) {
     return (
       <div className={isDesktop ? 'hidden items-center gap-3 sm:flex' : 'flex flex-col gap-1'}>
+        <Link
+          href="/favoritos"
+          className={
+            isDesktop
+              ? 'text-sm font-semibold text-gray-500 hover:text-black'
+              : 'rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50'
+          }
+        >
+          Favoritos
+        </Link>
         <span className={isDesktop ? 'text-sm text-gray-600' : 'px-2 py-2 text-sm text-gray-600'}>
           {user.email}
         </span>

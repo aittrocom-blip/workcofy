@@ -4,6 +4,7 @@ import { formatDistanceKm } from '@/lib/geo/haversine'
 import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
+import { FavoriteButton } from '@/components/space/FavoriteButton'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 interface CompactSpaceRowProps {
@@ -21,13 +22,20 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
   const coverPhoto = space.photos?.find((photo) => photo.url)
 
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`flex w-full items-center gap-3 rounded-xl border p-2 text-left transition-colors ${
+    <div
+      className={`relative flex w-full items-center gap-3 rounded-xl border p-2 text-left transition-colors ${
         isSelected ? 'border-black bg-gray-50' : 'border-transparent hover:bg-gray-50'
       }`}
     >
+      {/* Covers the whole row for the select click — sits behind the
+          FavoriteButton below since that one is `relative` and comes
+          later in the DOM, which is what puts it on top. */}
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-label={`Ver ${space.name}`}
+        className="absolute inset-0 rounded-xl"
+      />
       <div className="relative h-14 w-14 flex-none overflow-hidden rounded-lg bg-gray-100">
         {coverPhoto && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -56,6 +64,10 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
           {priceLevel && <span>{priceLevel}</span>}
         </div>
       </div>
-    </button>
+      <FavoriteButton
+        spaceId={space.id}
+        className="relative flex h-8 w-8 flex-none items-center justify-center rounded-full p-1.5 hover:bg-gray-100"
+      />
+    </div>
   )
 }

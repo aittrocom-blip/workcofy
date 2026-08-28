@@ -8,6 +8,7 @@ import { getLimaNow } from '@/lib/geo/limaTime'
 import { formatPriceLevel } from '@/lib/priceLevel'
 import { WorkcofyScoreBadge } from '@/components/space/WorkcofyScoreBadge'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
+import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { SocialLinks } from '@/components/space/SocialLinks'
 import { CommunityPreview } from '@/components/space/CommunityPreview'
@@ -121,7 +122,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
         )}
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <a
           href={buildDirectionsUrl(space)}
           target="_blank"
@@ -130,6 +131,10 @@ export default async function SpacePage({ params }: SpacePageProps) {
         >
           Cómo llegar
         </a>
+        <FavoriteButton
+          spaceId={space.id}
+          className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
+        />
         <span
           className="inline-flex cursor-not-allowed items-center rounded-full border border-dashed border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400"
           title="Reserva de asiento o espacio — todavía no disponible"
