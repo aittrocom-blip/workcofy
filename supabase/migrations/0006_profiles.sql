@@ -14,16 +14,18 @@ alter table profiles enable row level security;
 drop policy if exists "Users can read their own profile" on profiles;
 create policy "Users can read their own profile"
   on profiles for select
+  to authenticated
   using (auth.uid() = id);
 
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.profiles (id, email)
-  values (new.id, new.email);
+  values (new.id, coalesce(new.email, ''))
+  on conflict (id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = '';
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created

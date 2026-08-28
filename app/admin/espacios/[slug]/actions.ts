@@ -20,8 +20,7 @@ async function requireAdmin() {
         return cookieStore.getAll()
       },
       setAll() {
-        // Server Actions can't set cookies on an already-sent response;
-        // the middleware already refreshes the session on navigation.
+        // Nothing here needs to write cookies — middleware.ts owns session refresh on navigation.
       },
     },
   })

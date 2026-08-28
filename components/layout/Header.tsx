@@ -59,13 +59,15 @@ export function Header() {
           </Link>
         </nav>
 
-        <Link
-          href="/near-me"
-          className="rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
-        >
-          Usar mi ubicación
-        </Link>
-        <HeaderAuthLinks />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/near-me"
+            className="rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+          >
+            Usar mi ubicación
+          </Link>
+          <HeaderAuthLinks />
+        </div>
       </div>
 
       {mobileMenuOpen && (
@@ -98,6 +100,9 @@ export function Header() {
           >
             Workcofy Coins
           </Link>
+          <div className="mt-1 border-t border-gray-100 pt-1">
+            <HeaderAuthLinks variant="mobile" />
+          </div>
         </nav>
       )}
     </header>

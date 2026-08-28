@@ -6,7 +6,9 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const redirect = NextResponse.redirect(new URL('/login', request.url))
+      response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+      return redirect
     }
     const { data: profile } = await supabase
       .from('profiles')
@@ -14,7 +16,9 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
     if (!profile?.is_admin) {
-      return NextResponse.redirect(new URL('/', request.url))
+      const redirect = NextResponse.redirect(new URL('/', request.url))
+      response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+      return redirect
     }
   }
 

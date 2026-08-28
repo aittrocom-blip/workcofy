@@ -6,7 +6,11 @@ import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 
-export function HeaderAuthLinks() {
+interface HeaderAuthLinksProps {
+  variant?: 'desktop' | 'mobile'
+}
+
+export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loaded, setLoaded] = useState(false)
@@ -25,6 +29,12 @@ export function HeaderAuthLinks() {
     return () => subscription.unsubscribe()
   }, [])
 
+  const isDesktop = variant === 'desktop'
+
+  if (!loaded) {
+    return isDesktop ? <div className="hidden h-9 w-32 sm:block" /> : null
+  }
+
   async function handleSignOut() {
     const supabase = createBrowserSupabaseClient()
     await supabase.auth.signOut()
@@ -32,17 +42,20 @@ export function HeaderAuthLinks() {
     router.refresh()
   }
 
-  // Avoid a flash of the wrong state before the client resolves the session.
-  if (!loaded) return <div className="hidden h-9 w-32 sm:block" />
-
   if (user) {
     return (
-      <div className="hidden items-center gap-3 sm:flex">
-        <span className="text-sm text-gray-600">{user.email}</span>
+      <div className={isDesktop ? 'hidden items-center gap-3 sm:flex' : 'flex flex-col gap-1'}>
+        <span className={isDesktop ? 'text-sm text-gray-600' : 'px-2 py-2 text-sm text-gray-600'}>
+          {user.email}
+        </span>
         <button
           type="button"
           onClick={handleSignOut}
-          className="text-sm font-semibold text-gray-500 hover:text-black"
+          className={
+            isDesktop
+              ? 'text-sm font-semibold text-gray-500 hover:text-black'
+              : 'rounded-lg px-2 py-2.5 text-left text-sm font-semibold text-gray-500 hover:bg-gray-50 hover:text-black'
+          }
         >
           Cerrar sesión
         </button>
@@ -51,16 +64,27 @@ export function HeaderAuthLinks() {
   }
 
   return (
-    <>
-      <Link href="/login" className="hidden px-2 text-sm font-semibold text-gray-500 hover:text-black sm:inline-flex">
+    <div className={isDesktop ? 'contents' : 'flex flex-col gap-1'}>
+      <Link
+        href="/login"
+        className={
+          isDesktop
+            ? 'hidden px-2 text-sm font-semibold text-gray-500 hover:text-black sm:inline-flex sm:items-center'
+            : 'rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50'
+        }
+      >
         Ingresa
       </Link>
       <Link
         href="/registro"
-        className="hidden items-center rounded-full border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-black hover:text-black sm:inline-flex"
+        className={
+          isDesktop
+            ? 'hidden items-center rounded-full border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-black hover:text-black sm:inline-flex'
+            : 'rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50'
+        }
       >
         Regístrate
       </Link>
-    </>
+    </div>
   )
 }
