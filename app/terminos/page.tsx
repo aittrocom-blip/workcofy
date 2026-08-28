@@ -1,3 +1,7 @@
+export const metadata = {
+  title: 'Términos y Condiciones | Workcofy',
+}
+
 export default function TerminosPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">

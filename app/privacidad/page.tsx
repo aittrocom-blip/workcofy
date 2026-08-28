@@ -1,3 +1,7 @@
+export const metadata = {
+  title: 'Política de Privacidad | Workcofy',
+}
+
 export default function PrivacidadPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">

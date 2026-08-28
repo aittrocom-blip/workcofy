@@ -6,6 +6,10 @@
 export const ALL_COUNTRIES: { value: string; label: string }[] = [
   { value: 'af', label: 'Afganistán' },
   { value: 'za', label: 'Sudáfrica' },
+  { value: 'ag', label: 'Antigua y Barbuda' },
+  { value: 'mh', label: 'Islas Marshall' },
+  { value: 'sd', label: 'Sudán' },
+  { value: 'ss', label: 'Sudán del Sur' },
   { value: 'al', label: 'Albania' },
   { value: 'de', label: 'Alemania' },
   { value: 'ad', label: 'Andorra' },

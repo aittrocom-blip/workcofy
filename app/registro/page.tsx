@@ -191,7 +191,12 @@ export default function RegistroPage() {
           />
           <span>
             Acepto los{' '}
-            <Link href="/terminos" target="_blank" className="font-semibold text-black hover:underline">
+            <Link
+              href="/terminos"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-black hover:underline"
+            >
               Términos y Condiciones
             </Link>
           </span>

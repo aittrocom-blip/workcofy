@@ -8,6 +8,15 @@ alter table profiles add column if not exists terms_accepted boolean not null de
 alter table profiles add column if not exists terms_version text;
 alter table profiles add column if not exists terms_accepted_at timestamptz;
 
+alter table profiles add constraint profiles_country_iso
+  check (country is null or country ~ '^[a-z]{2}$');
+alter table profiles add constraint profiles_text_len
+  check (
+    length(coalesce(name, '')) <= 120
+    and length(coalesce(city, '')) <= 120
+    and length(coalesce(acquisition_source, '')) <= 40
+  );
+
 -- Reads the extra fields signUp()'s options.data attaches to auth.users as
 -- raw_user_meta_data — the client never gets a session until email
 -- confirmation, so this trigger (not a client-side update) is the only way
@@ -29,7 +38,7 @@ begin
     coalesce((new.raw_user_meta_data->>'marketing_consent')::boolean, false),
     case when (new.raw_user_meta_data->>'marketing_consent')::boolean then now() else null end,
     coalesce((new.raw_user_meta_data->>'terms_accepted')::boolean, false),
-    new.raw_user_meta_data->>'terms_version',
+    case when (new.raw_user_meta_data->>'terms_accepted')::boolean then 'v1' else null end,
     case when (new.raw_user_meta_data->>'terms_accepted')::boolean then now() else null end
   )
   on conflict (id) do nothing;
