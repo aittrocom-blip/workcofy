@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { HeaderAuthLinks } from '@/components/layout/HeaderAuthLinks'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -64,6 +65,7 @@ export function Header() {
         >
           Usar mi ubicación
         </Link>
+        <HeaderAuthLinks />
       </div>
 
       {mobileMenuOpen && (
