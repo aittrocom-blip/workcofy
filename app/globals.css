@@ -26,21 +26,6 @@
   }
 }
 
-/* MockMapAdapter's user-location marker is a raw DOM element (maplibre-gl
-   markers live outside React/Tailwind's tree), so its pulse needs a plain
-   CSS keyframe instead of Tailwind's animate-ping utility class. */
-@keyframes workcofy-user-location-ping {
-  0% {
-    transform: scale(1);
-    opacity: 0.75;
-  }
-  75%,
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
 /* Full 15s loop: type line 1, pause, type line 2, hold, then reset. Each
    line includes a trailing "_" character as literal text, so it appears as
    the last "typed" character rather than a separate cursor element — the

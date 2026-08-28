@@ -53,10 +53,9 @@ export function GoogleMapAdapter({
 
         {userLocation && (
           <AdvancedMarker position={userLocation} zIndex={0}>
-            <span className="relative flex h-4 w-4">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
-              <span className="relative inline-flex h-4 w-4 rounded-full border-2 border-white bg-blue-500 shadow-md" />
-            </span>
+            {/* Worky, the Workcofy mascot, marks the user's own position — a
+                plain blue dot blended in with the white-backed venue pins. */}
+            <img src="/icons/worky-location.png" alt="Tu ubicación" className="h-9 w-9 drop-shadow-md" />
           </AdvancedMarker>
         )}
       </GoogleMap>

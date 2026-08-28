@@ -12,33 +12,18 @@ const OSM_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const MARK_SRC = '/logo-solo-alpha.png'
 const MARK_HEIGHT = 34
 
-// The classic "you are here" blue dot with a pulsing halo, matching what
-// GoogleMapAdapter renders so both map backends look consistent.
+// Worky, the Workcofy mascot, marks the user's own position — matching
+// what GoogleMapAdapter renders so both map backends look consistent. A
+// plain blue dot blended in with the white-backed venue pins.
 function createUserLocationElement(): HTMLElement {
-  const el = document.createElement('div')
-  el.style.position = 'relative'
-  el.style.width = '16px'
-  el.style.height = '16px'
-
-  const halo = document.createElement('div')
-  halo.style.position = 'absolute'
-  halo.style.inset = '0'
-  halo.style.borderRadius = '9999px'
-  halo.style.backgroundColor = '#60a5fa'
-  halo.style.opacity = '0.75'
-  halo.style.animation = 'workcofy-user-location-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite'
-  el.appendChild(halo)
-
-  const dot = document.createElement('div')
-  dot.style.position = 'absolute'
-  dot.style.inset = '0'
-  dot.style.borderRadius = '9999px'
-  dot.style.backgroundColor = '#3b82f6'
-  dot.style.border = '2px solid white'
-  dot.style.boxShadow = '0 2px 4px rgba(0,0,0,0.25)'
-  el.appendChild(dot)
-
-  return el
+  const img = document.createElement('img')
+  img.src = '/icons/worky-location.png'
+  img.alt = 'Tu ubicación'
+  img.style.height = '36px'
+  img.style.width = '36px'
+  img.style.display = 'block'
+  img.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))'
+  return img
 }
 
 function createMarkerElement(isSelected: boolean, verified: boolean, onSelect: () => void): HTMLElement {
