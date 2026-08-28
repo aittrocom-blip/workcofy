@@ -1,0 +1,65 @@
+<!--
+  Supabase "Confirm signup" email template — Workcofy branding.
+
+  Where to paste this:
+  Supabase Dashboard → your project → Authentication → Email Templates →
+  "Confirm signup" tab → replace the "Message body" field with everything
+  below, then also set the "Subject heading" field to:
+
+    Confirma tu cuenta de Workcofy
+
+  Supabase's template variables used here: {{ .ConfirmationURL }} (required —
+  this is the actual link, already pointed at /auth/callback because that's
+  what emailRedirectTo passes when app/registro/page.tsx calls signUp()).
+  Do not remove or rename that variable — the confirmation link breaks
+  without it.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:40px 0;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+        <tr>
+          <td style="background-color:#0a0a0a;padding:28px 32px;">
+            <span style="color:#F4B942;font-size:20px;font-weight:800;letter-spacing:-0.02em;">Workcofy</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px 32px 8px 32px;">
+            <h1 style="margin:0;font-size:22px;font-weight:800;color:#0a0a0a;letter-spacing:-0.01em;">
+              Confirma tu cuenta
+            </h1>
+            <p style="margin:12px 0 0 0;font-size:15px;line-height:1.5;color:#4b5563;">
+              Gracias por registrarte en Workcofy. Confirma tu correo para activar tu cuenta y empezar a buscar espacios para trabajar cerca de ti.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 32px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-radius:9999px;background-color:#0a0a0a;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:9999px;">
+                    Confirmar mi correo
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 32px 32px 32px;">
+            <p style="margin:0;font-size:13px;line-height:1.5;color:#9ca3af;">
+              Si no creaste esta cuenta, puedes ignorar este correo. Este link expira por seguridad — si ya venció, puedes pedir uno nuevo intentando ingresar de nuevo en Workcofy.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 32px;border-top:1px solid #f0f0f0;">
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Workcofy — encuentra espacios para trabajar en Lima y Chile.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
