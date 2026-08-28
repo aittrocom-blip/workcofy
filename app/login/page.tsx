@@ -100,6 +100,11 @@ function LoginForm() {
         </button>
       </form>
       <p className="mt-4 text-sm text-gray-500">
+        <Link href="/recuperar" className="font-semibold text-black hover:underline">
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </p>
+      <p className="mt-2 text-sm text-gray-500">
         ¿No tienes cuenta?{' '}
         <Link href="/registro" className="font-semibold text-black hover:underline">
           Regístrate
