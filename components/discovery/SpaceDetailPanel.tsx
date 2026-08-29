@@ -12,6 +12,7 @@ import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { ShareButton } from '@/components/space/ShareButton'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
+import { CartaEspecialSection } from '@/components/space/CartaEspecialSection'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
@@ -180,6 +181,8 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
             </li>
           ))}
         </ul>
+
+        {space.special_menu_enabled && <CartaEspecialSection content={space.special_menu_content} />}
       </div>
     </div>
   )

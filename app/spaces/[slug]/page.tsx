@@ -15,6 +15,7 @@ import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { SocialLinks } from '@/components/space/SocialLinks'
 import { ReviewsSection } from '@/components/space/ReviewsSection'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
+import { CartaEspecialSection } from '@/components/space/CartaEspecialSection'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 
@@ -214,6 +215,8 @@ export default async function SpacePage({ params }: SpacePageProps) {
           </div>
         </>
       )}
+
+      {space.special_menu_enabled && <CartaEspecialSection content={space.special_menu_content} />}
 
       <ReviewsSection spaceId={space.id} initialReviews={reviews} initialStats={reviewStats} />
     </div>
