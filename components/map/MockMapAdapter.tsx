@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { MapViewProps } from '@/lib/map/types'
+import type { MapViewProps, MapViewHandle } from '@/lib/map/types'
 
 const OSM_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 
@@ -120,18 +120,23 @@ function createMarkerElement(
   return wrapper
 }
 
-export function MockMapAdapter({
-  center,
-  zoom,
-  markers,
-  selectedMarkerId,
-  onMarkerSelect,
-  userLocation,
-}: MapViewProps) {
+export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function MockMapAdapter(
+  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation },
+  ref
+) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const markerRefs = useRef<Map<string, maplibregl.Marker>>(new Map())
   const userLocationMarkerRef = useRef<maplibregl.Marker | null>(null)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      zoomIn: () => mapRef.current?.zoomIn(),
+      zoomOut: () => mapRef.current?.zoomOut(),
+    }),
+    []
+  )
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
@@ -206,4 +211,4 @@ export function MockMapAdapter({
   }, [center.lat, center.lng, zoom])
 
   return <div ref={containerRef} className="h-full w-full" data-testid="mock-map-adapter" />
-}
+})

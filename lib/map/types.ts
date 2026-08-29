@@ -15,3 +15,8 @@ export interface MapViewProps {
   onMarkerSelect: (id: string) => void
   userLocation?: { lat: number; lng: number } | null
 }
+
+export interface MapViewHandle {
+  zoomIn: () => void
+  zoomOut: () => void
+}

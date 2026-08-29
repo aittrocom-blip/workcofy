@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
-import type { MapViewProps } from '@/lib/map/types'
+import type { MapViewProps, MapViewHandle } from '@/lib/map/types'
 
 // Centers and zooms the camera on the user's position exactly once, the
 // first time a real (non-fallback) location becomes available — after
@@ -28,14 +28,27 @@ function CenterOnUserLocation({
   return null
 }
 
-export function GoogleMapAdapter({
-  center,
-  zoom,
-  markers,
-  selectedMarkerId,
-  onMarkerSelect,
-  userLocation,
-}: MapViewProps) {
+// Exposes zoomIn/zoomOut on the ref GoogleMapAdapter forwards, so a parent
+// component (DiscoveryView's custom zoom buttons) can drive the camera
+// without needing to know this is a Google map underneath. Must live
+// inside <GoogleMap> since useMap() needs that context.
+function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }) {
+  const map = useMap()
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      zoomIn: () => map?.setZoom((map.getZoom() ?? 14) + 1),
+      zoomOut: () => map?.setZoom((map.getZoom() ?? 14) - 1),
+    }),
+    [map]
+  )
+  return null
+}
+
+export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function GoogleMapAdapter(
+  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation },
+  ref
+) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
 
   return (
@@ -52,8 +65,10 @@ export function GoogleMapAdapter({
         defaultCenter={center}
         defaultZoom={zoom}
         gestureHandling="greedy"
+        zoomControl={false}
         className="h-full w-full"
       >
+        <ZoomHandle forwardedRef={ref} />
         {markers.map((marker) => {
           const isSelected = marker.id === selectedMarkerId
           return (
@@ -121,4 +136,4 @@ export function GoogleMapAdapter({
       </GoogleMap>
     </APIProvider>
   )
-}
+})
