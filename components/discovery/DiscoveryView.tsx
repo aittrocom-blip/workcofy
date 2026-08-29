@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
+import { useAuthUser } from '@/lib/hooks/useAuthUser'
+import { useIsDesktop } from '@/lib/hooks/useIsDesktop'
 import { MapView } from '@/components/map/MapView'
 import { SpaceList } from '@/components/discovery/SpaceList'
 import { FiltersBar } from '@/components/discovery/FiltersBar'
@@ -57,11 +59,22 @@ export function DiscoveryView({
 }: DiscoveryViewProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const { coordinate, status, requestLocation } = useUserLocation()
   const { isFavorited } = useFavorites()
+  const { user, loading: authLoading } = useAuthUser()
+  const isDesktop = useIsDesktop()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
   const mapRef = useRef<MapViewHandle>(null)
+
+  // Re-derives the exact same condition AppShell.tsx uses to decide whether
+  // to show the Sidebar shell instead of Header/Footer. DiscoveryView is
+  // already a client component rendered inside whichever shell AppShell
+  // picked, so it can independently detect "am I currently inside the
+  // Sidebar shell" rather than needing that fact threaded down from the
+  // (server) /near-me page component.
+  const insideSidebarShell = pathname === '/near-me' && !authLoading && user !== null && isDesktop
 
   const filters: DiscoveryFilterState = useMemo(() => {
     const parsed = parseDiscoveryFilters(searchParams)
@@ -180,7 +193,13 @@ export function DiscoveryView({
 
   if (fullScreen) {
     return (
-      <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden [@supports(height:100dvh)]:h-[calc(100dvh-4rem)]">
+      <div
+        className={`relative w-full overflow-hidden ${
+          insideSidebarShell
+            ? 'h-full'
+            : 'h-[calc(100vh-4rem)] [@supports(height:100dvh)]:h-[calc(100dvh-4rem)]'
+        }`}
+      >
         <div className="absolute inset-0">
           <MapView
             ref={mapRef}
@@ -190,28 +209,34 @@ export function DiscoveryView({
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
             userLocation={status === 'granted' ? coordinate : null}
+            hideNativeZoom
           />
         </div>
 
-        {/* Desktop: draggable floating card, reachable anywhere over the map. */}
-        <div className="pointer-events-none absolute inset-0 z-20 hidden p-3 md:block md:p-4">
-          <DraggableFloatingBar className="pointer-events-auto w-full max-w-xl">
-            <FiltersBar
-              filters={filters}
-              onChange={updateFilters}
-              onRequestLocation={requestNearby}
-              resultCount={filtered.length}
-              availableDistricts={availableDistricts}
-              hideLocationFilters
-              floating
-            />
-            {locationUnavailable && (
-              <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">
-                {LOCATION_PROMPT}
-              </p>
-            )}
-          </DraggableFloatingBar>
-        </div>
+        {/* Desktop: draggable floating card, reachable anywhere over the map.
+            Hidden in list mode — otherwise it paints under the list panel
+            despite sharing its z-index, since same-z-index siblings stack
+            in DOM order. */}
+        {viewMode === 'map' && (
+          <div className="pointer-events-none absolute inset-0 z-20 hidden p-3 md:block md:p-4">
+            <DraggableFloatingBar className="pointer-events-auto w-full max-w-xl">
+              <FiltersBar
+                filters={filters}
+                onChange={updateFilters}
+                onRequestLocation={requestNearby}
+                resultCount={filtered.length}
+                availableDistricts={availableDistricts}
+                hideLocationFilters
+                floating
+              />
+              {locationUnavailable && (
+                <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">
+                  {LOCATION_PROMPT}
+                </p>
+              )}
+            </DraggableFloatingBar>
+          </div>
+        )}
 
         {/* Mobile: docked to the bottom of the screen, like Uber/Cabify's bottom bar. */}
         {!selectedSpace && (
@@ -262,9 +287,12 @@ export function DiscoveryView({
           />
         </div>
 
-        {/* List view — desktop only, replaces the map+pin interaction while active. */}
+        {/* List view — desktop only, replaces the map+pin interaction while active.
+            z-30 (not z-20) so it unambiguously sits above the floating
+            filters/search card and NearbyPopularPanel, both of which are
+            now hidden in list mode anyway but share this z-index. */}
         {viewMode === 'list' && (
-          <div className="absolute inset-y-0 left-0 z-20 hidden w-full max-w-md overflow-y-auto bg-white shadow-2xl md:block">
+          <div className="absolute inset-y-0 left-0 z-30 hidden w-full max-w-md overflow-y-auto bg-white shadow-2xl md:block">
             <SpaceList
               spaces={filtered}
               selectedId={selectedId}
@@ -274,8 +302,10 @@ export function DiscoveryView({
           </div>
         )}
 
-        {/* Compact rotating "popular near you" widget, hidden once a space is selected. */}
-        {!selectedSpace && (
+        {/* Compact rotating "popular near you" widget, hidden once a space is
+            selected, and in list mode (where it would otherwise paint over
+            the list panel's bottom-left corner). */}
+        {viewMode === 'map' && !selectedSpace && (
           <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden w-full max-w-xs md:block">
             <NearbyPopularPanel spaces={nearbyPopular} selectedId={selectedId} onSelect={setSelectedId} />
           </div>
@@ -288,7 +318,17 @@ export function DiscoveryView({
             fuller detail view there). */}
         {selectedSpace && (
           <div className="pointer-events-none absolute inset-0 z-30 hidden items-end justify-end p-4 md:flex">
-            <div className="pointer-events-auto w-80">
+            <div className="pointer-events-auto relative w-80">
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                aria-label="Cerrar ficha"
+                className="absolute -top-2 -right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md hover:border-black"
+              >
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
               <SpaceCard
                 space={selectedSpace}
                 isSelected

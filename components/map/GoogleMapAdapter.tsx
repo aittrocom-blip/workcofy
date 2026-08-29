@@ -46,7 +46,7 @@ function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }
 }
 
 export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function GoogleMapAdapter(
-  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation },
+  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation, hideNativeZoom },
   ref
 ) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
@@ -65,7 +65,7 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
         defaultCenter={center}
         defaultZoom={zoom}
         gestureHandling="greedy"
-        zoomControl={false}
+        zoomControl={!hideNativeZoom}
         className="h-full w-full"
       >
         <ZoomHandle forwardedRef={ref} />
@@ -96,7 +96,7 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
                         marker.verified ? 'bg-workcofy-yellow' : 'bg-white'
                       }`}
                     >
-                      <img src="/logo-solo-alpha.png" alt="Workcofy" className="h-4 w-auto" />
+                      <img src="/logo-solo-alpha.png" alt="Workcofy" className="h-[26px] w-auto" />
                     </div>
                   )}
                 </div>

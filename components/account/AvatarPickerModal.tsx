@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { AVATAR_OPTIONS } from '@/lib/avatars'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 
@@ -9,9 +10,16 @@ interface AvatarPickerModalProps {
 }
 
 export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) {
+  const [error, setError] = useState<string | null>(null)
+
   async function pick(avatarId: string) {
     const supabase = createBrowserSupabaseClient()
-    await supabase.from('profiles').update({ avatar_id: avatarId }).eq('id', userId)
+    const { error } = await supabase.from('profiles').update({ avatar_id: avatarId }).eq('id', userId)
+    if (error) {
+      setError('No se pudo guardar tu avatar. Intenta de nuevo.')
+      return
+    }
+    setError(null)
     onPicked(avatarId)
   }
 
@@ -37,6 +45,7 @@ export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) 
             </button>
           ))}
         </div>
+        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </div>
     </div>
   )

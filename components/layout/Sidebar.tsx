@@ -37,7 +37,14 @@ export function Sidebar() {
       .select('avatar_id')
       .eq('id', user.id)
       .single()
-      .then(({ data }) => setAvatarId(data?.avatar_id ?? null))
+      .then(({ data, error }) => {
+        // A failed fetch (e.g. network error) must not collapse into "no
+        // avatar chosen" — that would set avatarId to null and pop the
+        // picker modal (which has no skip/close) on a mere fetch hiccup.
+        // Leave avatarId as undefined on error so that slot renders nothing.
+        if (error) return
+        setAvatarId(data?.avatar_id ?? null)
+      })
   }, [user])
 
   return (
