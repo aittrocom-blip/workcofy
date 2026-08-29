@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
+import { RewardsBadge } from '@/components/layout/RewardsBadge'
 
 interface HeaderAuthLinksProps {
   variant?: 'desktop' | 'mobile'
@@ -45,6 +46,9 @@ export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
   if (user) {
     return (
       <div className={isDesktop ? 'hidden items-center gap-3 sm:flex' : 'flex flex-col gap-1'}>
+        <div className={isDesktop ? 'contents' : 'px-2 py-1'}>
+          <RewardsBadge />
+        </div>
         <Link
           href="/favoritos"
           className={
