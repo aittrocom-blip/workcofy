@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { MapView } from '@/components/map/MapView'
@@ -11,6 +11,8 @@ import { SpaceDetailPanel } from '@/components/discovery/SpaceDetailPanel'
 import { NearbyPopularPanel } from '@/components/discovery/NearbyPopularPanel'
 import { DraggableFloatingBar } from '@/components/discovery/DraggableFloatingBar'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
+import type { MapViewHandle } from '@/lib/map/types'
+import { MapZoomControls } from '@/components/map/MapZoomControls'
 import { useFavorites } from '@/components/providers/FavoritesProvider'
 import { haversineDistanceKm } from '@/lib/geo/haversine'
 import { selectNearbyPopularSpaces } from '@/lib/discovery/selectNearbyPopularSpaces'
@@ -58,6 +60,8 @@ export function DiscoveryView({
   const { coordinate, status, requestLocation } = useUserLocation()
   const { isFavorited } = useFavorites()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
+  const mapRef = useRef<MapViewHandle>(null)
 
   const filters: DiscoveryFilterState = useMemo(() => {
     const parsed = parseDiscoveryFilters(searchParams)
@@ -179,6 +183,7 @@ export function DiscoveryView({
       <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden [@supports(height:100dvh)]:h-[calc(100dvh-4rem)]">
         <div className="absolute inset-0">
           <MapView
+            ref={mapRef}
             center={coordinate}
             zoom={mapZoom}
             markers={markers}
@@ -198,7 +203,6 @@ export function DiscoveryView({
               resultCount={filtered.length}
               availableDistricts={availableDistricts}
               hideLocationFilters
-              hideSearch
               floating
             />
             {locationUnavailable && (
@@ -232,6 +236,44 @@ export function DiscoveryView({
           </div>
         )}
 
+        {/* Desktop-only floating controls: list/map toggle, my-location, zoom. */}
+        <div className="pointer-events-none absolute right-4 top-20 z-20 hidden flex-col items-end gap-2 md:flex">
+          <button
+            type="button"
+            onClick={() => setViewMode((mode) => (mode === 'map' ? 'list' : 'map'))}
+            className="pointer-events-auto flex items-center gap-2 rounded-full border border-gray-100 bg-white px-4 py-2.5 text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:bg-gray-50"
+          >
+            {viewMode === 'map' ? 'Lista' : 'Mapa'}
+          </button>
+          <button
+            type="button"
+            onClick={requestLocation}
+            aria-label="Ir a mi ubicación"
+            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-gray-100 bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:bg-gray-50"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3" />
+              <path strokeLinecap="round" d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
+          </button>
+          <MapZoomControls
+            onZoomIn={() => mapRef.current?.zoomIn()}
+            onZoomOut={() => mapRef.current?.zoomOut()}
+          />
+        </div>
+
+        {/* List view — desktop only, replaces the map+pin interaction while active. */}
+        {viewMode === 'list' && (
+          <div className="absolute inset-y-0 left-0 z-20 hidden w-full max-w-md overflow-y-auto bg-white shadow-2xl md:block">
+            <SpaceList
+              spaces={filtered}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              origin={status === 'granted' ? coordinate : null}
+            />
+          </div>
+        )}
+
         {/* Compact rotating "popular near you" widget, hidden once a space is selected. */}
         {!selectedSpace && (
           <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden w-full max-w-xs md:block">
@@ -239,9 +281,25 @@ export function DiscoveryView({
           </div>
         )}
 
-        {/* Selected space's details — slides in from the right, full height. */}
+        {/* Selected space — desktop: lightweight floating card that doesn't
+            cover the map, matching the non-fullScreen branch below. Mobile
+            keeps the full slide-over panel (unchanged, out of this plan's
+            desktop-only scope — limited screen space still needs the
+            fuller detail view there). */}
+        {selectedSpace && (
+          <div className="pointer-events-none absolute inset-0 z-30 hidden items-end justify-end p-4 md:flex">
+            <div className="pointer-events-auto w-80">
+              <SpaceCard
+                space={selectedSpace}
+                isSelected
+                onSelect={() => {}}
+                origin={status === 'granted' ? coordinate : null}
+              />
+            </div>
+          </div>
+        )}
         <div
-          className={`absolute inset-y-0 right-0 z-30 w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ease-out ${
+          className={`absolute inset-y-0 right-0 z-30 w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ease-out md:hidden ${
             selectedSpace ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
