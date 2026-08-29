@@ -40,6 +40,15 @@ export function CartaEspecialSection({ content }: CartaEspecialSectionProps) {
       setUserId(data.user?.id ?? null)
       loadStatus(data.user?.id ?? null)
     })
+
+    function handleRewardEarned() {
+      supabase.auth.getUser().then(({ data }) => loadStatus(data.user?.id ?? null))
+    }
+    window.addEventListener('workcofy:reward-earned', handleRewardEarned)
+
+    return () => {
+      window.removeEventListener('workcofy:reward-earned', handleRewardEarned)
+    }
   }, [])
 
   if (!loaded) return null

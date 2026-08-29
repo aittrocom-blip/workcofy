@@ -135,6 +135,16 @@ begin
 end;
 $$;
 
+-- security definer functions get EXECUTE granted to PUBLIC by default, and
+-- Supabase exposes that as a callable PostgREST RPC
+-- (POST /rest/v1/rpc/mission_progress_advance). Without this revoke, anyone
+-- could call it directly with an arbitrary p_user_id and write a
+-- mission-completion/reward row into another user's ledger — defeating the
+-- revokes above that lock reward_events/mission_progress writes to trigger
+-- functions only. Only the two trigger wrapper functions below (themselves
+-- security definer) may call this.
+revoke execute on function mission_progress_advance(uuid, text, uuid) from public, anon, authenticated;
+
 -- Postgres trigger functions take no arguments and read NEW directly, so
 -- each source table gets a thin zero-arg wrapper that calls the shared
 -- function above with the right tracked_action.
@@ -168,5 +178,13 @@ create trigger favorites_missions_progress
 -- pattern as spaces.verified / space_benefits). No structured items table;
 -- special_menu_content is plain text, can be normalized later if a partner
 -- needs anything richer.
+--
+-- Carta especial gating is presentational only: 'spaces' is already
+-- anon-readable table-wide (see 0001_create_spaces.sql), so
+-- special_menu_content is retrievable via a direct PostgREST query
+-- regardless of the app's client-side unlock check. Acceptable for a v1
+-- marketing-copy teaser; do NOT rely on this for anything genuinely
+-- sensitive without moving the content to a separately-RLS'd table behind a
+-- security-definer RPC.
 alter table spaces add column if not exists special_menu_enabled boolean not null default false;
 alter table spaces add column if not exists special_menu_content text;
