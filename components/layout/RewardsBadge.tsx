@@ -3,7 +3,11 @@
 import { useEffect, useState } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 
-export function RewardsBadge() {
+interface RewardsBadgeProps {
+  size?: 'sm' | 'lg'
+}
+
+export function RewardsBadge({ size = 'sm' }: RewardsBadgeProps) {
   const [userId, setUserId] = useState<string | null>(null)
   const [balance, setBalance] = useState<number | null>(null)
 
@@ -45,10 +49,21 @@ export function RewardsBadge() {
 
   if (userId === null || balance === null) return null
 
+  if (size === 'lg') {
+    return (
+      <div className="flex flex-col items-center gap-1 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icons/rewards-coin.png" alt="" className="h-[18px] w-[18px]" />
+        <span className="text-lg font-bold text-workcofy-black">{balance}</span>
+        <span className="text-xs font-medium text-gray-500">Rewards</span>
+      </div>
+    )
+  }
+
   return (
     <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/w-coins.png" alt="" className="h-3.5 w-3.5" />
+      <img src="/icons/rewards-coin.png" alt="" className="h-3.5 w-3.5" />
       {balance}
     </span>
   )

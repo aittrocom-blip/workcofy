@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { AppShell } from '@/components/layout/AppShell'
 import { FavoritesProvider } from '@/components/providers/FavoritesProvider'
 
 export const metadata: Metadata = {
@@ -14,9 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className="min-h-screen bg-white text-black antialiased">
         <FavoritesProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <AppShell>{children}</AppShell>
         </FavoritesProvider>
       </body>
     </html>
