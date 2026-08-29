@@ -1,10 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { User } from '@supabase/supabase-js'
-import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
+import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
 
 interface HeaderAuthLinksProps {
@@ -13,32 +11,15 @@ interface HeaderAuthLinksProps {
 
 export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    const supabase = createBrowserSupabaseClient()
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user)
-      setLoaded(true)
-    })
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
-
+  const { user, loading, signOut } = useAuthUser()
   const isDesktop = variant === 'desktop'
 
-  if (!loaded) {
+  if (loading) {
     return isDesktop ? <div className="hidden h-9 w-32 sm:block" /> : null
   }
 
   async function handleSignOut() {
-    const supabase = createBrowserSupabaseClient()
-    await supabase.auth.signOut()
+    await signOut()
     router.push('/')
     router.refresh()
   }
