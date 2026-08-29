@@ -1,10 +1,15 @@
 // components/layout/Sidebar.tsx
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NAV_LINKS } from '@/lib/navLinks'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
+import { AvatarMenu } from '@/components/layout/AvatarMenu'
+import { AvatarPickerModal } from '@/components/account/AvatarPickerModal'
+import { useAuthUser } from '@/lib/hooks/useAuthUser'
+import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 
 // Real artwork the user supplied for the sidebar, distinct from the
 // smaller mobile-menu icons NAV_LINKS.icon already points at (Header's
@@ -19,6 +24,22 @@ const SIDEBAR_ICONS: Record<string, string> = {
 }
 
 export function Sidebar() {
+  const { user } = useAuthUser()
+  // undefined = not fetched yet, null = fetched but no avatar chosen
+  // (triggers the picker modal), string = a chosen avatar id.
+  const [avatarId, setAvatarId] = useState<string | null | undefined>(undefined)
+
+  useEffect(() => {
+    if (!user) return
+    const supabase = createBrowserSupabaseClient()
+    supabase
+      .from('profiles')
+      .select('avatar_id')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => setAvatarId(data?.avatar_id ?? null))
+  }, [user])
+
   return (
     <aside className="flex h-screen w-[280px] flex-none flex-col border-r border-gray-100 bg-white">
       <div className="px-5 pt-6">
@@ -81,13 +102,12 @@ export function Sidebar() {
 
       <div className="mt-auto flex flex-col items-center gap-4 border-t border-gray-100 px-5 py-6">
         <RewardsBadge size="lg" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/avatars/explorador-default.png"
-          alt=""
-          className="h-11 w-11 rounded-full border border-gray-200 object-cover"
-        />
+        {avatarId !== undefined && <AvatarMenu avatarId={avatarId} />}
       </div>
+
+      {user && avatarId === null && (
+        <AvatarPickerModal userId={user.id} onPicked={(id) => setAvatarId(id)} />
+      )}
     </aside>
   )
 }
