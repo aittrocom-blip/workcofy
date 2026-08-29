@@ -3,6 +3,8 @@ export interface MapMarkerData {
   position: { lat: number; lng: number }
   label: string
   verified: boolean
+  photoUrl: string | null
+  favorited: boolean
 }
 
 export interface MapViewProps {

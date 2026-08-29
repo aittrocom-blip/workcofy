@@ -11,6 +11,7 @@ import { SpaceDetailPanel } from '@/components/discovery/SpaceDetailPanel'
 import { NearbyPopularPanel } from '@/components/discovery/NearbyPopularPanel'
 import { DraggableFloatingBar } from '@/components/discovery/DraggableFloatingBar'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
+import { useFavorites } from '@/components/providers/FavoritesProvider'
 import { haversineDistanceKm } from '@/lib/geo/haversine'
 import { selectNearbyPopularSpaces } from '@/lib/discovery/selectNearbyPopularSpaces'
 import {
@@ -55,6 +56,7 @@ export function DiscoveryView({
   const router = useRouter()
   const searchParams = useSearchParams()
   const { coordinate, status, requestLocation } = useUserLocation()
+  const { isFavorited } = useFavorites()
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const filters: DiscoveryFilterState = useMemo(() => {
@@ -168,6 +170,8 @@ export function DiscoveryView({
       position: { lat: space.latitude as number, lng: space.longitude as number },
       label: space.name,
       verified: space.verified,
+      photoUrl: space.photos?.find((photo) => photo.url)?.url ?? null,
+      favorited: isFavorited(space.id),
     }))
 
   if (fullScreen) {

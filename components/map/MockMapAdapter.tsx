@@ -47,33 +47,77 @@ function createUserLocationElement(): HTMLElement {
   return wrapper
 }
 
-function createMarkerElement(isSelected: boolean, verified: boolean, onSelect: () => void): HTMLElement {
+function createMarkerElement(
+  isSelected: boolean,
+  verified: boolean,
+  photoUrl: string | null,
+  favorited: boolean,
+  onSelect: () => void
+): HTMLElement {
+  const wrapper = document.createElement('div')
+  wrapper.style.position = 'relative'
+  wrapper.style.cursor = 'pointer'
+
   const el = document.createElement('div')
-  el.style.cursor = 'pointer'
   el.style.display = 'flex'
   el.style.alignItems = 'center'
   el.style.justifyContent = 'center'
+  el.style.width = '36px'
+  el.style.height = '36px'
   el.style.borderRadius = '9999px'
-  el.style.padding = '4px'
-  // Yellow disc for Workcofy Verified spaces, white for everything else
-  // discovered by the community — same distinction as GoogleMapAdapter.
-  el.style.backgroundColor = verified ? '#F4B942' : '#ffffff'
+  el.style.overflow = 'hidden'
+  // Border color keeps its one existing meaning — yellow for Workcofy
+  // Verified, white otherwise. Favorited gets its own heart badge below,
+  // never a color change.
+  el.style.border = `3px solid ${verified ? '#F4B942' : '#ffffff'}`
   el.style.transition = 'transform 0.15s ease, box-shadow 0.15s ease'
   el.style.transform = isSelected ? 'scale(1.18)' : 'scale(1)'
   el.style.boxShadow = isSelected
     ? '0 6px 10px rgba(0,0,0,0.35)'
     : '0 2px 4px rgba(0,0,0,0.25)'
 
-  const img = document.createElement('img')
-  img.src = MARK_SRC
-  img.alt = 'Workcofy'
-  img.style.height = `${MARK_HEIGHT - 8}px`
-  img.style.width = 'auto'
-  img.style.display = 'block'
-  el.appendChild(img)
+  if (photoUrl) {
+    const img = document.createElement('img')
+    img.src = photoUrl
+    img.alt = ''
+    img.style.width = '100%'
+    img.style.height = '100%'
+    img.style.objectFit = 'cover'
+    el.appendChild(img)
+  } else {
+    el.style.backgroundColor = verified ? '#F4B942' : '#ffffff'
+    const img = document.createElement('img')
+    img.src = MARK_SRC
+    img.alt = 'Workcofy'
+    img.style.height = `${MARK_HEIGHT - 8}px`
+    img.style.width = 'auto'
+    el.appendChild(img)
+  }
 
-  el.addEventListener('click', onSelect)
-  return el
+  wrapper.appendChild(el)
+
+  if (favorited) {
+    const heart = document.createElement('span')
+    heart.style.position = 'absolute'
+    heart.style.bottom = '-2px'
+    heart.style.right = '-2px'
+    heart.style.display = 'flex'
+    heart.style.alignItems = 'center'
+    heart.style.justifyContent = 'center'
+    heart.style.width = '16px'
+    heart.style.height = '16px'
+    heart.style.borderRadius = '9999px'
+    heart.style.backgroundColor = '#ffffff'
+    heart.style.boxShadow = '0 1px 3px rgba(0,0,0,0.3)'
+    // Same heart path as FavoriteButton.tsx's HeartIcon and
+    // GoogleMapAdapter's marker, so it reads as the same icon everywhere.
+    heart.innerHTML =
+      '<svg viewBox="0 0 24 24" width="12" height="12" fill="#ef4444"><path d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z"/></svg>'
+    wrapper.appendChild(heart)
+  }
+
+  wrapper.addEventListener('click', onSelect)
+  return wrapper
 }
 
 export function MockMapAdapter({
@@ -115,7 +159,13 @@ export function MockMapAdapter({
 
     markers.forEach((markerData) => {
       const isSelected = markerData.id === selectedMarkerId
-      const el = createMarkerElement(isSelected, markerData.verified, () => onMarkerSelect(markerData.id))
+      const el = createMarkerElement(
+        isSelected,
+        markerData.verified,
+        markerData.photoUrl,
+        markerData.favorited,
+        () => onMarkerSelect(markerData.id)
+      )
 
       const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat([markerData.position.lng, markerData.position.lat])

@@ -62,15 +62,36 @@ export function GoogleMapAdapter({
               position={marker.position}
               onClick={() => onMarkerSelect(marker.id)}
             >
-              {/* The official Workcofy isotype doubles as the map pin itself,
-                  backed by a colored disc: yellow for Workcofy Verified spaces,
-                  white for everything else discovered by the community. */}
-              <div
-                className={`flex items-center justify-center rounded-full p-1 shadow transition-transform duration-150 ${
-                  isSelected ? 'scale-[1.18] shadow-lg' : ''
-                } ${marker.verified ? 'bg-workcofy-yellow' : 'bg-white'}`}
-              >
-                <img src="/logo-solo-alpha.png" alt="Workcofy" className="h-[26px] w-auto" />
+              <div className="relative">
+                {/* A circular photo of the space is the pin itself when one
+                    exists. The border color keeps its one existing meaning —
+                    yellow for Workcofy Verified, white otherwise — favorited
+                    status gets its own heart badge instead of touching color. */}
+                <div
+                  className={`flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-[3px] shadow transition-transform duration-150 ${
+                    isSelected ? 'scale-[1.18] shadow-lg' : ''
+                  } ${marker.verified ? 'border-workcofy-yellow' : 'border-white'}`}
+                >
+                  {marker.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={marker.photoUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <div
+                      className={`flex h-full w-full items-center justify-center ${
+                        marker.verified ? 'bg-workcofy-yellow' : 'bg-white'
+                      }`}
+                    >
+                      <img src="/logo-solo-alpha.png" alt="Workcofy" className="h-4 w-auto" />
+                    </div>
+                  )}
+                </div>
+                {marker.favorited && (
+                  <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white shadow">
+                    <svg viewBox="0 0 24 24" className="h-3 w-3 text-red-500" fill="currentColor">
+                      <path d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z" />
+                    </svg>
+                  </span>
+                )}
               </div>
             </AdvancedMarker>
           )
