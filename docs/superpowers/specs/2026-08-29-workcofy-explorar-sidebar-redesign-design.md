@@ -28,8 +28,6 @@ for everyone, same as today.
 ### Explicitly deferred (out of scope for this phase)
 
 - Mobile/tablet responsive redesign of the sidebar (collapsed sidebar, hamburger, bottom nav).
-- Real avatar artwork — 4 placeholder variants (Worky recolored) ship now; swapped for real assets
-  later by editing one file (`lib/avatars.ts`), no other code changes needed.
 - Real `/equipos`, `/eventos`, `/comunidad` features — these stay marketing-only homepage sections;
   the sidebar's nav entries for them are disabled placeholders, not new pages.
 - A dedicated `/rewards` page — the sidebar's Rewards nav entry links to the existing `/perfil`
@@ -171,7 +169,13 @@ alter table profiles add column if not exists avatar_id text;
 Nullable — `null` means "hasn't picked one yet." No FK/enum constraint at the DB level (keeps this
 migration trivial); validity is enforced at the application layer against a fixed, small option set.
 
-### 4.2 Avatar catalog (placeholder, swappable later)
+### 4.2 Avatar catalog
+
+**Update after this spec was approved:** the user supplied 7 real character images
+(`media/avatares/*.png`) and a designated default (`explorador-default`) before implementation
+started — see the implementation plan for the exact final catalog (real artwork, not the
+CSS-tinted Worky placeholders originally sketched below). The mechanism (a small fixed option set
+in `lib/avatars.ts`, referenced only from there) is unchanged.
 
 ```ts
 // lib/avatars.ts

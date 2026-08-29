@@ -34,8 +34,9 @@ TypeScript, Tailwind CSS, `@vis.gl/react-google-maps`, `maplibre-gl`.
   layout/interaction work (`FavoriteButton.tsx`, `ReviewsSection.tsx`, `RewardsBadge.tsx`, etc.
   all ship with zero test files) is manual dev-server verification; `tsc --noEmit` is the
   correctness gate.
-- Avatar artwork is a placeholder (Worky, CSS-recolored) confined to `lib/avatars.ts` — no other
-  file may hardcode an avatar image path, so swapping in real art later touches one file only.
+- Avatar artwork is real (7 user-supplied characters, `explorador-default` as the designated
+  default), sourced only from `AVATAR_OPTIONS` in `lib/avatars.ts` — no other file may hardcode an
+  avatar image path.
 
 ---
 
@@ -290,7 +291,7 @@ export function RewardsBadge({ size = 'sm' }: RewardsBadgeProps) {
     return (
       <div className="flex flex-col items-center gap-1 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/w-coins.png" alt="" className="h-[18px] w-[18px]" />
+        <img src="/icons/rewards-coin.png" alt="" className="h-[18px] w-[18px]" />
         <span className="text-lg font-bold text-workcofy-black">{balance}</span>
         <span className="text-xs font-medium text-gray-500">Rewards</span>
       </div>
@@ -300,12 +301,17 @@ export function RewardsBadge({ size = 'sm' }: RewardsBadgeProps) {
   return (
     <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/w-coins.png" alt="" className="h-3.5 w-3.5" />
+      <img src="/icons/rewards-coin.png" alt="" className="h-3.5 w-3.5" />
       {balance}
     </span>
   )
 }
 ```
+
+(Uses the real coin artwork the user supplied — `public/icons/rewards-coin.png`, already added and
+resized to 96×96 in this repo — replacing the placeholder `/w-coins.png` everywhere `RewardsBadge`
+renders, both the header and the new sidebar. `CoinsSection.tsx` and `RewardsPanel.tsx`'s own
+separate `/w-coins.png` references are untouched — out of scope for this plan.)
 
 (`h-3.5 w-3.5` is 14px; `18px` is the "~30% bigger" icon the spec calls for. All existing call
 sites — `HeaderAuthLinks.tsx` — use the default `size="sm"` and are unaffected.)
@@ -320,6 +326,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { NAV_LINKS } from '@/lib/navLinks'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
+
+// Real artwork the user supplied for the sidebar, distinct from the
+// smaller mobile-menu icons NAV_LINKS.icon already points at (Header's
+// mobile dropdown keeps using those, unchanged, since it wasn't part of
+// this redesign). No dedicated "Equipos" icon was supplied — it falls back
+// to the existing shared NAV_LINKS.icon for that one item.
+const SIDEBAR_ICONS: Record<string, string> = {
+  Explorar: '/icons/sidebar-explorar.png',
+  Comunidad: '/icons/sidebar-comunidad.png',
+  Eventos: '/icons/sidebar-eventos.png',
+  Rewards: '/icons/sidebar-rewards.png',
+}
 
 export function Sidebar() {
   return (
@@ -339,6 +357,8 @@ export function Sidebar() {
 
       <nav className="mt-8 flex flex-col gap-1 px-3">
         {NAV_LINKS.map((link) => {
+          const iconSrc = SIDEBAR_ICONS[link.label] ?? link.icon
+
           if (link.label === 'Explorar') {
             return (
               <span
@@ -346,7 +366,7 @@ export function Sidebar() {
                 className="flex items-center gap-2.5 rounded-xl bg-workcofy-yellow/15 px-3 py-2.5 text-sm font-semibold text-workcofy-black"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={link.icon} alt="" className="h-4 w-4" />
+                <img src={iconSrc} alt="" className="h-4 w-4" />
                 {link.label}
               </span>
             )
@@ -360,7 +380,7 @@ export function Sidebar() {
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={link.icon} alt="" className="h-4 w-4" />
+                <img src={iconSrc} alt="" className="h-4 w-4" />
                 {link.label}
               </Link>
             )
@@ -373,7 +393,7 @@ export function Sidebar() {
               className="flex cursor-not-allowed items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-300"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={link.icon} alt="" className="h-4 w-4 opacity-40" />
+              <img src={iconSrc} alt="" className="h-4 w-4 opacity-40" />
               {link.label}
             </span>
           )
@@ -384,7 +404,7 @@ export function Sidebar() {
         <RewardsBadge size="lg" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/icons/worky-location.png"
+          src="/avatars/explorador-default.png"
           alt=""
           className="h-11 w-11 rounded-full border border-gray-200 object-cover"
         />
@@ -554,11 +574,18 @@ git commit -m "feat: add AppShell and Sidebar for logged-in desktop /near-me"
 - Create: `components/layout/AvatarMenu.tsx`
 - Modify: `components/layout/Sidebar.tsx`
 
+**Already done, ahead of this task — do not redo:** `public/avatars/{explorador-default,chica,chico,
+intelectual,robotico,espacial,ai}.png` and `public/icons/{sidebar-explorar,sidebar-comunidad,
+sidebar-eventos,sidebar-rewards,rewards-coin}.png` already exist in this repo (copied from
+`media/avatares/` and `media/iconos/`, resized to 256×256 / 96×96 respectively). This task only
+references these paths in code — it does not create, move, or resize any image file.
+
 **Interfaces:**
 - Consumes: `useAuthUser()` from Task 1; `Sidebar` shell from Task 2.
-- Produces: `lib/avatars.ts` — `interface AvatarOption { id: string; src: string; label: string;
-  filter: string }`, `AVATAR_OPTIONS: AvatarOption[]` (4 entries), `avatarFor(avatarId: string |
-  null): AvatarOption` (never returns undefined — falls back to `AVATAR_OPTIONS[0]`).
+- Produces: `lib/avatars.ts` — `interface AvatarOption { id: string; src: string; label: string }`,
+  `AVATAR_OPTIONS: AvatarOption[]` (7 entries, real artwork), `avatarFor(avatarId: string |
+  null): AvatarOption` (never returns undefined — falls back to `AVATAR_OPTIONS[0]`, which is
+  `explorador-default`, the user-designated default).
   `AvatarPickerModal({ userId: string; onPicked: (avatarId: string) => void })`.
   `AvatarMenu({ avatarId: string | null })`.
 
@@ -593,18 +620,21 @@ export interface AvatarOption {
   id: string
   src: string
   label: string
-  filter: string
 }
 
-// Placeholder set: Worky, recolored via a CSS filter, until real character
-// art is ready. Swapping to real art later means editing only this file —
-// no other code (the picker modal, the sidebar, the avatar menu, the DB
-// column) changes.
+// Real character art the user supplied (media/avatares/*.png in the repo
+// root, resized from ~1250px/1-2.8MB sources down to 256×256 and copied
+// into public/avatars/ ahead of this plan's execution). explorador-default
+// is first on purpose — it's both the picker's first option and, via
+// avatarFor's fallback below, the avatar shown before a user has chosen one.
 export const AVATAR_OPTIONS: AvatarOption[] = [
-  { id: 'worky-yellow', src: '/icons/worky-location.png', label: 'Worky amarillo', filter: 'none' },
-  { id: 'worky-blue', src: '/icons/worky-location.png', label: 'Worky azul', filter: 'hue-rotate(180deg)' },
-  { id: 'worky-green', src: '/icons/worky-location.png', label: 'Worky verde', filter: 'hue-rotate(90deg)' },
-  { id: 'worky-pink', src: '/icons/worky-location.png', label: 'Worky rosa', filter: 'hue-rotate(-60deg)' },
+  { id: 'explorador-default', src: '/avatars/explorador-default.png', label: 'Explorador' },
+  { id: 'chica', src: '/avatars/chica.png', label: 'Chica' },
+  { id: 'chico', src: '/avatars/chico.png', label: 'Chico' },
+  { id: 'intelectual', src: '/avatars/intelectual.png', label: 'Intelectual' },
+  { id: 'robotico', src: '/avatars/robotico.png', label: 'Robótico' },
+  { id: 'espacial', src: '/avatars/espacial.png', label: 'Espacial' },
+  { id: 'ai', src: '/avatars/ai.png', label: 'AI' },
 ]
 
 export function avatarFor(avatarId: string | null): AvatarOption {
@@ -635,9 +665,9 @@ export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 text-center shadow-2xl">
         <h2 className="text-lg font-bold tracking-tight">Elige tu avatar</h2>
-        <div className="mt-5 grid grid-cols-2 gap-4">
+        <div className="mt-5 grid grid-cols-3 gap-4">
           {AVATAR_OPTIONS.map((option) => (
             <button
               key={option.id}
@@ -650,7 +680,6 @@ export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) 
               <img
                 src={option.src}
                 alt={option.label}
-                style={{ filter: option.filter }}
                 className="h-16 w-16 rounded-full object-cover"
               />
             </button>
@@ -721,12 +750,7 @@ export function AvatarMenu({ avatarId }: AvatarMenuProps) {
         className="h-11 w-11 overflow-hidden rounded-full border border-gray-200"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={avatar.src}
-          alt=""
-          style={{ filter: avatar.filter }}
-          className="h-full w-full object-cover"
-        />
+        <img src={avatar.src} alt="" className="h-full w-full object-cover" />
       </button>
 
       {open && (
@@ -779,6 +803,18 @@ import { AvatarPickerModal } from '@/components/account/AvatarPickerModal'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 
+// Real artwork the user supplied for the sidebar, distinct from the
+// smaller mobile-menu icons NAV_LINKS.icon already points at (Header's
+// mobile dropdown keeps using those, unchanged, since it wasn't part of
+// this redesign). No dedicated "Equipos" icon was supplied — it falls back
+// to the existing shared NAV_LINKS.icon for that one item.
+const SIDEBAR_ICONS: Record<string, string> = {
+  Explorar: '/icons/sidebar-explorar.png',
+  Comunidad: '/icons/sidebar-comunidad.png',
+  Eventos: '/icons/sidebar-eventos.png',
+  Rewards: '/icons/sidebar-rewards.png',
+}
+
 export function Sidebar() {
   const { user } = useAuthUser()
   // undefined = not fetched yet, null = fetched but no avatar chosen
@@ -813,6 +849,8 @@ export function Sidebar() {
 
       <nav className="mt-8 flex flex-col gap-1 px-3">
         {NAV_LINKS.map((link) => {
+          const iconSrc = SIDEBAR_ICONS[link.label] ?? link.icon
+
           if (link.label === 'Explorar') {
             return (
               <span
@@ -820,7 +858,7 @@ export function Sidebar() {
                 className="flex items-center gap-2.5 rounded-xl bg-workcofy-yellow/15 px-3 py-2.5 text-sm font-semibold text-workcofy-black"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={link.icon} alt="" className="h-4 w-4" />
+                <img src={iconSrc} alt="" className="h-4 w-4" />
                 {link.label}
               </span>
             )
@@ -834,7 +872,7 @@ export function Sidebar() {
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={link.icon} alt="" className="h-4 w-4" />
+                <img src={iconSrc} alt="" className="h-4 w-4" />
                 {link.label}
               </Link>
             )
@@ -847,7 +885,7 @@ export function Sidebar() {
               className="flex cursor-not-allowed items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-300"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={link.icon} alt="" className="h-4 w-4 opacity-40" />
+              <img src={iconSrc} alt="" className="h-4 w-4 opacity-40" />
               {link.label}
             </span>
           )
