@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { ProfileForm } from '@/components/account/ProfileForm'
+import { listMissions, listMissionProgress, cartaEspecialUnlockCountThisMonth } from '@/lib/data/missions'
+import { listRewardEvents, rewardsBalanceFrom } from '@/lib/data/rewards'
+import { RewardsPanel } from '@/components/account/RewardsPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,6 +43,14 @@ export default async function PerfilPage() {
     .eq('id', user.id)
     .single()
 
+  const events = await listRewardEvents(supabase, user.id)
+  const balance = rewardsBalanceFrom(events)
+
+  const missions = await listMissions()
+  const progress = await listMissionProgress(supabase, user.id)
+  const completedMissionKeys = new Set(progress.map((entry) => entry.missionKey))
+  const cartaEspecialCompletedThisMonth = cartaEspecialUnlockCountThisMonth(progress)
+
   return (
     <div className="mx-auto max-w-sm px-4 py-16">
       <h1 className="text-2xl font-bold tracking-tight">Mi perfil</h1>
@@ -49,6 +60,13 @@ export default async function PerfilPage() {
         initialCountry={profile?.country ?? ''}
         initialCity={profile?.city ?? ''}
         initialMarketingConsent={profile?.marketing_consent ?? false}
+      />
+      <RewardsPanel
+        balance={balance}
+        events={events}
+        missions={missions}
+        completedMissionKeys={completedMissionKeys}
+        cartaEspecialCompletedThisMonth={cartaEspecialCompletedThisMonth}
       />
     </div>
   )
