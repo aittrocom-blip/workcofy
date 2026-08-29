@@ -118,19 +118,21 @@ create table if not exists missions (
 
 alter table missions enable row level security;
 create policy "Public can read active missions" on missions for select to anon using (active = true);
-
-insert into missions (key, label, description, tracked_action, target_count, coins, period, sort_order) values
-  ('first_review', 'Deja tu primera reseña', 'Comparte tu opinión sobre un espacio por primera vez.', 'review', 1, 20, 'once', 1),
-  ('favorite_three', 'Guarda 3 favoritos', 'Marca 3 espacios como favoritos.', 'favorite', 3, 15, 'once', 2),
-  ('monthly_reviewer', 'Deja 3 reseñas este mes', 'Deja 3 reseñas dentro del mes calendario actual.', 'review', 3, 30, 'monthly', 3)
-on conflict (key) do nothing;
 ```
 
-Public read (same pattern as `coin_rules`) so the mission catalog can be shown to logged-out
-visitors on the homepage, informationally — same spirit as the existing Coins section.
+**No seed rows.** Per the user's explicit direction ("vamos a definir las misiones más adelante"),
+this migration creates the table and its policies only — it ships empty. The actual mission
+content (which labels, targets, and coin rewards to offer) gets added by hand later via the
+Supabase Table Editor, the same manual-entry pattern already used for `space_benefits` and the
+`coin_redemptions` tiers. Every piece of UI that reads from `missions` must degrade gracefully to
+"nothing to show" while the table is empty — see §3 and §5.
+
+Public read (same pattern as `coin_rules`) so that once real rows exist, the mission catalog can
+be shown to logged-out visitors on the homepage, informationally — same spirit as the existing
+Coins section.
 
 `tracked_action` is intentionally a small closed set (`review`, `favorite`) matching what's
-actually persisted server-side today. Adding a new mission later that reuses one of these two
+actually persisted server-side today. Any mission added later that reuses one of these two
 actions requires **no code change** — just a new row.
 
 ### 2.4 `mission_progress` — completion marker (not an incrementing counter)
@@ -211,11 +213,11 @@ arguments and read `NEW` directly, so the actual implementation needs a thin `re
 with the right arguments. The implementation plan will spell out both wrappers in full.)
 
 **Known limitation, accepted for v1:** once a `period = 'once'` mission is completed, it can never
-be completed again, by definition. With only one `monthly`-period mission seeded
-(`monthly_reviewer`), a user who has already completed both `once` missions has exactly one
-remaining path to unlock Carta especial in later months. This is fine for a v1 seed — more
-monthly missions can be added later via a plain `insert into missions`, no code change required —
-but it's worth the user knowing this explicitly rather than discovering it as a surprise.
+be completed again, by definition. Since the table ships empty (§2.3), sustaining Carta especial
+unlocks month over month depends entirely on how many `monthly`-period missions get added later —
+if only `once` missions ever get created, a user runs out of ways to re-unlock after their first
+qualifying month. Worth keeping in mind when defining the actual mission content later: at least
+one `monthly`-period mission is what keeps Carta especial reachable indefinitely.
 
 ### 2.5 Carta especial — `spaces` columns + live unlock check
 
@@ -255,7 +257,9 @@ computing the Rewards balance.
   shared Context provider (only one component consumes this, unlike Favorites).
 - **Homepage**: extend the existing Rewards section (or add a sibling `MissionsSection`) to list
   active missions from `listMissions()` — public, informational, same spirit as the existing
-  `coin_rules`/`coin_redemptions` display.
+  `coin_rules`/`coin_redemptions` display. Must render nothing (not an empty box) while `missions`
+  has zero rows, following the same "omit until real content exists" rule already used for the
+  Beneficios section.
 - **`/perfil`**: adds (a) Rewards balance + a simple movement history list ("+20 Rewards · Reseña
   en Café de Lima · hace 2 días"), (b) mission progress (completed vs. available, per mission),
   (c) Carta especial status this month ("Desbloqueado" or "Completa 1 misión más para
@@ -269,10 +273,12 @@ computing the Rewards balance.
 - Unit tests for `lib/data/rewards.ts` and `lib/data/missions.ts` (mocked Supabase client,
   following the existing pattern used for `lib/data/reviews.ts`).
 - Manual verification in dev (documented in the implementation plan): write a review → confirm
-  `reward_events` gets a `full_review` row and, if it's the user's first review ever, a
-  `mission_first_review` row too; edit that same review → confirm no new rows; favorite 3
-  distinct spaces → confirm `mission_favorite_three` fires exactly once; un-favorite and
-  re-favorite the same space repeatedly → confirm it does **not** re-trigger the mission.
+  `reward_events` gets a `full_review` row; edit that same review → confirm no new row. Since
+  `missions` ships empty (§2.3), verifying the mission-progress trigger itself requires inserting
+  one throwaway test mission by hand first (e.g. a `review`/`once`/`target_count = 1` row) —
+  write a review, confirm a matching `mission_progress` + `reward_events` row appears exactly
+  once; do the same for a `favorite`/`once`/`target_count = 3` test mission, un-favoriting and
+  re-favoriting the same space repeatedly to confirm it does **not** re-trigger the mission.
 
 ## 5. Migration safety
 
