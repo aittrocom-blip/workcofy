@@ -9,7 +9,7 @@ export function Hero() {
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-10 text-center md:px-8 md:pt-14">
       <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">&nbsp;</span>
       <h1 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-tight md:text-6xl">
-        La ciudad es tu oficina.
+        Tu ecosistema para trabajar.
       </h1>
       <p className="mx-auto mt-3 max-w-lg text-base text-gray-500 md:text-lg">
         Encuentra espacios para trabajar, colaborar y aprender.

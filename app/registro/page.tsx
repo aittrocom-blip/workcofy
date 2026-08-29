@@ -8,6 +8,12 @@ import { ALL_COUNTRIES } from '@/lib/allCountries'
 
 const TERMS_VERSION = 'v1'
 
+const GENDER_OPTIONS: { value: string; label: string }[] = [
+  { value: 'hombre', label: 'Hombre' },
+  { value: 'mujer', label: 'Mujer' },
+  { value: 'prefiero_no_decir', label: 'Prefiero no decirlo' },
+]
+
 const ACQUISITION_SOURCES: { value: string; label: string }[] = [
   { value: 'google', label: 'Google / buscador' },
   { value: 'instagram', label: 'Instagram' },
@@ -25,6 +31,7 @@ export default function RegistroPage() {
   const [password, setPassword] = useState('')
   const [country, setCountry] = useState('')
   const [city, setCity] = useState('')
+  const [gender, setGender] = useState('')
   const [acquisitionSource, setAcquisitionSource] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [marketingConsent, setMarketingConsent] = useState(false)
@@ -47,6 +54,7 @@ export default function RegistroPage() {
             name,
             country,
             city,
+            gender,
             acquisition_source: acquisitionSource,
             marketing_consent: marketingConsent,
             terms_accepted: termsAccepted,
@@ -159,6 +167,27 @@ export default function RegistroPage() {
             placeholder="Tu ciudad"
             className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="gender" className="text-xs font-medium text-gray-500">
+            Sexo
+          </label>
+          <select
+            id="gender"
+            required
+            value={gender}
+            onChange={(event) => setGender(event.target.value)}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:border-black"
+          >
+            <option value="" disabled>
+              Selecciona una opción
+            </option>
+            {GENDER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="acquisitionSource" className="text-xs font-medium text-gray-500">
