@@ -134,6 +134,7 @@ function ReviewForm({ spaceId, userId, existing, onSaved }: ReviewFormProps) {
         updatedAt: data.updated_at,
         reviewerName: 'Tú',
       })
+      window.dispatchEvent(new Event('workcofy:reward-earned'))
     } catch {
       setError(NETWORK_ERROR_MESSAGE)
     } finally {

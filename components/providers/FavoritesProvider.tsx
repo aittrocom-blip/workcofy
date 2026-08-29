@@ -66,6 +66,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         await supabase.from('favorites').delete().eq('user_id', userId).eq('space_id', spaceId)
       } else {
         await supabase.from('favorites').insert({ user_id: userId, space_id: spaceId })
+        window.dispatchEvent(new Event('workcofy:reward-earned'))
       }
     },
     [userId, favoriteIds]
