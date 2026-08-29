@@ -1,9 +1,11 @@
 import Image from 'next/image'
 import type { CoinRule, CoinRedemption } from '@/lib/data/coins'
+import type { Mission } from '@/lib/data/missions'
 
 interface CoinsSectionProps {
   rules: CoinRule[]
   redemptions: CoinRedemption[]
+  missions: Mission[]
 }
 
 // Maps the emoji stored in coin_redemptions.icon to our own icon set, so the
@@ -14,8 +16,8 @@ const REDEMPTION_ICON_SRC: Record<string, string> = {
   '🧑‍💻': '/icons/nav-equipos.png',
 }
 
-export function CoinsSection({ rules, redemptions }: CoinsSectionProps) {
-  if (rules.length === 0 && redemptions.length === 0) return null
+export function CoinsSection({ rules, redemptions, missions }: CoinsSectionProps) {
+  if (rules.length === 0 && redemptions.length === 0 && missions.length === 0) return null
 
   return (
     <section id="rewards" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-8">
@@ -87,6 +89,26 @@ export function CoinsSection({ rules, redemptions }: CoinsSectionProps) {
                         {redemption.label}
                       </span>
                       <span className="font-semibold">{redemption.coins_required} Rewards</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {missions.length > 0 && (
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  Misiones
+                </h4>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {missions.map((mission) => (
+                    <li
+                      key={mission.id}
+                      className="flex items-center justify-between rounded-xl border border-gray-100 bg-white px-4 py-2.5 text-sm"
+                    >
+                      <span>{mission.label}</span>
+                      <span className="font-semibold text-workcofy-black">
+                        +{mission.coins} <span className="text-workcofy-yellow">Rewards</span>
+                      </span>
                     </li>
                   ))}
                 </ul>
