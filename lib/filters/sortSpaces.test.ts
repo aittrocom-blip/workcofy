@@ -14,6 +14,7 @@ function makeSpace(overrides: Partial<SpaceWithDistance>): SpaceWithDistance {
     workcofy_score: null, workcofy_notes: null,
     verified: false, verified_at: null, verified_amenities: [],
     partner_status: 'none', data_source: 'mock', active: true, view_count: 0,
+    special_menu_enabled: false, special_menu_content: null,
     distanceKm: null,
     ...overrides,
   }

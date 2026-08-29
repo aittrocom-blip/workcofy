@@ -48,6 +48,8 @@ export interface SpaceRecord {
   data_source: 'mock' | 'google'
   active: boolean
   view_count: number
+  special_menu_enabled: boolean
+  special_menu_content: string | null
 }
 
 export type SpaceWithDistance = SpaceRecord & { distanceKm: number | null }
