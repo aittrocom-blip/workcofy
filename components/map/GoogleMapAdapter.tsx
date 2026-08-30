@@ -46,7 +46,7 @@ function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }
 }
 
 export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function GoogleMapAdapter(
-  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation, hideNativeZoom },
+  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation, hideNativeZoom, userAvatarSrc },
   ref
 ) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
@@ -118,16 +118,16 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
             {/* zIndex kept high so Worky never ends up buried under a venue
                 pin — venue markers above have no explicit zIndex. */}
             <AdvancedMarker position={userLocation} zIndex={999}>
-              {/* Worky, the Workcofy mascot, marks the user's own position —
-                  a plain blue dot blended in with the white-backed venue
-                  pins. The ping halo behind it is the same brand yellow as
-                  Verified pins, radiating outward to draw the eye. */}
+              {/* Worky (default) or the logged-in user's chosen avatar marks
+                  their own position. The ping halo behind it is the same
+                  brand yellow as Verified pins, radiating outward to draw
+                  the eye. */}
               <span className="relative flex h-9 w-9 items-center justify-center">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-workcofy-yellow opacity-60" />
                 <img
-                  src="/icons/worky-location.png"
+                  src={userAvatarSrc ?? '/icons/worky-location.png'}
                   alt="Tu ubicación"
-                  className="relative h-9 w-9 drop-shadow-md"
+                  className="relative h-9 w-9 rounded-full object-cover drop-shadow-md"
                 />
               </span>
             </AdvancedMarker>

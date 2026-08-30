@@ -12,13 +12,12 @@ const OSM_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const MARK_SRC = '/logo-solo-alpha.png'
 const MARK_HEIGHT = 34
 
-// Worky, the Workcofy mascot, marks the user's own position — matching
-// what GoogleMapAdapter renders so both map backends look consistent. The
-// yellow ping halo behind it is the same brand yellow as Verified pins,
-// radiating outward to draw the eye — a plain blue dot blended in with the
-// white-backed venue pins. z-index is kept high so Worky never ends up
-// buried under a venue pin.
-function createUserLocationElement(): HTMLElement {
+// Worky (default) or the logged-in user's chosen avatar marks their own
+// position — matching what GoogleMapAdapter renders so both map backends
+// look consistent. The yellow ping halo behind it is the same brand yellow
+// as Verified pins, radiating outward to draw the eye. z-index is kept high
+// so this marker never ends up buried under a venue pin.
+function createUserLocationElement(avatarSrc: string): HTMLElement {
   const wrapper = document.createElement('div')
   wrapper.style.position = 'relative'
   wrapper.style.width = '36px'
@@ -35,12 +34,14 @@ function createUserLocationElement(): HTMLElement {
   wrapper.appendChild(halo)
 
   const img = document.createElement('img')
-  img.src = '/icons/worky-location.png'
+  img.src = avatarSrc
   img.alt = 'Tu ubicación'
   img.style.position = 'relative'
   img.style.height = '36px'
   img.style.width = '36px'
   img.style.display = 'block'
+  img.style.borderRadius = '9999px'
+  img.style.objectFit = 'cover'
   img.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))'
   wrapper.appendChild(img)
 
@@ -121,7 +122,7 @@ function createMarkerElement(
 }
 
 export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function MockMapAdapter(
-  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation },
+  { center, zoom, markers, selectedMarkerId, onMarkerSelect, userLocation, userAvatarSrc },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -193,7 +194,9 @@ export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function M
     if (userLocationMarkerRef.current) {
       userLocationMarkerRef.current.setLngLat([userLocation.lng, userLocation.lat])
     } else {
-      const marker = new maplibregl.Marker({ element: createUserLocationElement() })
+      const marker = new maplibregl.Marker({
+        element: createUserLocationElement(userAvatarSrc ?? '/icons/worky-location.png'),
+      })
         .setLngLat([userLocation.lng, userLocation.lat])
         .addTo(map)
       // z-index on our own element only wins against its own children — to
@@ -204,7 +207,7 @@ export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function M
       if (wrapperEl) wrapperEl.style.zIndex = '999'
       userLocationMarkerRef.current = marker
     }
-  }, [userLocation])
+  }, [userLocation, userAvatarSrc])
 
   useEffect(() => {
     mapRef.current?.easeTo({ center: [center.lng, center.lat], zoom })

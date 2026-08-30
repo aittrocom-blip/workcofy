@@ -5,6 +5,8 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { useIsDesktop } from '@/lib/hooks/useIsDesktop'
+import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
+import { avatarFor } from '@/lib/avatars'
 import { MapView } from '@/components/map/MapView'
 import { SpaceList } from '@/components/discovery/SpaceList'
 import { FiltersBar } from '@/components/discovery/FiltersBar'
@@ -63,6 +65,10 @@ export function DiscoveryView({
   const { coordinate, status, requestLocation } = useUserLocation()
   const { isFavorited } = useFavorites()
   const { user, loading: authLoading } = useAuthUser()
+  // Falls back to Worky (avatarFor's own default) while logged out or before
+  // the user has chosen one — only a genuinely chosen avatar overrides it.
+  const chosenAvatarId = useUserAvatar()
+  const userAvatarSrc = chosenAvatarId ? avatarFor(chosenAvatarId).src : '/icons/worky-location.png'
   const isDesktop = useIsDesktop()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
@@ -211,6 +217,7 @@ export function DiscoveryView({
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
             userLocation={status === 'granted' ? coordinate : null}
+            userAvatarSrc={userAvatarSrc}
             hideNativeZoom
           />
         </div>
@@ -385,6 +392,7 @@ export function DiscoveryView({
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
             userLocation={status === 'granted' ? coordinate : null}
+            userAvatarSrc={userAvatarSrc}
           />
           {selectedSpace && (
             <div className="pointer-events-none absolute inset-0 z-10 hidden items-end justify-end p-4 md:flex">

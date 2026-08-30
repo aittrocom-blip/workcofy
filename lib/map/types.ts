@@ -20,6 +20,12 @@ export interface MapViewProps {
    * (e.g. MapZoomControls) is actually rendered instead.
    */
   hideNativeZoom?: boolean
+  /**
+   * Image shown at the user's own location marker. Defaults to the Worky
+   * mascot when not provided — pass the current user's chosen avatar (see
+   * lib/avatars.ts / lib/hooks/useUserAvatar.ts) to personalize it.
+   */
+  userAvatarSrc?: string
 }
 
 export interface MapViewHandle {
