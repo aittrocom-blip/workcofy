@@ -28,7 +28,11 @@ export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) 
       .select('avatar_id')
       .single()
     if (error) {
-      setError('No se pudo guardar tu avatar. Intenta de nuevo.')
+      // Temporary: surface the real Postgres/PostgREST error (code + message)
+      // instead of a generic string, to diagnose why the save is failing —
+      // revert to a plain user-facing message once the root cause is fixed.
+      console.error('avatar_id update failed', error)
+      setError(`No se pudo guardar tu avatar (${error.code ?? '??'}): ${error.message}`)
       return
     }
     setError(null)
