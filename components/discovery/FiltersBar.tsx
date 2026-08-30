@@ -46,13 +46,22 @@ export function FiltersBar({
 
   const chipBase = 'flex-none rounded-full px-3.5 py-2.5 text-xs font-semibold whitespace-nowrap transition-all'
   const chipActive = 'bg-black text-white shadow-sm'
-  const chipInactive = 'border border-gray-200 text-gray-700 hover:border-black hover:text-black'
+  // Each chip carries its own white background + shadow rather than relying
+  // on a shared card behind it — in `floating` mode there is no shared card
+  // (see below), so every element needs to read as its own pill floating
+  // directly over the map.
+  const chipInactive =
+    'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
 
   return (
     <div
       className={
         floating
-          ? 'rounded-2xl border border-gray-100 bg-white/95 px-3 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.16)] backdrop-blur-sm'
+          ? // No shared card background/border here on purpose — each child
+            // element (search bar, chips, tiles) is its own floating pill
+            // with its own bg-white + shadow, so the map shows through the
+            // gaps between them instead of one solid card sitting over it.
+            ''
           : 'border-b border-gray-100 bg-white px-4 py-3 md:px-8'
       }
     >
@@ -60,7 +69,7 @@ export function FiltersBar({
       <div className="flex flex-wrap items-center gap-2">
         {!hideSearch && (
           <form onSubmit={submitSearch} className="min-w-0 flex-1 basis-full sm:min-w-[220px] sm:basis-auto">
-            <div className="flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 transition-colors focus-within:border-black">
+            <div className="flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 shadow-sm transition-colors focus-within:border-black">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icons/nav-search.png" alt="" className="h-4 w-4 flex-none opacity-50" />
               <input
@@ -131,7 +140,7 @@ export function FiltersBar({
             <div
               key={option.value}
               title="Próximamente"
-              className="flex flex-none cursor-not-allowed flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold text-gray-300"
+              className="flex flex-none cursor-not-allowed flex-col items-center gap-1 rounded-xl bg-white/70 px-3 py-2 text-xs font-semibold text-gray-300 shadow-sm"
             >
               <CategoryIcon name={option.value} className="h-4 w-4 opacity-40" />
               {option.label}

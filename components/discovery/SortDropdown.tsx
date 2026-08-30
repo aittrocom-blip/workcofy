@@ -36,7 +36,7 @@ export function SortDropdown({ value, onChange }: SortDropdownProps) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex flex-none items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-2.5 text-xs font-semibold text-gray-700 transition-colors hover:border-black hover:text-black"
+        className="flex flex-none items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:border-black hover:text-black"
       >
         {current.label}
         {/* eslint-disable-next-line @next/next/no-img-element */}

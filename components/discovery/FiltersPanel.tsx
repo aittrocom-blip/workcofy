@@ -34,8 +34,10 @@ export function FiltersPanel({ filters, onChange, resultCount }: FiltersPanelPro
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className={`flex flex-none items-center gap-1.5 rounded-full border px-3.5 py-2.5 text-xs font-semibold transition-colors ${
-          activeCount > 0 ? 'border-black bg-black text-white' : 'border-gray-200 text-gray-700 hover:border-black hover:text-black'
+        className={`flex flex-none items-center gap-1.5 rounded-full border px-3.5 py-2.5 text-xs font-semibold shadow-sm transition-colors ${
+          activeCount > 0
+            ? 'border-black bg-black text-white'
+            : 'border-gray-200 bg-white text-gray-700 hover:border-black hover:text-black'
         }`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
