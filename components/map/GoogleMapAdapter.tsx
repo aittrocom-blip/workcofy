@@ -61,7 +61,12 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
         props set the initial camera once and then let the user drive.
       */}
       <GoogleMap
-        mapId="workcofy-map"
+        // The real Google Cloud Map ID (its display name is "workcofy-map",
+        // but that name isn't the ID the API actually requires) — linked to
+        // a custom cloud style with the Points of Interest layer hidden, so
+        // Google's own museums/malls/restaurants stop competing with our
+        // own venue pins on the map.
+        mapId="b80ce4335c4d94f24de918b7"
         defaultCenter={center}
         defaultZoom={zoom}
         gestureHandling="greedy"
