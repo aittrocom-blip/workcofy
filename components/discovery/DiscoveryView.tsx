@@ -95,9 +95,11 @@ export function DiscoveryView({
   // null, matching how `userLocation` and `origin` are already gated below.
   const hasRealLocation = status === 'granted'
 
-  // Once we have a real position, zoom in to a neighborhood-level view
-  // (roughly a 500m radius) instead of the wider city-level fallback zoom.
-  const mapZoom = hasRealLocation ? 16 : 14
+  // Always start at a city-wide scale (several districts visible), even once
+  // a real position is known — the user explicitly asked to keep this wider
+  // view as the starting point rather than auto-zooming in to ~500m; from
+  // here they zoom in manually if they want to get closer.
+  const mapZoom = 14
 
   const withDistance = useMemo(
     () =>
