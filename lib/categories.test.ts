@@ -16,8 +16,8 @@ describe('categories', () => {
     expect(hotel).toEqual({ value: 'hotel', label: 'Lobby Café', active: true })
   })
 
-  it('labels meeting_room as Salas de reunión', () => {
+  it('labels meeting_room as Sala de reunión', () => {
     const meetingRoom = CATEGORY_OPTIONS.find((option) => option.value === 'meeting_room')
-    expect(meetingRoom?.label).toBe('Salas de reunión')
+    expect(meetingRoom?.label).toBe('Sala de reunión')
   })
 })
