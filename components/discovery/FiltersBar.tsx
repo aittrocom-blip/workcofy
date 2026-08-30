@@ -94,7 +94,10 @@ export function FiltersBar({
           Cerca de mí
         </button>
 
-        <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />
+        {/* "Filtros" (Workcofy Verified) stays available for the non-floating
+            toolbar (district pages) but is dropped from the floating map
+            overlay — same declutter request as "Más cerca". */}
+        {!floating && <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />}
 
         <OpenHoursFilter filters={filters} onChange={onChange} />
 
