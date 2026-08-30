@@ -234,7 +234,7 @@ export function DiscoveryView({
             in DOM order. */}
         {viewMode === 'map' && (
           <div className="pointer-events-none absolute inset-0 z-20 hidden p-3 md:block md:p-4">
-            <DraggableFloatingBar className="pointer-events-auto w-full max-w-xl">
+            <DraggableFloatingBar className="pointer-events-auto w-full max-w-2xl">
               <FiltersBar
                 filters={filters}
                 onChange={updateFilters}
