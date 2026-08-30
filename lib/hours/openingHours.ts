@@ -35,6 +35,32 @@ export function isOpenNow(hours: OpeningHours | null | undefined, now: Date): bo
   })
 }
 
+// Whether a space is open continuously across the given [startTime, endTime)
+// window on today's day of week — used by the "horario específico" filter.
+// "Continuously" (not just "open at some point in the range") matches what
+// someone filtering by a work window actually wants: don't show a space
+// that closes partway through.
+export function isOpenDuring(
+  hours: OpeningHours | null | undefined,
+  now: Date,
+  startTime: string,
+  endTime: string
+): boolean {
+  if (!hours || hours.periods.length === 0) return false
+  const day = now.getDay()
+  const startMinutes = timeToMinutes(startTime.replace(':', ''))
+  const endMinutes = timeToMinutes(endTime.replace(':', ''))
+
+  return hours.periods.some((period) => {
+    if (period.open.day !== day) return false
+    if (!period.close) return true // open 24h that day
+    if (period.close.day !== day) return true // stays open past midnight, covers the rest of today
+    const openMinutes = timeToMinutes(period.open.time)
+    const closeMinutes = timeToMinutes(period.close.time)
+    return openMinutes <= startMinutes && closeMinutes >= endMinutes
+  })
+}
+
 export function formatPeriodForDay(hours: OpeningHours | null | undefined, day: number): string {
   if (!hours) return 'Horario no disponible'
   const period = hours.periods.find((p) => p.open.day === day)

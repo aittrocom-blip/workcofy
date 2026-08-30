@@ -44,7 +44,7 @@ export function FiltersPanel({ filters, onChange, resultCount }: FiltersPanelPro
         <img
           src="/icons/nav-filters.png"
           alt=""
-          className={`h-3.5 w-3.5 ${activeCount > 0 ? 'invert' : ''}`}
+          className={`h-3.5 w-auto ${activeCount > 0 ? 'invert' : ''}`}
         />
         Filtros
         {activeCount > 0 && (

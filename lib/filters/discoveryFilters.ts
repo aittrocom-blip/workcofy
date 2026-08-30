@@ -10,6 +10,10 @@ export interface DiscoveryFilterState {
   // it doesn't just reorder it, and "verificado" is a trust signal, not a
   // ranking criterion.
   openNow: boolean
+  // Mutually exclusive with openNow — set by the "horario específico" option
+  // in the same dropdown; both represent "how do you want to filter by
+  // hours", never active together.
+  openBetween: { start: string; end: string } | null
   verifiedOnly: boolean
 }
 
@@ -24,6 +28,7 @@ export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilterState = {
   // resolves (see DiscoveryView's autoRequestLocation).
   sort: 'distance',
   openNow: false,
+  openBetween: null,
   verifiedOnly: false,
 }
 
@@ -35,6 +40,11 @@ export function parseDiscoveryFilters(params: URLSearchParams): DiscoveryFilterS
     search: params.get('q'),
     sort: (params.get('sort') as SortOption) || DEFAULT_DISCOVERY_FILTERS.sort,
     openNow: params.get('open') === '1',
+    openBetween: (() => {
+      const from = params.get('openFrom')
+      const to = params.get('openTo')
+      return from && to ? { start: from, end: to } : null
+    })(),
     verifiedOnly: params.get('verified') === '1',
   }
 }
@@ -47,6 +57,10 @@ export function serializeDiscoveryFilters(state: Partial<DiscoveryFilterState>):
   if (state.search) params.set('q', state.search)
   if (state.sort) params.set('sort', state.sort)
   if (state.openNow) params.set('open', '1')
+  if (state.openBetween) {
+    params.set('openFrom', state.openBetween.start)
+    params.set('openTo', state.openBetween.end)
+  }
   if (state.verifiedOnly) params.set('verified', '1')
   return params.toString()
 }
@@ -60,6 +74,7 @@ export function countActiveFilters(state: DiscoveryFilterState): number {
   if (state.country) count += 1
   if (state.district) count += 1
   if (state.openNow) count += 1
+  if (state.openBetween) count += 1
   if (state.verifiedOnly) count += 1
   return count
 }

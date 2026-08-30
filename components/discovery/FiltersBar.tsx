@@ -6,6 +6,7 @@ import { COUNTRY_OPTIONS } from '@/lib/countries'
 import { CategoryIcon } from '@/components/discovery/CategoryIcon'
 import { FiltersPanel } from '@/components/discovery/FiltersPanel'
 import { SortDropdown } from '@/components/discovery/SortDropdown'
+import { OpenHoursFilter } from '@/components/discovery/OpenHoursFilter'
 import type { DiscoveryFilterState } from '@/lib/filters/discoveryFilters'
 
 interface FiltersBarProps {
@@ -71,7 +72,7 @@ export function FiltersBar({
           <form onSubmit={submitSearch} className="min-w-0 flex-1 basis-full sm:min-w-[220px] sm:basis-auto">
             <div className="flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 shadow-sm transition-colors focus-within:border-black">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/nav-search.png" alt="" className="h-4 w-4 flex-none opacity-50" />
+              <img src="/icons/nav-search.png" alt="" className="h-4 w-auto flex-none opacity-50" />
               <input
                 value={searchValue}
                 onChange={(event) => setSearchValue(event.target.value)}
@@ -89,24 +90,18 @@ export function FiltersBar({
           className={`${chipBase} flex items-center gap-1.5 ${chipInactive}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-3.5" />
+          <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-auto" />
           Cerca de mí
         </button>
 
         <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />
 
-        <span className="mx-0.5 hidden h-6 w-px flex-none self-center bg-gray-200 sm:block" />
+        <OpenHoursFilter filters={filters} onChange={onChange} />
 
-        <button
-          type="button"
-          onClick={() => onChange({ openNow: !filters.openNow })}
-          className={`${chipBase} flex items-center gap-1.5 ${filters.openNow ? chipActive : chipInactive}`}
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${filters.openNow ? 'bg-workcofy-yellow' : 'bg-green-500'}`} />
-          Abierto ahora
-        </button>
-
-        <SortDropdown value={filters.sort} onChange={(sort) => onChange({ sort })} />
+        {/* "Más cerca" (sort) stays available for the non-floating toolbar
+            (district pages) but is dropped from the floating map overlay —
+            explicit request to declutter that screen. */}
+        {!floating && <SortDropdown value={filters.sort} onChange={(sort) => onChange({ sort })} />}
       </div>
 
       {/* Piso 2 — categorías y zonas populares */}

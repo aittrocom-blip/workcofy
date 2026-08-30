@@ -28,7 +28,7 @@ import {
 } from '@/lib/filters/discoveryFilters'
 import { sortSpaces } from '@/lib/filters/sortSpaces'
 import { districtLabel, districtSlugFromValue } from '@/lib/districts'
-import { isOpenNow } from '@/lib/hours/openingHours'
+import { isOpenNow, isOpenDuring } from '@/lib/hours/openingHours'
 import { getLimaNow } from '@/lib/geo/limaTime'
 
 interface DiscoveryViewProps {
@@ -128,10 +128,16 @@ export function DiscoveryView({
     const now = getLimaNow()
     return sorted.filter((space) => {
       if (filters.openNow && !isOpenNow(space.opening_hours, now)) return false
+      if (
+        filters.openBetween &&
+        !isOpenDuring(space.opening_hours, now, filters.openBetween.start, filters.openBetween.end)
+      ) {
+        return false
+      }
       if (filters.verifiedOnly && !space.verified) return false
       return true
     })
-  }, [sorted, filters.openNow, filters.verifiedOnly])
+  }, [sorted, filters.openNow, filters.openBetween, filters.verifiedOnly])
 
   const selectedSpace = filtered.find((space) => space.id === selectedId) ?? null
 

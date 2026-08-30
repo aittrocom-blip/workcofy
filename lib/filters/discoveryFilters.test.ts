@@ -10,6 +10,7 @@ describe('discoveryFilters', () => {
       search: null,
       sort: 'distance',
       openNow: false,
+      openBetween: null,
       verifiedOnly: false,
     })
   })
@@ -25,8 +26,29 @@ describe('discoveryFilters', () => {
       search: 'neira',
       sort: 'rating',
       openNow: true,
+      openBetween: null,
       verifiedOnly: true,
     })
+  })
+
+  it('parses an open-hours time range from openFrom/openTo params', () => {
+    const params = new URLSearchParams('openFrom=09:00&openTo=18:00')
+    expect(parseDiscoveryFilters(params).openBetween).toEqual({ start: '09:00', end: '18:00' })
+  })
+
+  it('round-trips an open-hours time range through serialize then parse', () => {
+    const state = {
+      country: null,
+      district: null,
+      category: null,
+      search: null,
+      sort: 'distance' as const,
+      openNow: false,
+      openBetween: { start: '09:00', end: '18:00' },
+      verifiedOnly: false,
+    }
+    const parsed = parseDiscoveryFilters(new URLSearchParams(serializeDiscoveryFilters(state)))
+    expect(parsed.openBetween).toEqual({ start: '09:00', end: '18:00' })
   })
 
   it('round-trips through serialize then parse', () => {
