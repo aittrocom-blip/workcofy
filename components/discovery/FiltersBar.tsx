@@ -69,17 +69,24 @@ export function FiltersBar({
       {/* Piso 1 — buscar, explorar cerca, filtrar, ordenar */}
       <div className="flex flex-wrap items-center gap-2">
         {!hideSearch && (
-          <form onSubmit={submitSearch} className="min-w-0 flex-1 basis-full sm:min-w-[220px] sm:basis-auto">
-            <div className="flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-3.5 py-2 shadow-sm transition-colors focus-within:border-black">
+          <form onSubmit={submitSearch} className="min-w-0 flex-1 basis-full sm:min-w-[260px] sm:basis-auto">
+            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-5 py-3 shadow-sm transition-colors focus-within:border-black">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/nav-search.png" alt="" className="h-4 w-auto flex-none opacity-50" />
-              <input
-                value={searchValue}
-                onChange={(event) => setSearchValue(event.target.value)}
-                placeholder="¿Dónde quieres trabajar?"
-                aria-label="¿Dónde quieres trabajar?"
-                className="min-w-0 flex-1 text-sm font-medium outline-none placeholder:font-semibold placeholder:text-black"
-              />
+              <img src="/icons/nav-search.png" alt="" className="h-5 w-auto flex-none" />
+              <div className="min-w-0 flex-1">
+                <input
+                  value={searchValue}
+                  onChange={(event) => setSearchValue(event.target.value)}
+                  placeholder="¿Dónde quieres trabajar?"
+                  aria-label="¿Dónde quieres trabajar?"
+                  className="w-full text-sm font-semibold text-black outline-none placeholder:font-semibold placeholder:text-black"
+                />
+                {/* Static hint of what can be searched — disappears once the
+                    user starts typing, so it never overlaps a real value. */}
+                {searchValue === '' && (
+                  <p className="truncate text-xs text-gray-400">Café, coworking, salas de reunión...</p>
+                )}
+              </div>
             </div>
           </form>
         )}
@@ -94,12 +101,9 @@ export function FiltersBar({
           Cerca de mí
         </button>
 
-        {/* "Filtros" (Workcofy Verified) stays available for the non-floating
-            toolbar (district pages) but is dropped from the floating map
-            overlay — same declutter request as "Más cerca". */}
-        {!floating && <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />}
-
         <OpenHoursFilter filters={filters} onChange={onChange} />
+
+        <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />
 
         {/* "Más cerca" (sort) stays available for the non-floating toolbar
             (district pages) but is dropped from the floating map overlay —
@@ -112,24 +116,24 @@ export function FiltersBar({
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => onChange({ category: null })}
-            className={`flex flex-none flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+            className={`flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
               !filters.category ? chipActive : chipInactive
             }`}
           >
-            <CategoryIcon name="todos" className={`h-8 w-8 ${!filters.category ? 'invert' : ''}`} />
+            <CategoryIcon name="todos" className={`h-5 w-5 ${!filters.category ? 'invert' : ''}`} />
             Todos
           </button>
           {TILE_ACTIVE.map((option) => (
             <button
               key={option.value}
               onClick={() => onChange({ category: option.value })}
-              className={`flex flex-none flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+              className={`flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
                 filters.category === option.value ? chipActive : chipInactive
               }`}
             >
               <CategoryIcon
                 name={option.value}
-                className={`h-8 w-8 ${filters.category === option.value ? 'invert' : ''}`}
+                className={`h-5 w-5 ${filters.category === option.value ? 'invert' : ''}`}
               />
               {option.label}
             </button>
@@ -138,9 +142,9 @@ export function FiltersBar({
             <div
               key={option.value}
               title="Próximamente"
-              className="flex flex-none cursor-not-allowed flex-col items-center gap-1 rounded-xl bg-white/70 px-3 py-2 text-xs font-semibold text-gray-300 shadow-sm"
+              className="flex flex-none cursor-not-allowed items-center gap-2 rounded-full bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-300 shadow-sm"
             >
-              <CategoryIcon name={option.value} className="h-8 w-8 opacity-40" />
+              <CategoryIcon name={option.value} className="h-5 w-5 opacity-40" />
               {option.label}
             </div>
           ))}

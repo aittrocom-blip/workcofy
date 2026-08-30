@@ -10,6 +10,7 @@ const CATEGORY_ICON_SRC: Record<string, string> = {
   coworking: '/icons/cat-coworking.png',
   hotel: '/icons/cat-hotel.png',
   meeting_room: '/icons/cat-meeting-room.png',
+  library: '/icons/cat-biblioteca.png',
 }
 
 // One custom-drawn icon per category tile in the discovery filter bar.
