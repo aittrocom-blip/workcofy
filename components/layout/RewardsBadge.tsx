@@ -52,10 +52,9 @@ export function RewardsBadge({ size = 'sm' }: RewardsBadgeProps) {
   if (size === 'lg') {
     return (
       <div className="flex items-center gap-1.5">
-        {/* Same size as the avatar circle next to it (h-11 w-11) so the two
-            sit at equal visual weight in the sidebar's bottom section. */}
+        {/* ~5% smaller than the avatar circle next to it (h-11 w-11 = 44px). */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/rewards-coin.png" alt="" className="h-11 w-11" />
+        <img src="/icons/rewards-coin.png" alt="" className="h-[42px] w-[42px]" />
         <span className="text-lg font-bold text-workcofy-black">{balance}</span>
       </div>
     )
