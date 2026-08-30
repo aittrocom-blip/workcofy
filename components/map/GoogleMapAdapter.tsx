@@ -39,6 +39,10 @@ function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }
     () => ({
       zoomIn: () => map?.setZoom((map.getZoom() ?? 14) + 1),
       zoomOut: () => map?.setZoom((map.getZoom() ?? 14) - 1),
+      centerOn: (position, zoom) => {
+        map?.panTo(position)
+        if (map && zoom != null) map.setZoom(zoom)
+      },
     }),
     [map]
   )

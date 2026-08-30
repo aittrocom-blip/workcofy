@@ -31,4 +31,5 @@ export interface MapViewProps {
 export interface MapViewHandle {
   zoomIn: () => void
   zoomOut: () => void
+  centerOn: (position: { lat: number; lng: number }, zoom?: number) => void
 }

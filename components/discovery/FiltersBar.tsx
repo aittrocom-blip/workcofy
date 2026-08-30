@@ -22,6 +22,8 @@ interface FiltersBarProps {
   floating?: boolean
   /** True on the full-screen map, where browsing is location-driven and typed search is redundant. */
   hideSearch?: boolean
+  /** Gives the full-screen map its own compact, unified control surface. */
+  mapOverlay?: boolean
 }
 
 const TILE_ACTIVE = CATEGORY_OPTIONS.filter((option) => option.active)
@@ -36,6 +38,7 @@ export function FiltersBar({
   hideLocationFilters = false,
   floating = false,
   hideSearch = false,
+  mapOverlay = false,
 }: FiltersBarProps) {
   const [searchValue, setSearchValue] = useState(filters.search ?? '')
 
@@ -54,10 +57,14 @@ export function FiltersBar({
   const chipInactive =
     'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
 
+  const isMapOverlay = floating && mapOverlay
+
   return (
     <div
       className={
-        floating
+        isMapOverlay
+          ? 'rounded-[24px] border border-white/70 bg-white/95 p-2.5 shadow-[0_18px_50px_rgba(17,24,39,0.18)] backdrop-blur-md'
+          : floating
           ? // No shared card background/border here on purpose — each child
             // element (search bar, chips, tiles) is its own floating pill
             // with its own bg-white + shadow, so the map shows through the
@@ -67,10 +74,13 @@ export function FiltersBar({
       }
     >
       {/* Piso 1 — buscar, explorar cerca, filtrar, ordenar */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className={`flex flex-wrap items-center gap-2 ${isMapOverlay ? 'md:flex-nowrap' : ''}`}>
         {!hideSearch && (
-          <form onSubmit={submitSearch} className="min-w-0 flex-1 basis-full sm:min-w-[260px] sm:basis-auto">
-            <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-5 py-3 shadow-sm transition-colors focus-within:border-black">
+          <form
+            onSubmit={submitSearch}
+            className={`min-w-0 flex-1 basis-full sm:min-w-[260px] sm:basis-auto ${isMapOverlay ? 'md:basis-auto' : ''}`}
+          >
+            <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-colors focus-within:border-black">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icons/nav-search.png" alt="" className="h-5 w-auto flex-none" />
               <div className="min-w-0 flex-1">
@@ -94,7 +104,7 @@ export function FiltersBar({
         <button
           type="button"
           onClick={onRequestLocation}
-          className={`${chipBase} flex items-center gap-1.5 ${chipInactive}`}
+          className={`${chipBase} flex items-center gap-1.5 ${isMapOverlay ? 'bg-black text-white shadow-sm hover:bg-gray-800' : chipInactive}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-auto" />
@@ -112,8 +122,8 @@ export function FiltersBar({
       </div>
 
       {/* Piso 2 — categorías y zonas populares */}
-      <div className="mt-2.5 flex flex-wrap items-center gap-4">
-        <div className="flex flex-wrap gap-1.5">
+      <div className={`mt-2.5 flex flex-wrap items-center gap-4 ${isMapOverlay ? 'border-t border-gray-100 pt-2.5' : ''}`}>
+        <div className={`flex gap-1.5 ${isMapOverlay ? 'no-scrollbar w-full overflow-x-auto pb-0.5' : 'flex-wrap'}`}>
           <button
             onClick={() => onChange({ category: null })}
             className={`flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
@@ -138,7 +148,7 @@ export function FiltersBar({
               {option.label}
             </button>
           ))}
-          {TILE_MORE.map((option) => (
+          {!isMapOverlay && TILE_MORE.map((option) => (
             <div
               key={option.value}
               title="Próximamente"

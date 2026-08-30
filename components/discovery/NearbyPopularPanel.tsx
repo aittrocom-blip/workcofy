@@ -43,10 +43,13 @@ export function NearbyPopularPanel({ spaces, selectedId, onSelect }: NearbyPopul
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="pointer-events-auto flex flex-col overflow-hidden rounded-2xl bg-white/95 shadow-[0_16px_40px_rgba(0,0,0,0.16)] backdrop-blur-sm"
+      className="pointer-events-auto flex flex-col overflow-hidden rounded-[22px] border border-white/80 bg-white/95 shadow-[0_18px_48px_rgba(17,24,39,0.18)] backdrop-blur-md"
     >
-      <div className="border-b border-gray-100 px-3.5 py-2.5">
-        <h2 className="text-xs font-semibold tracking-tight">Popular cerca de ti</h2>
+      <div className="flex items-center justify-between border-b border-gray-100 px-3.5 py-3">
+        <h2 className="text-sm font-semibold tracking-tight">Para descubrir cerca</h2>
+        <span className="rounded-full bg-workcofy-yellow/20 px-2 py-0.5 text-[10px] font-bold text-workcofy-black">
+          {spaces.length}
+        </span>
       </div>
       <div key={page} className="animate-fade-in flex flex-col gap-0.5 p-1.5">
         {visible.map((space) => (

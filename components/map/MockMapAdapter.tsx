@@ -135,6 +135,8 @@ export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function M
     () => ({
       zoomIn: () => mapRef.current?.zoomIn(),
       zoomOut: () => mapRef.current?.zoomOut(),
+      centerOn: (position, nextZoom) =>
+        mapRef.current?.easeTo({ center: [position.lng, position.lat], ...(nextZoom != null ? { zoom: nextZoom } : {}) }),
     }),
     []
   )

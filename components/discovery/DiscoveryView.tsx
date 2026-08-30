@@ -238,6 +238,7 @@ export function DiscoveryView({
               availableDistricts={availableDistricts}
               hideLocationFilters
               floating
+              mapOverlay
             />
             {locationUnavailable && (
               <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">
