@@ -74,7 +74,7 @@ export function Sidebar() {
                 className="flex items-center gap-2.5 rounded-xl bg-workcofy-yellow/15 px-3 py-2.5 text-[21px] font-semibold text-workcofy-black"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconSrc} alt="" className="h-8 w-auto flex-none" />
+                <img src={iconSrc} alt="" className="h-[26px] w-auto flex-none" />
                 {link.label}
               </span>
             )
@@ -88,7 +88,7 @@ export function Sidebar() {
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[21px] font-medium text-gray-700 hover:bg-gray-50"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconSrc} alt="" className="h-8 w-auto flex-none" />
+                <img src={iconSrc} alt="" className="h-[26px] w-auto flex-none" />
                 {link.label}
               </Link>
             )
@@ -101,7 +101,7 @@ export function Sidebar() {
               className="flex cursor-not-allowed items-center gap-2.5 rounded-xl px-3 py-2.5 text-[21px] font-medium text-gray-300"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={iconSrc} alt="" className="h-8 w-auto flex-none opacity-40" />
+              <img src={iconSrc} alt="" className="h-[26px] w-auto flex-none opacity-40" />
               {link.label}
             </span>
           )
