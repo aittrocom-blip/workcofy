@@ -12,7 +12,7 @@ const LINK_EXPIRED_MESSAGE = 'Tu link de confirmación expiró. Ingresa aquí o 
 // (a full URL, a protocol-relative "//evil.com") could send the user off-site.
 function safeNextPath(value: string | null): string {
   if (value && value.startsWith('/') && !value.startsWith('//')) return value
-  return '/'
+  return '/near-me'
 }
 
 // useSearchParams() forces this page to opt into client-side rendering;
