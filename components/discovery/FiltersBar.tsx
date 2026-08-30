@@ -113,7 +113,7 @@ export function FiltersBar({
               !filters.category ? chipActive : chipInactive
             }`}
           >
-            <CategoryIcon name="todos" className={`h-4 w-4 ${!filters.category ? 'invert' : ''}`} />
+            <CategoryIcon name="todos" className={`h-8 w-8 ${!filters.category ? 'invert' : ''}`} />
             Todos
           </button>
           {TILE_ACTIVE.map((option) => (
@@ -126,7 +126,7 @@ export function FiltersBar({
             >
               <CategoryIcon
                 name={option.value}
-                className={`h-4 w-4 ${filters.category === option.value ? 'invert' : ''}`}
+                className={`h-8 w-8 ${filters.category === option.value ? 'invert' : ''}`}
               />
               {option.label}
             </button>
@@ -137,7 +137,7 @@ export function FiltersBar({
               title="Próximamente"
               className="flex flex-none cursor-not-allowed flex-col items-center gap-1 rounded-xl bg-white/70 px-3 py-2 text-xs font-semibold text-gray-300 shadow-sm"
             >
-              <CategoryIcon name={option.value} className="h-4 w-4 opacity-40" />
+              <CategoryIcon name={option.value} className="h-8 w-8 opacity-40" />
               {option.label}
             </div>
           ))}
