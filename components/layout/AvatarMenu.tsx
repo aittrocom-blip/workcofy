@@ -8,9 +8,20 @@ import { avatarFor } from '@/lib/avatars'
 
 interface AvatarMenuProps {
   avatarId: string | null
+  name?: string | null
+  lastSignInAt?: string | null
 }
 
-export function AvatarMenu({ avatarId }: AvatarMenuProps) {
+function formatLastSeen(iso: string): string {
+  return new Date(iso).toLocaleString('es-PE', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export function AvatarMenu({ avatarId, name, lastSignInAt }: AvatarMenuProps) {
   const router = useRouter()
   const { signOut } = useAuthUser()
   const [open, setOpen] = useState(false)
@@ -46,10 +57,20 @@ export function AvatarMenu({ avatarId }: AvatarMenuProps) {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-label="Menú de cuenta"
-        className="h-11 w-11 overflow-hidden rounded-full border border-gray-200"
+        className="flex items-center gap-2.5 text-left"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={avatar.src} alt="" className="h-full w-full object-cover" />
+        <span className="h-11 w-11 flex-none overflow-hidden rounded-full border border-gray-200">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={avatar.src} alt="" className="h-full w-full object-cover" />
+        </span>
+        {(name || lastSignInAt) && (
+          <span className="flex flex-col justify-center">
+            {name && <span className="text-xs font-medium text-gray-500">{name}</span>}
+            {lastSignInAt && (
+              <span className="text-xs text-gray-400">{formatLastSeen(lastSignInAt)}</span>
+            )}
+          </span>
+        )}
       </button>
 
       {open && (

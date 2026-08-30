@@ -1,7 +1,7 @@
 // components/layout/Sidebar.tsx
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NAV_LINKS } from '@/lib/navLinks'
@@ -10,6 +10,7 @@ import { AvatarMenu } from '@/components/layout/AvatarMenu'
 import { AvatarPickerModal } from '@/components/account/AvatarPickerModal'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
+import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 
 // Real artwork the user supplied for the sidebar, distinct from the
 // smaller mobile-menu icons NAV_LINKS.icon already points at (Header's
@@ -31,9 +32,24 @@ export function Sidebar() {
   // single source of truth for what's actually persisted.
   const [pickedAvatarId, setPickedAvatarId] = useState<string | null>(null)
   const avatarId = pickedAvatarId ?? fetchedAvatarId
+  const [name, setName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!user) return
+    const supabase = createBrowserSupabaseClient()
+    supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error) return
+        setName(data?.name ?? null)
+      })
+  }, [user])
 
   return (
-    <aside className="flex h-screen w-[280px] flex-none flex-col border-r border-gray-100 bg-white">
+    <aside className="flex h-screen w-[224px] flex-none flex-col border-r border-gray-100 bg-white">
       <div className="px-5 pt-6">
         <Link href="/" className="flex items-center gap-2">
           <Image
@@ -94,7 +110,9 @@ export function Sidebar() {
 
       <div className="mt-auto flex flex-col items-start gap-4 border-t border-gray-100 px-5 py-6">
         <RewardsBadge size="lg" />
-        {avatarId !== undefined && <AvatarMenu avatarId={avatarId} />}
+        {avatarId !== undefined && (
+          <AvatarMenu avatarId={avatarId} name={name} lastSignInAt={user?.last_sign_in_at ?? null} />
+        )}
       </div>
 
       {user && avatarId === null && (
