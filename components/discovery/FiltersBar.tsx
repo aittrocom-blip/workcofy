@@ -22,6 +22,8 @@ interface FiltersBarProps {
   floating?: boolean
   /** True on the full-screen map, where browsing is location-driven and typed search is redundant. */
   hideSearch?: boolean
+  /** Hides the advanced filters popover when the map needs a lighter toolbar. */
+  hideFiltersPanel?: boolean
   /** Gives the full-screen map its own compact, unified control surface. */
   mapOverlay?: boolean
 }
@@ -38,6 +40,7 @@ export function FiltersBar({
   hideLocationFilters = false,
   floating = false,
   hideSearch = false,
+  hideFiltersPanel = false,
   mapOverlay = false,
 }: FiltersBarProps) {
   const [searchValue, setSearchValue] = useState(filters.search ?? '')
@@ -62,9 +65,7 @@ export function FiltersBar({
   return (
     <div
       className={
-        isMapOverlay
-          ? 'rounded-[24px] border border-white/70 bg-white/95 p-2.5 shadow-[0_18px_50px_rgba(17,24,39,0.18)] backdrop-blur-md'
-          : floating
+        floating
           ? // No shared card background/border here on purpose — each child
             // element (search bar, chips, tiles) is its own floating pill
             // with its own bg-white + shadow, so the map shows through the
@@ -101,19 +102,23 @@ export function FiltersBar({
           </form>
         )}
 
-        <button
-          type="button"
-          onClick={onRequestLocation}
-          className={`${chipBase} flex items-center gap-1.5 ${isMapOverlay ? 'bg-black text-white shadow-sm hover:bg-gray-800' : chipInactive}`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-auto" />
-          Cerca de mí
-        </button>
+        {!isMapOverlay && (
+          <button
+            type="button"
+            onClick={onRequestLocation}
+            className={`${chipBase} flex items-center gap-1.5 ${chipInactive}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-auto" />
+            Cerca de mí
+          </button>
+        )}
 
-        <OpenHoursFilter filters={filters} onChange={onChange} />
+        {!isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} />}
 
-        <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />
+        {!hideFiltersPanel && (
+          <FiltersPanel filters={filters} onChange={onChange} resultCount={resultCount} />
+        )}
 
         {/* "Más cerca" (sort) stays available for the non-floating toolbar
             (district pages) but is dropped from the floating map overlay —
@@ -122,8 +127,20 @@ export function FiltersBar({
       </div>
 
       {/* Piso 2 — categorías y zonas populares */}
-      <div className={`mt-2.5 flex flex-wrap items-center gap-4 ${isMapOverlay ? 'border-t border-gray-100 pt-2.5' : ''}`}>
-        <div className={`flex gap-1.5 ${isMapOverlay ? 'no-scrollbar w-full overflow-x-auto pb-0.5' : 'flex-wrap'}`}>
+      <div className="mt-2.5 flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap gap-1.5">
+          {isMapOverlay && (
+            <button
+              type="button"
+              onClick={onRequestLocation}
+              aria-label="Cerca de mí"
+              className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm hover:border-black"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/nav-near-me.png" alt="" className="h-5 w-auto" />
+            </button>
+          )}
+          {isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} variant="chip" />}
           <button
             onClick={() => onChange({ category: null })}
             className={`flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${

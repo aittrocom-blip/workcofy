@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { districtLabel } from '@/lib/districts'
 import { isOpenNow, formatPeriodForDay, DAY_LABELS, WEEK_DISPLAY_ORDER } from '@/lib/hours/openingHours'
 import { buildDirectionsUrl } from '@/lib/directions'
@@ -7,15 +8,28 @@ import { getLimaNow } from '@/lib/geo/limaTime'
 import { formatDistanceKm } from '@/lib/geo/haversine'
 import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
+import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { ShareButton } from '@/components/space/ShareButton'
+import { SocialLinks } from '@/components/space/SocialLinks'
+import { ReviewsSection } from '@/components/space/ReviewsSection'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { CartaEspecialSection } from '@/components/space/CartaEspecialSection'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
+// Type-only — erased at compile time, so this doesn't pull the server-only
+// createServerSupabaseClient (next/headers) that lib/data/reviews.ts also
+// exports into this client component's bundle.
+import type { Review, ReviewStats } from '@/lib/data/reviews'
+
+interface SpaceBenefit {
+  id: string
+  label: string
+  icon: string | null
+}
 
 interface SpaceDetailPanelProps {
   space: SpaceWithDistance
@@ -25,15 +39,68 @@ interface SpaceDetailPanelProps {
 
 // The map-mode side panel — same content as the full /spaces/[slug] page,
 // reusing its sub-components, but taking the space directly (it's already in
-// memory from the discovery list) instead of fetching. Benefits and the
-// view-count increment are server-only concerns of that page and are
-// deliberately skipped here.
+// memory from the discovery list) instead of fetching. Benefits and reviews
+// aren't in that initial payload, so they're fetched client-side below
+// (mirroring the full page's server-side reads); the view-count increment
+// stays a server-only concern of that page and is deliberately skipped here.
 export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailPanelProps) {
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayIndex = now.getDay()
   const score = computeWorkcofyScore(space)
   const priceLevel = formatPriceLevel(space.price_level)
+  const [benefits, setBenefits] = useState<SpaceBenefit[]>([])
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviewStats, setReviewStats] = useState<ReviewStats>({ average: null, count: 0 })
+
+  useEffect(() => {
+    const supabase = createBrowserSupabaseClient()
+    let cancelled = false
+
+    supabase
+      .from('space_benefits')
+      .select('id, label, icon')
+      .eq('space_id', space.id)
+      .order('sort_order', { ascending: true })
+      .then(({ data, error }) => {
+        if (cancelled || error) return
+        setBenefits(data ?? [])
+      })
+
+    supabase
+      .from('reviews')
+      .select('id, user_id, rating, comment, created_at, updated_at, profiles(name)')
+      .eq('space_id', space.id)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled || error || !data) return
+        const mapped: Review[] = data.map((row) => {
+          const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+          return {
+            id: row.id,
+            userId: row.user_id,
+            rating: row.rating,
+            comment: row.comment,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+            reviewerName: profile?.name?.trim() || 'Usuario Workcofy',
+          }
+        })
+        setReviews(mapped)
+        setReviewStats(
+          mapped.length === 0
+            ? { average: null, count: 0 }
+            : {
+                average: mapped.reduce((sum, review) => sum + review.rating, 0) / mapped.length,
+                count: mapped.length,
+              }
+        )
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [space.id])
   const renderablePhotos = (space.photos ?? []).filter(
     (photo): photo is typeof photo & { url: string } => Boolean(photo.url)
   )
@@ -164,6 +231,20 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
         <h3 className="mt-8 text-lg font-bold tracking-tight">Amenities</h3>
         <AmenitiesSection amenities={space.amenities} />
 
+        {benefits.length > 0 && (
+          <>
+            <h3 className="mt-8 text-lg font-bold tracking-tight">Beneficios Workcofy</h3>
+            <ul className="mt-3 flex flex-col gap-2 text-sm">
+              {benefits.map((benefit) => (
+                <li key={benefit.id} className="flex items-center gap-2">
+                  {benefit.icon && <span>{benefit.icon}</span>}
+                  {benefit.label}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
         <h3 className="mt-8 text-lg font-bold tracking-tight">Horario</h3>
         <ul className="mt-3 overflow-hidden rounded-2xl border border-gray-100 text-sm">
           {WEEK_DISPLAY_ORDER.map((dayIndex) => (
@@ -182,7 +263,18 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           ))}
         </ul>
 
+        {(space.instagram_url || space.tiktok_url) && (
+          <>
+            <h3 className="mt-8 text-lg font-bold tracking-tight">Redes sociales</h3>
+            <div className="mt-3">
+              <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
+            </div>
+          </>
+        )}
+
         {space.special_menu_enabled && <CartaEspecialSection content={space.special_menu_content} />}
+
+        <ReviewsSection spaceId={space.id} initialReviews={reviews} initialStats={reviewStats} />
       </div>
     </div>
   )

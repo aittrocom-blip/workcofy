@@ -4,6 +4,15 @@ import { updateSession } from '@/lib/supabase/middleware'
 export async function middleware(request: NextRequest) {
   const { response, user, supabase } = await updateSession(request)
 
+  // The signed-in experience is map-first: the public landing page remains
+  // available to visitors, while an authenticated user always continues in
+  // their active exploration context instead of returning to marketing home.
+  if (user && request.nextUrl.pathname === '/') {
+    const redirect = NextResponse.redirect(new URL('/near-me', request.url))
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+    return redirect
+  }
+
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
       const loginUrl = new URL('/login', request.url)

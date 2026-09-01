@@ -6,6 +6,8 @@ import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
+import { isOpenNow } from '@/lib/hours/openingHours'
+import { getLimaNow } from '@/lib/geo/limaTime'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 interface CompactSpaceRowProps {
@@ -20,6 +22,7 @@ interface CompactSpaceRowProps {
 export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRowProps) {
   const score = computeWorkcofyScore(space)
   const priceLevel = formatPriceLevel(space.price_level)
+  const openNow = isOpenNow(space.opening_hours, getLimaNow())
   const coverPhoto = space.photos?.find((photo) => photo.url)
   const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label
 
@@ -59,6 +62,14 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
           )}
         </div>
         <div className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
+          <span
+            className={`inline-flex items-center gap-1 font-medium ${
+              openNow ? 'text-green-600' : 'text-gray-400'
+            }`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${openNow ? 'bg-green-500' : 'bg-gray-300'}`} />
+            {openNow ? 'Abierto' : 'Cerrado'}
+          </span>
           {space.rating != null && (
             <span className="inline-flex items-center gap-0.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}

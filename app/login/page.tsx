@@ -10,11 +10,6 @@ const LINK_EXPIRED_MESSAGE = 'Tu link de confirmación expiró. Ingresa aquí o 
 
 // Only a same-site relative path is a safe redirect target — anything else
 // (a full URL, a protocol-relative "//evil.com") could send the user off-site.
-function safeNextPath(value: string | null): string {
-  if (value && value.startsWith('/') && !value.startsWith('//')) return value
-  return '/near-me'
-}
-
 // useSearchParams() forces this page to opt into client-side rendering;
 // Next requires it wrapped in Suspense or the build fails prerendering.
 export default function LoginPage() {
@@ -28,7 +23,6 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = safeNextPath(searchParams.get('next'))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -49,7 +43,7 @@ function LoginForm() {
         setError(translateAuthError(signInError))
         return
       }
-      router.push(next)
+      router.replace('/near-me')
       router.refresh()
     } catch {
       setError(NETWORK_ERROR_MESSAGE)

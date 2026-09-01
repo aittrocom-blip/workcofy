@@ -19,9 +19,11 @@ interface SpaceCardProps {
   isSelected: boolean
   onSelect: () => void
   origin?: { lat: number; lng: number } | null
+  /** When provided, "Ver espacio" calls this instead of navigating to the standalone /spaces/[slug] page — used on the full-screen map so the detail opens in place instead of leaving the sidebar shell. */
+  onViewDetail?: () => void
 }
 
-export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceCardProps) {
+export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDetail }: SpaceCardProps) {
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayHours = formatPeriodForDay(space.opening_hours, now.getDay())
@@ -81,13 +83,26 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null }: SpaceC
       )}
       <p className="mt-1 text-xs text-gray-500">{openNow ? `Abierto · ${todayHours}` : 'Cerrado'}</p>
       <div className="mt-3.5 flex flex-wrap gap-1.5">
-        <Link
-          href={`/spaces/${space.slug}`}
-          onClick={(event) => event.stopPropagation()}
-          className="whitespace-nowrap rounded-full bg-black px-3.5 py-2.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
-        >
-          Ver espacio
-        </Link>
+        {onViewDetail ? (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation()
+              onViewDetail()
+            }}
+            className="whitespace-nowrap rounded-full bg-black px-3.5 py-2.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
+          >
+            Ver espacio
+          </button>
+        ) : (
+          <Link
+            href={`/spaces/${space.slug}`}
+            onClick={(event) => event.stopPropagation()}
+            className="whitespace-nowrap rounded-full bg-black px-3.5 py-2.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
+          >
+            Ver espacio
+          </Link>
+        )}
         <a
           href={buildDirectionsUrl(space, origin)}
           target="_blank"

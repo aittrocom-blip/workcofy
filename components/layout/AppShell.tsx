@@ -12,7 +12,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { user, loading } = useAuthUser()
   const isDesktop = useIsDesktop()
-  const showSidebarLayout = pathname === '/near-me' && !loading && user !== null && isDesktop
+  // Authenticated desktop routes share the same application shell so moving
+  // from the map to profile never drops the user back into the marketing
+  // header/footer layout.
+  const showSidebarLayout = (pathname === '/near-me' || pathname === '/perfil') && !loading && user !== null && isDesktop
 
   if (showSidebarLayout) {
     return (

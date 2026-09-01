@@ -4,7 +4,7 @@
 // duplicated so they can't drift apart.
 export const NAV_LINKS = [
   { href: '/#explorar', label: 'Explorar', icon: '/icons/nav-explorar.png' },
-  { href: '/#equipos', label: 'Equipos', icon: '/icons/nav-equipos.png' },
+  { href: '/#equipos', label: 'Trabajo', icon: '/icons/nav-equipos.png' },
   { href: '/#eventos', label: 'Eventos', icon: '/icons/nav-eventos.png' },
   { href: '/#comunidad', label: 'Comunidad', icon: '/icons/nav-comunidad.png' },
   { href: '/#rewards', label: 'Rewards', icon: '/icons/nav-rewards.png' },

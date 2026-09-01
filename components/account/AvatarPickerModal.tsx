@@ -7,9 +7,10 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 interface AvatarPickerModalProps {
   userId: string
   onPicked: (avatarId: string) => void
+  onClose?: () => void
 }
 
-export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) {
+export function AvatarPickerModal({ userId, onPicked, onClose }: AvatarPickerModalProps) {
   const [error, setError] = useState<string | null>(null)
 
   async function pick(avatarId: string) {
@@ -37,7 +38,19 @@ export function AvatarPickerModal({ userId, onPicked }: AvatarPickerModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 text-center shadow-2xl">
+      <div className="relative w-full max-w-md rounded-3xl bg-white p-6 text-center shadow-2xl">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar selector de avatar"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-black"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        )}
         <h2 className="text-lg font-bold tracking-tight">Elige tu avatar</h2>
         <div className="mt-5 grid grid-cols-3 gap-4">
           {AVATAR_OPTIONS.map((option) => (

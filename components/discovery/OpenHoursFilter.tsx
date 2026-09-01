@@ -6,6 +6,8 @@ import type { DiscoveryFilterState } from '@/lib/filters/discoveryFilters'
 interface OpenHoursFilterProps {
   filters: DiscoveryFilterState
   onChange: (partial: Partial<DiscoveryFilterState>) => void
+  /** 'chip' matches the category-chip look (icon + text-sm, same sizing as Todos/Café/...) for bars that place this alongside those chips. */
+  variant?: 'default' | 'chip'
 }
 
 // Replaces the old plain "Abierto ahora" toggle button with a dropdown that
@@ -13,7 +15,7 @@ interface OpenHoursFilterProps {
 // — the two are mutually exclusive (both answer "how do I want to filter by
 // hours"), matching the FiltersPanel/SortDropdown popover pattern already
 // used elsewhere in this bar.
-export function OpenHoursFilter({ filters, onChange }: OpenHoursFilterProps) {
+export function OpenHoursFilter({ filters, onChange, variant = 'default' }: OpenHoursFilterProps) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const [start, setStart] = useState(filters.openBetween?.start ?? '09:00')
@@ -47,13 +49,26 @@ export function OpenHoursFilter({ filters, onChange }: OpenHoursFilterProps) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className={`flex flex-none items-center gap-1.5 rounded-full px-3.5 py-2.5 text-xs font-semibold shadow-sm transition-all ${
-          active
-            ? 'bg-black text-white'
-            : 'border border-gray-200 bg-white text-gray-700 hover:border-black hover:text-black'
-        }`}
+        className={
+          variant === 'chip'
+            ? `flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+                active ? 'bg-black text-white shadow-sm' : 'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
+              }`
+            : `flex flex-none items-center gap-1.5 rounded-full px-3.5 py-2.5 text-xs font-semibold shadow-sm transition-all ${
+                active
+                  ? 'bg-black text-white'
+                  : 'border border-gray-200 bg-white text-gray-700 hover:border-black hover:text-black'
+              }`
+        }
       >
-        <span className={`h-1.5 w-1.5 rounded-full ${filters.openNow ? 'bg-workcofy-yellow' : 'bg-green-500'}`} />
+        {variant === 'chip' ? (
+          <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'invert' : ''}`} fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="9" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 3" />
+          </svg>
+        ) : (
+          <span className={`h-1.5 w-1.5 rounded-full ${filters.openNow ? 'bg-workcofy-yellow' : 'bg-green-500'}`} />
+        )}
         {filters.openBetween ? `${filters.openBetween.start}–${filters.openBetween.end}` : 'Abierto ahora'}
       </button>
 

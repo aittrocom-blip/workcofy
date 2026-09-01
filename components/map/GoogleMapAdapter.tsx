@@ -34,6 +34,18 @@ function CenterOnUserLocation({
 // inside <GoogleMap> since useMap() needs that context.
 function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }) {
   const map = useMap()
+
+  // The native Map/Satellite control defaults to the bottom-left corner,
+  // where it collides with NearbyPopularPanel — moved to the right edge,
+  // clear of every other floating overlay (search card top-left, zoom +
+  // view-toggle top-right, popular panel bottom-left).
+  useEffect(() => {
+    if (!map) return
+    map.setOptions({
+      mapTypeControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
+    })
+  }, [map])
+
   useImperativeHandle(
     forwardedRef,
     () => ({

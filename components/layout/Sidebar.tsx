@@ -4,8 +4,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { NAV_LINKS } from '@/lib/navLinks'
-import { RewardsBadge } from '@/components/layout/RewardsBadge'
 import { AvatarMenu } from '@/components/layout/AvatarMenu'
 import { AvatarPickerModal } from '@/components/account/AvatarPickerModal'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
@@ -18,13 +18,14 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 // this redesign).
 const SIDEBAR_ICONS: Record<string, string> = {
   Explorar: '/icons/sidebar-explorar.png',
-  Equipos: '/icons/sidebar-equipo.png',
+  Trabajo: '/icons/sidebar-equipo.png',
   Comunidad: '/icons/sidebar-comunidad.png',
   Eventos: '/icons/sidebar-eventos.png',
-  Rewards: '/icons/sidebar-rewards.png',
+  Rewards: '/icons/rewards-coin.png',
 }
 
 export function Sidebar() {
+  const pathname = usePathname()
   const { user } = useAuthUser()
   const fetchedAvatarId = useUserAvatar()
   // A local override so picking an avatar reflects instantly without
@@ -49,34 +50,39 @@ export function Sidebar() {
   }, [user])
 
   return (
-    <aside className="flex h-screen w-[224px] flex-none flex-col border-r border-gray-100 bg-white">
-      <div className="px-5 pt-6">
-        <Link href="/" className="flex items-center gap-2">
+    <aside className="flex h-screen w-[184px] flex-none flex-col border-r border-gray-100 bg-white">
+      <div className="px-4 pt-5">
+        <Link href="/near-me" className="flex items-center gap-2" aria-label="Ir al mapa">
           <Image
             src="/logo-wordmark.png"
             alt="Workcofy"
             width={1251}
             height={476}
             priority
-            className="h-8 w-auto"
+            className="h-10 w-auto"
           />
         </Link>
       </div>
 
-      <nav className="mt-8 flex flex-col gap-1 px-3">
+      <nav className="mt-6 flex flex-col gap-1 px-2.5">
         {NAV_LINKS.map((link) => {
           const iconSrc = SIDEBAR_ICONS[link.label] ?? link.icon
 
           if (link.label === 'Explorar') {
             return (
-              <span
+              <Link
                 key={link.href}
-                className="flex items-center gap-2.5 rounded-xl bg-workcofy-yellow/15 px-3 py-2.5 text-[21px] font-semibold text-workcofy-black"
+                href="/near-me"
+                className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-base font-semibold transition-colors ${
+                  pathname === '/near-me'
+                    ? 'bg-workcofy-yellow/15 text-workcofy-black'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconSrc} alt="" className="h-[26px] w-auto flex-none" />
+                <img src={iconSrc} alt="" className="h-5 w-auto flex-none" />
                 {link.label}
-              </span>
+              </Link>
             )
           }
 
@@ -85,10 +91,14 @@ export function Sidebar() {
               <Link
                 key={link.href}
                 href="/perfil"
-                className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[21px] font-medium text-gray-700 hover:bg-gray-50"
+                className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-base font-medium transition-colors ${
+                  pathname === '/perfil'
+                    ? 'bg-workcofy-yellow/15 text-workcofy-black'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconSrc} alt="" className="h-[26px] w-auto flex-none" />
+                <img src={iconSrc} alt="" className="h-5 w-auto flex-none" />
                 {link.label}
               </Link>
             )
@@ -98,18 +108,17 @@ export function Sidebar() {
             <span
               key={link.href}
               title="Próximamente"
-              className="flex cursor-not-allowed items-center gap-2.5 rounded-xl px-3 py-2.5 text-[21px] font-medium text-gray-300"
+              className="flex cursor-not-allowed items-center gap-2 rounded-xl px-2.5 py-2 text-base font-medium text-gray-300"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={iconSrc} alt="" className="h-[26px] w-auto flex-none opacity-40" />
+              <img src={iconSrc} alt="" className="h-5 w-auto flex-none opacity-40" />
               {link.label}
             </span>
           )
         })}
       </nav>
 
-      <div className="mt-auto flex flex-col items-start gap-4 border-t border-gray-100 px-5 py-6">
-        <RewardsBadge size="lg" />
+      <div className="mt-auto flex flex-col items-start gap-3 border-t border-gray-100 px-4 py-4">
         {avatarId !== undefined && (
           <AvatarMenu avatarId={avatarId} name={name} lastSignInAt={user?.last_sign_in_at ?? null} />
         )}
