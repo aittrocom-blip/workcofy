@@ -69,7 +69,7 @@ export function OpenHoursFilter({ filters, onChange, variant = 'default' }: Open
         ) : (
           <span className={`h-1.5 w-1.5 rounded-full ${filters.openNow ? 'bg-workcofy-yellow' : 'bg-green-500'}`} />
         )}
-        {filters.openBetween ? `${filters.openBetween.start}–${filters.openBetween.end}` : 'Abierto ahora'}
+        {filters.openBetween ? `${filters.openBetween.start}–${filters.openBetween.end}` : 'Abierto'}
       </button>
 
       {open && (
