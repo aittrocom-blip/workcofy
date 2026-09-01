@@ -1,11 +1,12 @@
 import Image from 'next/image'
 
 const BULLETS = [
-  'Encuentra lugares para reuniones',
-  'Organiza encuentros de equipo',
-  'Descubre espacios cerca de todos',
-  'Trabaja fuera de la oficina',
-  'Coordina actividades',
+  'Encuentra oportunidades freelance',
+  'Descubre proyectos específicos',
+  'Conecta con empresas y startups',
+  'Encuentra trabajos cerca de ti',
+  'Publica tus propios proyectos',
+  'Colabora con otros profesionales',
 ]
 
 export function EquiposSection() {
@@ -15,17 +16,17 @@ export function EquiposSection() {
         <div className="flex flex-col items-center gap-10 md:flex-row-reverse">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">02 — Equipos</span>
+              <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">02 — Trabajo</span>
               <span className="rounded-full border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-semibold text-gray-500">
                 Próximamente
               </span>
             </div>
             <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight md:text-4xl">
-              Trabajar juntos no significa trabajar en el mismo lugar.
+              Trabajar diferente significa encontrar nuevas oportunidades.
             </h2>
             <p className="mt-3 max-w-xl text-gray-500">
-              Crea equipos y encuentra espacios que funcionen para todos — para empresas,
-              startups y equipos híbridos.
+              Descubre proyectos, trabajos y colaboraciones que se adaptan a lo que sabes hacer — estés
+              donde estés y trabajes como trabajes.
             </p>
 
             <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
@@ -37,20 +38,14 @@ export function EquiposSection() {
               ))}
             </ul>
 
-            <p className="mt-6 text-sm font-semibold">Workcofy para equipos que trabajan diferente.</p>
-            <span
-              className="mt-4 inline-flex cursor-not-allowed items-center rounded-full border border-dashed border-gray-300 px-6 py-2.5 text-sm font-semibold text-gray-400"
-              title="Próximamente"
-            >
-              Descubre Workcofy para equipos
-            </span>
+            <p className="mt-6 text-sm font-semibold">Workcofy para quienes trabajan diferente.</p>
           </div>
 
           <div className="w-full flex-1 overflow-hidden rounded-3xl">
             <Image
-              src="/section-equipos.png"
-              alt="Equipos coordinando espacios de trabajo con Workcofy"
-              width={1536}
+              src="/section-trabajo.png"
+              alt="Oportunidades de trabajo y proyectos freelance cerca de ti en Workcofy"
+              width={1535}
               height={1024}
               className="h-auto w-full"
             />

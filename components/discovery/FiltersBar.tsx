@@ -128,7 +128,13 @@ export function FiltersBar({
 
       {/* Piso 2 — categorías y zonas populares */}
       <div className="mt-2.5 flex flex-wrap items-center gap-4">
-        <div className="flex flex-wrap gap-1.5">
+        <div
+          className={`gap-1.5 ${
+            isMapOverlay
+              ? 'no-scrollbar -mx-3 flex flex-nowrap overflow-x-auto px-3 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0'
+              : 'flex flex-wrap'
+          }`}
+        >
           {isMapOverlay && (
             <button
               type="button"

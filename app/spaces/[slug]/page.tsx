@@ -59,7 +59,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
   const priceLevel = formatPriceLevel(space.price_level)
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 md:px-8 md:py-14">
+    <div className="mx-auto max-w-3xl px-4 py-7 md:px-8 md:py-14">
       {renderablePhotos.length > 0 ? (
         <HorizontalScroller className="gap-2">
           {renderablePhotos.map((photo, index) => (
@@ -67,19 +67,19 @@ export default async function SpacePage({ params }: SpacePageProps) {
               key={index}
               src={photo.url}
               alt={`${space.name} — foto ${index + 1}`}
-              className="h-64 w-auto flex-none rounded-3xl object-cover shadow-[0_8px_24px_rgba(0,0,0,0.06)] md:h-80"
+              className="h-56 w-auto flex-none rounded-3xl object-cover shadow-[0_8px_24px_rgba(0,0,0,0.06)] sm:h-64 md:h-80"
             />
           ))}
         </HorizontalScroller>
       ) : (
-        <div className="h-64 w-full rounded-3xl bg-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.06)] md:h-80" />
+        <div className="h-56 w-full rounded-3xl bg-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.06)] sm:h-64 md:h-80" />
       )}
 
       <div className="mt-5">
         <VisitorAvatarsStrip spaceId={space.id} />
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <h1 className="text-3xl font-extrabold tracking-tight">{space.name}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{space.name}</h1>
         {space.verified && <VerifiedBadge />}
       </div>
       <p className="mt-1 text-gray-500">{districtLabel(space.district)}</p>
@@ -88,7 +88,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
           Datos de ejemplo
         </span>
       )}
-      <div className="mt-3 flex items-center gap-3 text-sm">
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
         {space.rating != null && (
           <span className="inline-flex items-center gap-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -138,21 +138,21 @@ export default async function SpacePage({ params }: SpacePageProps) {
           href={buildDirectionsUrl(space)}
           target="_blank"
           rel="noreferrer"
-          className="inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+          className="inline-flex min-h-11 w-full touch-manipulation items-center justify-center rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97] sm:w-auto"
         >
           Cómo llegar
         </a>
         <FavoriteButton
           spaceId={space.id}
-          className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
+          className="flex h-11 w-11 flex-none touch-manipulation items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
         />
         <ShareButton
           spaceName={space.name}
           slug={space.slug}
-          className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
+          className="flex h-11 w-11 flex-none touch-manipulation items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
         />
         <span
-          className="inline-flex cursor-not-allowed items-center rounded-full border border-dashed border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400"
+          className="inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full border border-dashed border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400 sm:w-auto"
           title="Reserva de asiento o espacio — todavía no disponible"
         >
           Reservar · Próximamente

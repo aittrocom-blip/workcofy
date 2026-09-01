@@ -239,7 +239,7 @@ export function DiscoveryView({
         className={`relative w-full overflow-hidden ${
           insideSidebarShell
             ? 'h-full'
-            : 'h-[calc(100vh-4rem)] [@supports(height:100dvh)]:h-[calc(100dvh-4rem)]'
+            : 'h-[calc(100vh-var(--app-header-height,4rem))] [@supports(height:100dvh)]:h-[calc(100dvh-var(--app-header-height,4rem))]'
         }`}
       >
         <div className="absolute inset-0">
@@ -279,9 +279,11 @@ export function DiscoveryView({
           </div>
         </div>
 
-        {/* Mobile: docked to the bottom of the screen, like Uber/Cabify's bottom bar. */}
+        {/* Mobile uses the same compact controls as desktop, but docked at the
+            top. This preserves the lower half of the map for pins and keeps
+            the toolbar out of the way of the space detail sheet. */}
         {!selectedSpace && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:hidden">
             <div className="pointer-events-auto">
               <FiltersBar
                 filters={filters}
@@ -293,6 +295,7 @@ export function DiscoveryView({
                 hideSearch
                 hideFiltersPanel
                 floating
+                mapOverlay
               />
               {locationUnavailable && (
                 <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">

@@ -1,11 +1,13 @@
 import Image from 'next/image'
 
 const COMMUNITY_ACTIONS = [
-  { emoji: '⭐', label: 'Calificar espacios' },
-  { emoji: '📸', label: 'Compartir experiencias' },
-  { emoji: '💬', label: 'Dejar reseñas' },
-  { emoji: '👍', label: 'Recomendar lugares' },
-  { emoji: '📍', label: 'Descubrir nuevos espacios' },
+  { emoji: '⭐', label: 'Valora tu experiencia' },
+  { emoji: '💬', label: 'Comparte una reseña' },
+  { emoji: '📍', label: 'Recomienda un lugar' },
+  { emoji: '🔎', label: 'Descubre lugares que otros recomiendan' },
+  { emoji: '❤️', label: 'Guarda tus favoritos' },
+  { emoji: '💡', label: 'Comparte tips sobre espacios' },
+  { emoji: '🏆', label: 'Ayuda a destacar los mejores lugares' },
 ]
 
 export function VerifiedExplainer() {
@@ -18,48 +20,27 @@ export function VerifiedExplainer() {
             Los mejores lugares también los descubre la comunidad.
           </h2>
           <p className="mt-3 max-w-xl text-gray-500">
-            Workcofy no solamente te dice dónde está un espacio — te dice cómo es realmente
-            trabajar ahí.
+            Workcofy combina información de los espacios con la experiencia de las personas que
+            los utilizan.
+          </p>
+          <p className="mt-3 max-w-xl text-gray-500">
+            Puedes explorar opiniones, compartir experiencias, recomendar lugares y descubrir
+            nuevos espacios a través de la comunidad Workcofy.
           </p>
 
-          <div className="mt-6 rounded-3xl border border-gray-100 bg-gray-50 p-6">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-workcofy-green/20 px-3 py-1 text-xs font-semibold text-workcofy-black">
-              ✓ Workcofy Verified
-            </span>
-            <h3 className="mt-4 text-lg font-bold tracking-tight">
-              Workcofy comprobó que estos espacios cumplen nuestros estándares mínimos para
-              trabajar.
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              No todos los lugares del mapa están verificados — seguimos mostrando los espacios
-              descubiertos y evaluados por la comunidad. El sello Verified indica, además, que
-              Workcofy visitó el lugar y confirmó puntos concretos como wifi, enchufes o zona
-              tranquila.
-            </p>
+          <div className="mt-6 flex flex-wrap gap-2.5">
+            {COMMUNITY_ACTIONS.map((action) => (
+              <span
+                key={action.label}
+                className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1.5 text-sm font-medium text-gray-700"
+              >
+                <span aria-hidden="true">{action.emoji}</span>
+                {action.label}
+              </span>
+            ))}
           </div>
 
-          <div className="mt-4 rounded-2xl border border-dashed border-gray-200 p-6">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold">Próximamente: aportes de la comunidad</h3>
-              <span className="rounded-full border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-semibold text-gray-500">
-                Próximamente
-              </span>
-            </div>
-            <p className="mt-1 text-sm text-gray-500">
-              La información mejora a medida que la comunidad crece. Muy pronto vas a poder:
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2.5">
-              {COMMUNITY_ACTIONS.map((action) => (
-                <span
-                  key={action.label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm font-medium text-gray-500"
-                >
-                  <span aria-hidden="true">{action.emoji}</span>
-                  {action.label}
-                </span>
-              ))}
-            </div>
-          </div>
+          <p className="mt-6 text-sm font-semibold">Tu experiencia ayuda a otros a trabajar mejor.</p>
         </div>
 
         <div className="w-full flex-1 overflow-hidden rounded-3xl">

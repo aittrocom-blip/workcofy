@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
 import type { MapViewProps, MapViewHandle } from '@/lib/map/types'
 
@@ -34,6 +34,15 @@ function CenterOnUserLocation({
 // inside <GoogleMap> since useMap() needs that context.
 function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }) {
   const map = useMap()
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    const updateViewport = () => setIsDesktop(mediaQuery.matches)
+    updateViewport()
+    mediaQuery.addEventListener('change', updateViewport)
+    return () => mediaQuery.removeEventListener('change', updateViewport)
+  }, [])
 
   // The native Map/Satellite control defaults to the bottom-left corner,
   // where it collides with NearbyPopularPanel — moved to the right edge,
@@ -42,9 +51,12 @@ function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }
   useEffect(() => {
     if (!map) return
     map.setOptions({
-      mapTypeControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
+      mapTypeControl: isDesktop,
+      ...(isDesktop
+        ? { mapTypeControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } }
+        : {}),
     })
-  }, [map])
+  }, [map, isDesktop])
 
   useImperativeHandle(
     forwardedRef,

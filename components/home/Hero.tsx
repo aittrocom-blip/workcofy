@@ -9,7 +9,7 @@ export function Hero() {
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-10 text-center md:px-8 md:pt-14">
       <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">&nbsp;</span>
       <h1 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-tight md:text-6xl">
-        Tu ecosistema para trabajar.
+        Tu ecosistema para trabajar remoto.
       </h1>
       <p className="mx-auto mt-3 max-w-lg text-base text-gray-500 md:text-lg">
         Encuentra espacios para trabajar, colaborar y aprender.
@@ -31,8 +31,10 @@ export function Hero() {
       </p>
       <Link
         href="/near-me"
-        className="mt-4 inline-block rounded-full bg-black px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+        className="mt-4 inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icons/nav-search.png" alt="" className="h-4 w-auto invert" />
         Explora
       </Link>
     </div>
