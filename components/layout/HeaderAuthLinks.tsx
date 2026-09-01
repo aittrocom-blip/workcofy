@@ -8,6 +8,8 @@ import { RewardsBadge } from '@/components/layout/RewardsBadge'
 
 interface HeaderAuthLinksProps {
   variant?: 'desktop' | 'mobile'
+  /** Mobile only — closes the drawer this renders inside once an item is picked. */
+  onNavigate?: () => void
 }
 
 function UserIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
@@ -96,7 +98,7 @@ function MenuItem({
   )
 }
 
-export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
+export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthLinksProps) {
   const router = useRouter()
   const { user, loading, signOut } = useAuthUser()
   const [open, setOpen] = useState(false)
@@ -112,6 +114,7 @@ export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
 
   async function handleSignOut() {
     setOpen(false)
+    onNavigate?.()
     await signOut()
     router.push('/')
     router.refresh()
@@ -125,10 +128,18 @@ export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
             <div className="px-2 py-1">
               <RewardsBadge />
             </div>
-            <Link href="/favoritos" className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link
+              href="/favoritos"
+              onClick={onNavigate}
+              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
               Favoritos
             </Link>
-            <Link href="/perfil" className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link
+              href="/perfil"
+              onClick={onNavigate}
+              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
               Perfil
             </Link>
             <button
@@ -141,10 +152,18 @@ export function HeaderAuthLinks({ variant = 'desktop' }: HeaderAuthLinksProps) {
           </>
         ) : (
           <>
-            <Link href="/login" className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link
+              href="/login"
+              onClick={onNavigate}
+              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
               Ingresa
             </Link>
-            <Link href="/registro" className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link
+              href="/registro"
+              onClick={onNavigate}
+              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
               Regístrate
             </Link>
           </>

@@ -62,6 +62,15 @@ export function FiltersBar({
 
   const isMapOverlay = floating && mapOverlay
 
+  // Slimmer, single-line chip matching the 42px location button — used only
+  // in the map overlay row, kept separate from chipBase/chipActive above so
+  // the district-page toolbar's chips (bigger, bolder) are untouched.
+  function overlayChipClass(active: boolean) {
+    return `flex h-[42px] flex-none items-center gap-2 rounded-full px-4 text-sm font-medium transition-all ${
+      active ? 'bg-black text-white shadow-sm' : chipInactive
+    }`
+  }
+
   return (
     <div
       className={
@@ -128,6 +137,7 @@ export function FiltersBar({
 
       {/* Piso 2 — categorías y zonas populares */}
       <div className="mt-2.5 flex flex-wrap items-center gap-4">
+        <div className="relative min-w-0">
         <div
           className={`gap-1.5 ${
             isMapOverlay
@@ -149,7 +159,7 @@ export function FiltersBar({
           {isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} variant="chip" />}
           <button
             onClick={() => onChange({ category: null })}
-            className={`flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+            className={isMapOverlay ? overlayChipClass(!filters.category) : `flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
               !filters.category ? chipActive : chipInactive
             }`}
           >
@@ -160,7 +170,7 @@ export function FiltersBar({
             <button
               key={option.value}
               onClick={() => onChange({ category: option.value })}
-              className={`flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+              className={isMapOverlay ? overlayChipClass(filters.category === option.value) : `flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
                 filters.category === option.value ? chipActive : chipInactive
               }`}
             >
@@ -181,6 +191,16 @@ export function FiltersBar({
               {option.label}
             </div>
           ))}
+        </div>
+        {isMapOverlay && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex w-9 items-center justify-end bg-gradient-to-l from-white to-transparent md:hidden">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm">
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
+              </svg>
+            </span>
+          </div>
+        )}
         </div>
 
         {!hideLocationFilters && (

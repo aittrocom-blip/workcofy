@@ -69,7 +69,7 @@ export function Header() {
             </Link>
           ))}
           <div className="mt-1 border-t border-gray-100 pt-1">
-            <HeaderAuthLinks variant="mobile" />
+            <HeaderAuthLinks variant="mobile" onNavigate={() => setMobileMenuOpen(false)} />
           </div>
         </nav>
       )}

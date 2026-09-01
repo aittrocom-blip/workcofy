@@ -51,7 +51,7 @@ export function OpenHoursFilter({ filters, onChange, variant = 'default' }: Open
         onClick={() => setOpen((value) => !value)}
         className={
           variant === 'chip'
-            ? `flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+            ? `flex h-[42px] flex-none items-center gap-2 rounded-full px-4 text-sm font-medium transition-all ${
                 active ? 'bg-black text-white shadow-sm' : 'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
               }`
             : `flex flex-none items-center gap-1.5 rounded-full px-3.5 py-2.5 text-xs font-semibold shadow-sm transition-all ${
