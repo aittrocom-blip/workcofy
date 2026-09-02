@@ -37,7 +37,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<string | null>(searchParams.get('category'))
   const [sort, setSort] = useState<SortOption>('distance')
-  const [visibleCount, setVisibleCount] = useState(10)
+  const [page, setPage] = useState(1)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [openDropdown, setOpenDropdown] = useState<'ubicacion' | 'tipo' | 'ambiente' | 'filtros' | null>(null)
   const mapRef = useRef<MapViewHandle>(null)
@@ -58,10 +58,12 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
   }, [withDistance, search, category])
 
   const sortedFiltered = useMemo(() => sortSpaces(filtered, sort), [filtered, sort])
-  const visibleSpaces = sortedFiltered.slice(0, visibleCount)
+  const PAGE_SIZE = 10
+  const totalPages = Math.max(1, Math.ceil(sortedFiltered.length / PAGE_SIZE))
+  const visibleSpaces = sortedFiltered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   useEffect(() => {
-    setVisibleCount(10)
+    setPage(1)
   }, [filtered])
 
   const selectedSpace = sortedFiltered.find((space) => space.id === selectedId) ?? null
@@ -259,32 +261,6 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
         </div>
       )}
 
-      {recommended.length > 0 && (
-        <div className="mt-10">
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">Recomendados para ti</h2>
-              <p className="mt-0.5 text-sm text-gray-500">Cerca de ti y populares en la comunidad.</p>
-            </div>
-            <span title="Próximamente" className="cursor-not-allowed text-sm font-semibold text-gray-300">
-              Ver todos →
-            </span>
-          </div>
-          <HorizontalScroller className="mt-4 gap-4 pb-1">
-            {recommended.map((space) => (
-              <div key={space.id} className="w-64 flex-none">
-                <SpaceCard
-                  space={space}
-                  isSelected={false}
-                  onSelect={() => {}}
-                  origin={status === 'granted' ? coordinate : null}
-                />
-              </div>
-            ))}
-          </HorizontalScroller>
-        </div>
-      )}
-
       <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
         <div>
           <div className="flex items-center justify-between">
@@ -309,14 +285,28 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
             )}
           </div>
 
-          {visibleCount < sortedFiltered.length && (
-            <button
-              type="button"
-              onClick={() => setVisibleCount((count) => count + 10)}
-              className="mt-4 w-full rounded-full border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:border-black"
-            >
-              Ver más espacios
-            </button>
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={page === 1}
+                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-200"
+              >
+                ‹ Anterior
+              </button>
+              <span className="text-sm font-medium text-gray-500">
+                Página {page} de {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                disabled={page === totalPages}
+                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gray-200"
+              >
+                Siguiente ›
+              </button>
+            </div>
           )}
         </div>
 
@@ -377,6 +367,32 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
           </div>
         </aside>
       </div>
+
+      {recommended.length > 0 && (
+        <div className="mt-10">
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">Recomendados para ti</h2>
+              <p className="mt-0.5 text-sm text-gray-500">Cerca de ti y populares en la comunidad.</p>
+            </div>
+            <span title="Próximamente" className="cursor-not-allowed text-sm font-semibold text-gray-300">
+              Ver todos →
+            </span>
+          </div>
+          <HorizontalScroller className="mt-4 gap-4 pb-1">
+            {recommended.map((space) => (
+              <div key={space.id} className="w-64 flex-none">
+                <SpaceCard
+                  space={space}
+                  isSelected={false}
+                  onSelect={() => {}}
+                  origin={status === 'granted' ? coordinate : null}
+                />
+              </div>
+            ))}
+          </HorizontalScroller>
+        </div>
+      )}
     </div>
   )
 }
