@@ -1,6 +1,3 @@
-'use client'
-
-import { useState } from 'react'
 import { groupedAmenityEntries, type AmenityEntry } from '@/lib/amenities/groupedAmenityEntries'
 import { AmenityIcon } from '@/components/space/AmenityIcon'
 import { AMENITY_LABELS, type AmenitiesData } from '@/lib/amenities/types'
@@ -9,119 +6,93 @@ interface AmenitiesSectionProps {
   amenities: AmenitiesData
 }
 
-const CHIP_BASE = 'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium'
-
-const CHIP_STATE = {
-  available: `${CHIP_BASE} border-black bg-black text-white`,
-  unavailable: `${CHIP_BASE} border-gray-200 bg-white text-gray-400`,
-  // Most amenities are unknown until Google or the community confirms them —
-  // dashed, but legible (not washed out), since these are exactly the chips
-  // a user will eventually tap to confirm and earn Rewards for.
-  unknown: `${CHIP_BASE} border-dashed border-gray-300 bg-white text-gray-500`,
-}
-
-function AmenityChip({ entry }: { entry: AmenityEntry }) {
-  const state = entry.value === true ? 'available' : entry.value === false ? 'unavailable' : 'unknown'
+// Only what the space actually has — false/unknown amenities are simply
+// omitted rather than shown as "not available" or "unconfirmed", so this
+// never reads like a filter or a form.
+function AmenityChip({ entry, size = 'base' }: { entry: AmenityEntry; size?: 'base' | 'sm' }) {
   return (
-    <span className={CHIP_STATE[state]} title={state === 'unknown' ? 'Información no disponible' : undefined}>
-      <AmenityIcon name={entry.key} className={`h-3 w-3 flex-none ${state === 'available' ? 'invert' : ''}`} />
-      <span className={state === 'unavailable' ? 'line-through decoration-gray-300' : ''}>{entry.label}</span>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white font-medium text-gray-700 ${
+        size === 'sm' ? 'px-2 py-1 text-[11px]' : 'px-2.5 py-1.5 text-xs'
+      }`}
+    >
+      <span className="text-black">✓</span>
+      <AmenityIcon name={entry.key} className={size === 'sm' ? 'h-3 w-3 flex-none' : 'h-3.5 w-3.5 flex-none'} />
+      {entry.label}
     </span>
   )
 }
 
-function AmenityGroupRow({ title, entries }: { title: string; entries: AmenityEntry[] }) {
+function AmenityCategory({
+  title,
+  entries,
+  emphasis,
+}: {
+  title: string
+  entries: AmenityEntry[]
+  emphasis: 'primary' | 'secondary' | 'compact'
+}) {
+  const confirmed = entries.filter((entry) => entry.value === true)
+  if (confirmed.length === 0) return null
+
   return (
     <div>
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">{title}</h4>
-      <div className="mt-2.5 flex flex-wrap gap-1.5">
-        {entries.map((entry) => (
-          <AmenityChip key={entry.key} entry={entry} />
+      <h4
+        className={
+          emphasis === 'primary'
+            ? 'text-sm font-bold tracking-tight'
+            : emphasis === 'secondary'
+              ? 'text-xs font-semibold uppercase tracking-wide text-gray-500'
+              : 'text-xs font-semibold uppercase tracking-wide text-gray-400'
+        }
+      >
+        {title}
+      </h4>
+      <div className={`flex flex-wrap gap-1.5 ${emphasis === 'primary' ? 'mt-2.5' : 'mt-2'}`}>
+        {confirmed.map((entry) => (
+          <AmenityChip key={entry.key} entry={entry} size={emphasis === 'compact' ? 'sm' : 'base'} />
         ))}
       </div>
     </div>
   )
 }
 
-function findEntry(
-  groups: { groupKey: string; entries: AmenityEntry[] }[],
-  groupKey: string,
-  key: string
-): AmenityEntry {
-  const entry = groups.find((group) => group.groupKey === groupKey)?.entries.find((item) => item.key === key)
-  return entry ?? { key, label: AMENITY_LABELS[key] ?? key, value: null }
-}
-
-const COMODIDAD_KEYS = ['mesas_comodas', 'iluminacion', 'clima']
-const SERVICIOS_PRINCIPALES_KEYS = ['cafe', 'agua', 'banos', 'estacionamiento']
-const SERVICIOS_RESTO_KEYS = [
-  'comida', 'impresiones', 'pizarra', 'pantalla_tv', 'proyector', 'terraza', 'pet_friendly', 'accesibilidad',
-]
-
 export function AmenitiesSection({ amenities }: AmenitiesSectionProps) {
-  const [expanded, setExpanded] = useState(false)
   const groups = groupedAmenityEntries(amenities)
+  const paraTrabajar = groups.find((group) => group.groupKey === 'para_trabajar')?.entries ?? []
+  const paraLlamadas = groups.find((group) => group.groupKey === 'para_llamadas')?.entries ?? []
+  const servicios = groups.find((group) => group.groupKey === 'servicios')?.entries ?? []
+  const ambienteLabel = amenities.ambiente ? AMENITY_LABELS[amenities.ambiente] ?? amenities.ambiente : null
 
-  const wifi = findEntry(groups, 'para_trabajar', 'wifi')
-  const enchufes = findEntry(groups, 'para_trabajar', 'enchufes')
-  const wifiRapido = findEntry(groups, 'para_trabajar', 'wifi_rapido')
-  const senalMovil = findEntry(groups, 'para_trabajar', 'senal_movil')
-  const comodidadEntries = COMODIDAD_KEYS.map((key) => findEntry(groups, 'para_trabajar', key))
-  const llamadasEntries = groups.find((group) => group.groupKey === 'para_llamadas')?.entries ?? []
-  const serviciosPrincipales = SERVICIOS_PRINCIPALES_KEYS.map((key) => findEntry(groups, 'servicios', key))
-  const serviciosResto = SERVICIOS_RESTO_KEYS.map((key) => findEntry(groups, 'servicios', key))
+  const hasAnything =
+    paraTrabajar.some((entry) => entry.value === true) ||
+    paraLlamadas.some((entry) => entry.value === true) ||
+    servicios.some((entry) => entry.value === true) ||
+    ambienteLabel != null
 
   return (
-    <div className="mt-4 flex flex-col gap-6">
-      <div className="flex flex-wrap gap-1.5">
-        <AmenityChip entry={wifi} />
-        <AmenityChip entry={enchufes} />
-      </div>
+    <div className="mt-6">
+      <h3 className="text-base font-bold tracking-tight">¿Qué encontrarás aquí?</h3>
 
-      {amenities.ambiente && (
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Ambiente</h4>
-          <div className="mt-2.5">
-            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700">
-              {AMENITY_LABELS[amenities.ambiente] ?? amenities.ambiente}
-            </span>
-          </div>
-        </div>
-      )}
+      {hasAnything ? (
+        <div className="mt-4 flex flex-col gap-5">
+          <AmenityCategory title="Para trabajar" entries={paraTrabajar} emphasis="primary" />
+          <AmenityCategory title="Para llamadas" entries={paraLlamadas} emphasis="secondary" />
+          <AmenityCategory title="Servicios" entries={servicios} emphasis="compact" />
 
-      <AmenityGroupRow title="Comodidad" entries={comodidadEntries} />
-      <AmenityGroupRow title="Llamadas" entries={llamadasEntries} />
-      <AmenityGroupRow title="Servicios principales" entries={serviciosPrincipales} />
-
-      {expanded && (
-        <>
-          <AmenityGroupRow title="Más para trabajar" entries={[wifiRapido, senalMovil]} />
-          <AmenityGroupRow title="Más servicios" entries={serviciosResto} />
-          {(amenities.tipo_espacio ?? []).length > 0 && (
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Tipo de espacio</h4>
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
-                {(amenities.tipo_espacio ?? []).map((value) => (
-                  <span
-                    key={value}
-                    className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700"
-                  >
-                    {AMENITY_LABELS[value] ?? value}
-                  </span>
-                ))}
-              </div>
+          {ambienteLabel && (
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Ambiente</span>
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <span className="h-2 w-2 rounded-full bg-black" />
+                {ambienteLabel}
+              </span>
             </div>
           )}
-        </>
+        </div>
+      ) : (
+        <p className="mt-2 text-sm text-gray-500">Todavía no tenemos esta información confirmada.</p>
       )}
-
-      <button
-        type="button"
-        onClick={() => setExpanded((value) => !value)}
-        className="self-start text-xs font-semibold text-gray-500 underline hover:text-black"
-      >
-        {expanded ? 'Ver menos' : 'Ver todos'}
-      </button>
     </div>
   )
 }

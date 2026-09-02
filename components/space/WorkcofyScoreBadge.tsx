@@ -1,4 +1,5 @@
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
+import { topAmenityHighlights } from '@/lib/amenities/highlights'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 
 interface WorkcofyScoreBadgeProps {
@@ -18,6 +19,7 @@ function scoreLabel(score: number): string {
 export function WorkcofyScoreBadge({ space }: WorkcofyScoreBadgeProps) {
   const score = computeWorkcofyScore(space)
   const progress = score != null ? (score / 100) * CIRCUMFERENCE : 0
+  const highlights = topAmenityHighlights(space.amenities)
 
   return (
     <div className="mt-6 flex items-center gap-5 rounded-2xl border border-gray-100 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
@@ -53,6 +55,9 @@ export function WorkcofyScoreBadge({ space }: WorkcofyScoreBadgeProps) {
         <p className="mt-1 text-sm text-gray-500">
           {score != null ? scoreLabel(score) : 'Todavía no tenemos suficientes datos de este espacio.'}
         </p>
+        {highlights.length > 0 && (
+          <p className="mt-1.5 text-xs font-medium text-gray-600">{highlights.join(' · ')}</p>
+        )}
       </div>
     </div>
   )

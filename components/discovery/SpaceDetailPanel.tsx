@@ -7,7 +7,6 @@ import { buildDirectionsUrl } from '@/lib/directions'
 import { getLimaNow } from '@/lib/geo/limaTime'
 import { formatDistanceKm } from '@/lib/geo/haversine'
 import { formatPriceLevel } from '@/lib/priceLevel'
-import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
@@ -16,6 +15,7 @@ import { SocialLinks } from '@/components/space/SocialLinks'
 import { ReviewsSection } from '@/components/space/ReviewsSection'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
+import { WorkcofyScoreBadge } from '@/components/space/WorkcofyScoreBadge'
 import { CartaEspecialSection } from '@/components/space/CartaEspecialSection'
 import { AMENITY_LABELS } from '@/lib/amenities/types'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
@@ -47,7 +47,6 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayIndex = now.getDay()
-  const score = computeWorkcofyScore(space)
   const priceLevel = formatPriceLevel(space.price_level)
   const [benefits, setBenefits] = useState<SpaceBenefit[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
@@ -155,11 +154,6 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           )}
           {space.distanceKm != null && <span>{formatDistanceKm(space.distanceKm)}</span>}
           {priceLevel && <span className="text-gray-500">{priceLevel}</span>}
-          {score != null && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-workcofy-yellow/15 px-2 py-0.5 text-xs font-semibold">
-              <span className="text-workcofy-yellow">{score}</span> Workcofy Score
-            </span>
-          )}
           <span className={`inline-flex items-center gap-1 ${openNow ? 'font-semibold text-black' : 'text-gray-500'}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -217,6 +211,8 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           </span>
         </div>
 
+        <WorkcofyScoreBadge space={space} />
+
         {space.verified && space.verified_amenities.length > 0 && (
           <div className="mt-5 rounded-2xl border border-workcofy-green/40 bg-workcofy-green/10 p-4">
             <h3 className="text-sm font-semibold tracking-tight">Workcofy comprobó este espacio</h3>
@@ -228,8 +224,7 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           </div>
         )}
 
-        <h3 className="mt-8 text-lg font-bold tracking-tight">Amenities</h3>
-        {priceLevel && <p className="mt-2 text-sm font-medium text-gray-600">Precio: {priceLevel}</p>}
+        {priceLevel && <p className="mt-8 text-sm font-medium text-gray-600">Precio: {priceLevel}</p>}
         <AmenitiesSection amenities={space.amenities} />
 
         {benefits.length > 0 && (
