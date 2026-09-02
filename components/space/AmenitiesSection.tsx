@@ -18,7 +18,11 @@ function AmenityChip({ entry, size = 'base' }: { entry: AmenityEntry; size?: 'ba
       title={confirmed ? undefined : 'Todavía no confirmado'}
       className={`inline-flex items-center gap-1.5 rounded-full border font-medium ${
         size === 'sm' ? 'px-2 py-1 text-[11px]' : 'px-2.5 py-1.5 text-xs'
-      } ${confirmed ? 'border-gray-200 bg-white text-gray-700' : 'border-gray-100 bg-gray-50 text-gray-300'}`}
+      } ${
+        confirmed
+          ? 'border-workcofy-yellow bg-workcofy-yellow text-black'
+          : 'border-gray-100 bg-gray-50 text-gray-300'
+      }`}
     >
       {confirmed && <span className="text-black">✓</span>}
       <AmenityIcon
@@ -35,7 +39,7 @@ function AmbienteChip({ label, active }: { label: string; active: boolean }) {
     <span
       title={active ? undefined : 'Todavía no confirmado'}
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium ${
-        active ? 'border-gray-200 bg-white text-gray-700' : 'border-gray-100 bg-gray-50 text-gray-300'
+        active ? 'border-workcofy-yellow bg-workcofy-yellow text-black' : 'border-gray-100 bg-gray-50 text-gray-300'
       }`}
     >
       {active && <span className="text-black">✓</span>}
