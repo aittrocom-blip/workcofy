@@ -1,12 +1,14 @@
 import { pickExampleVisitors } from '@/lib/mockUsers'
+import { avatarFor } from '@/lib/avatars'
 
 interface VisitorAvatarsStripProps {
   spaceId: string
 }
 
-// Quick "who's been here" glance shown above the space name. Same example
-// visitor set as CommunityPreview (seeded by spaceId, so it matches what's
-// shown further down that same page) — just trimmed to fit above the title.
+// Quick "who's been here" glance shown above the space name — seeded by
+// spaceId so the same space always shows the same example visitors. Uses
+// the same illustrated avatar art as the "Cerca de ti" widget on the
+// Espacios dashboard, for visual consistency across the app.
 export function VisitorAvatarsStrip({ spaceId }: VisitorAvatarsStripProps) {
   const visitors = pickExampleVisitors(spaceId)
 
@@ -14,13 +16,14 @@ export function VisitorAvatarsStrip({ spaceId }: VisitorAvatarsStripProps) {
     <div className="flex items-center gap-2">
       <div className="flex -space-x-2">
         {visitors.map((visitor) => (
-          <span
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             key={visitor.initials + visitor.daysAgo}
+            src={avatarFor(visitor.avatarId).src}
+            alt=""
             title={`${visitor.name} (ejemplo)`}
-            className={`flex h-6 w-6 flex-none items-center justify-center rounded-full border-2 border-white text-[10px] font-bold ${visitor.colorClass}`}
-          >
-            {visitor.initials}
-          </span>
+            className="h-6 w-6 flex-none rounded-full border-2 border-white bg-gray-50 object-cover"
+          />
         ))}
       </div>
       <p className="text-xs text-gray-400">

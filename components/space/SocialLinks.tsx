@@ -25,7 +25,9 @@ function TikTokIcon() {
 }
 
 export function SocialLinks({ instagramUrl, tiktokUrl }: SocialLinksProps) {
-  if (!instagramUrl && !tiktokUrl) return null
+  if (!instagramUrl && !tiktokUrl) {
+    return <p className="text-sm text-gray-500">Este espacio todavía no tiene redes sociales registradas.</p>
+  }
 
   return (
     <div className="flex flex-wrap gap-2">

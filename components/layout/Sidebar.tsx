@@ -34,18 +34,20 @@ export function Sidebar() {
   const [pickedAvatarId, setPickedAvatarId] = useState<string | null>(null)
   const avatarId = pickedAvatarId ?? fetchedAvatarId
   const [name, setName] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     if (!user) return
     const supabase = createBrowserSupabaseClient()
     supabase
       .from('profiles')
-      .select('name')
+      .select('name, is_admin')
       .eq('id', user.id)
       .single()
       .then(({ data, error }) => {
         if (error) return
         setName(data?.name ?? null)
+        setIsAdmin(data?.is_admin ?? false)
       })
   }, [user])
 
@@ -116,6 +118,19 @@ export function Sidebar() {
             </span>
           )
         })}
+
+        {isAdmin && (
+          <Link
+            href="/admin/espacios"
+            className={`mt-2 flex items-center gap-2 rounded-xl border-t border-gray-100 px-2.5 pb-2 pt-3 text-base font-semibold transition-colors ${
+              pathname.startsWith('/admin')
+                ? 'bg-workcofy-yellow/15 text-workcofy-black'
+                : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            Admin
+          </Link>
+        )}
       </nav>
 
       <div className="mt-auto flex flex-col items-start gap-3 border-t border-gray-100 px-4 py-4">

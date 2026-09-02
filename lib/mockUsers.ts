@@ -1,21 +1,16 @@
+import { AVATAR_OPTIONS } from '@/lib/avatars'
+
 // Illustrative-only user set for previewing what the future Comunidad
 // features will look like once real accounts exist. Never presented as real
 // activity — always paired with a visible "vista previa / ejemplo" label
-// wherever it's rendered (see components/space/CommunityPreview.tsx).
+// wherever it's rendered. Uses the same avatar artwork as real user profiles
+// (see lib/avatars.ts) so example people look consistent with the rest of
+// the app instead of falling back to colored initials.
 export interface MockUser {
   initials: string
   name: string
-  colorClass: string
+  avatarId: string
 }
-
-const COLOR_CLASSES = [
-  'bg-workcofy-yellow/25 text-workcofy-black',
-  'bg-workcofy-green/25 text-workcofy-black',
-  'bg-purple-100 text-purple-900',
-  'bg-blue-100 text-blue-900',
-  'bg-rose-100 text-rose-900',
-  'bg-orange-100 text-orange-900',
-]
 
 const NAMES = [
   'José Ortiz', 'Rosa Paredes', 'Juan Jara', 'María Lucía Soto', 'Andrés Castillo',
@@ -37,7 +32,7 @@ function initialsFrom(name: string): string {
 export const MOCK_USERS: MockUser[] = NAMES.map((name, index) => ({
   initials: initialsFrom(name),
   name,
-  colorClass: COLOR_CLASSES[index % COLOR_CLASSES.length],
+  avatarId: AVATAR_OPTIONS[index % AVATAR_OPTIONS.length].id,
 }))
 
 // Deterministic per-space seed so the same space always shows the same
@@ -60,7 +55,9 @@ export function pickExampleVisitors(seed: string, count = 3): ExampleVisitor[] {
   const visitors: ExampleVisitor[] = []
   for (let i = 0; i < count; i++) {
     const userIndex = (base + i * 7) % MOCK_USERS.length
-    const daysAgo = ((base >> (i + 2)) % 6) + 1
+    // Unsigned shift — `base` treated as signed 32-bit here would go
+    // negative for large hashes, making `% 6` produce a negative daysAgo.
+    const daysAgo = ((base >>> (i + 2)) % 6) + 1
     visitors.push({ ...MOCK_USERS[userIndex], daysAgo })
   }
   return visitors

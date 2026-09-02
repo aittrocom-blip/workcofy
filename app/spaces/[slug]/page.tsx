@@ -13,6 +13,7 @@ import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { ShareButton } from '@/components/space/ShareButton'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { SocialLinks } from '@/components/space/SocialLinks'
+import { EventsSection } from '@/components/space/EventsSection'
 import { ReviewsSection } from '@/components/space/ReviewsSection'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { CartaEspecialSection } from '@/components/space/CartaEspecialSection'
@@ -201,14 +202,15 @@ export default async function SpacePage({ params }: SpacePageProps) {
         ))}
       </ul>
 
-      {(space.instagram_url || space.tiktok_url) && (
-        <>
-          <h2 className="mt-10 text-xl font-bold tracking-tight">Redes sociales</h2>
-          <div className="mt-3">
-            <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
-          </div>
-        </>
-      )}
+      <h2 className="mt-10 text-xl font-bold tracking-tight">Redes sociales</h2>
+      <div className="mt-3">
+        <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
+      </div>
+
+      <h2 className="mt-10 text-xl font-bold tracking-tight">Eventos</h2>
+      <div className="mt-3">
+        <EventsSection />
+      </div>
 
       {space.special_menu_enabled && <CartaEspecialSection content={space.special_menu_content} />}
 

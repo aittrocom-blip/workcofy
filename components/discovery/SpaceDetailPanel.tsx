@@ -12,6 +12,7 @@ import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { ShareButton } from '@/components/space/ShareButton'
 import { SocialLinks } from '@/components/space/SocialLinks'
+import { EventsSection } from '@/components/space/EventsSection'
 import { ReviewsSection } from '@/components/space/ReviewsSection'
 import { VisitorAvatarsStrip } from '@/components/space/VisitorAvatarsStrip'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
@@ -253,14 +254,15 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           ))}
         </ul>
 
-        {(space.instagram_url || space.tiktok_url) && (
-          <>
-            <h3 className="mt-8 text-lg font-bold tracking-tight">Redes sociales</h3>
-            <div className="mt-3">
-              <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
-            </div>
-          </>
-        )}
+        <h3 className="mt-8 text-lg font-bold tracking-tight">Redes sociales</h3>
+        <div className="mt-3">
+          <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
+        </div>
+
+        <h3 className="mt-8 text-lg font-bold tracking-tight">Eventos</h3>
+        <div className="mt-3">
+          <EventsSection />
+        </div>
 
         {space.special_menu_enabled && <CartaEspecialSection content={space.special_menu_content} />}
 
