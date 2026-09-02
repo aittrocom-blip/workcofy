@@ -32,4 +32,11 @@ describe('groupedAmenityEntries', () => {
     const otherEntries = groups.flatMap((g) => g.entries).filter((e) => !assumedTrue.has(e.key))
     expect(otherEntries.every((e) => e.value === null)).toBe(true)
   })
+
+  it('excludes ambiente and tipo_espacio — they have their own dedicated UI, not this entry shape', () => {
+    const groups = groupedAmenityEntries(DEFAULT_AMENITIES)
+    const groupKeys = groups.map((g) => g.groupKey)
+    expect(groupKeys).not.toContain('ambiente')
+    expect(groupKeys).not.toContain('tipo_espacio')
+  })
 })
