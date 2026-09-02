@@ -203,12 +203,6 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           >
             Ver ficha completa
           </a>
-          <span
-            className="inline-flex cursor-not-allowed items-center rounded-full border border-dashed border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-400"
-            title="Reserva de asiento o espacio — todavía no disponible"
-          >
-            Reservar
-          </span>
         </div>
 
         <WorkcofyScoreBadge space={space} />

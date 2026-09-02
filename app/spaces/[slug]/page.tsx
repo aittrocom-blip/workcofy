@@ -151,12 +151,6 @@ export default async function SpacePage({ params }: SpacePageProps) {
           slug={space.slug}
           className="flex h-11 w-11 flex-none touch-manipulation items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
         />
-        <span
-          className="inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full border border-dashed border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400 sm:w-auto"
-          title="Reserva de asiento o espacio — todavía no disponible"
-        >
-          Reservar · Próximamente
-        </span>
       </div>
 
       <WorkcofyScoreBadge space={space} />
