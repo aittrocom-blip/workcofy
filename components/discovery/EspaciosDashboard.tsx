@@ -22,11 +22,6 @@ interface EspaciosDashboardProps {
   isAdmin: boolean
 }
 
-// Not wired to real filtering logic yet — that's a separate, not-yet-designed
-// sub-project. Shown inert so the layout already matches the target design;
-// each becomes a real control when that sub-project builds it.
-const INERT_FILTERS = ['Ubicación', 'Tipo de espacio', 'Ambiente', 'Más filtros']
-
 export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
   const { coordinate, status, requestLocation } = useUserLocation()
   useEffect(() => {
@@ -121,22 +116,86 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
       {/* The main interaction from here down — buscar → descubrir → comparar
           → elegir → llegar — replaces the old metrics-first header. */}
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="¿Dónde quieres trabajar?"
-          className="min-w-[240px] flex-1 rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-black shadow-sm outline-none focus:border-black"
-        />
-        {INERT_FILTERS.map((label) => (
-          <span
-            key={label}
-            title="Próximamente"
-            className="inline-flex cursor-not-allowed items-center gap-1 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-300 shadow-sm"
-          >
-            {label}
-          </span>
-        ))}
+        <div className="relative min-w-[240px] flex-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/icons/nav-search.png"
+            alt=""
+            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 opacity-40"
+          />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Buscar espacios, barrios o lugares..."
+            className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-11 text-sm font-medium text-black shadow-sm outline-none focus:border-black"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/icons/nav-search.png"
+            alt=""
+            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 opacity-40"
+          />
+        </div>
+        <span
+          title="Próximamente"
+          className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-300 shadow-sm"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-3.5 opacity-40" />
+          Ubicación
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-chevron-down.png" alt="" className="h-3 w-3 opacity-40" />
+        </span>
+        <span
+          title="Próximamente"
+          className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-300 shadow-sm"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="8" height="8" rx="1.5" />
+            <rect x="13" y="3" width="8" height="8" rx="1.5" />
+            <rect x="3" y="13" width="8" height="8" rx="1.5" />
+            <rect x="13" y="13" width="8" height="8" rx="1.5" />
+          </svg>
+          Tipo de espacio
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-chevron-down.png" alt="" className="h-3 w-3 opacity-40" />
+        </span>
+        <span
+          title="Próximamente"
+          className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-300 shadow-sm"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="9" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-2 5-5 2 2-5 5-2z" />
+          </svg>
+          Ambiente
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-chevron-down.png" alt="" className="h-3 w-3 opacity-40" />
+        </span>
+        <span
+          title="Próximamente"
+          className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-300 shadow-sm"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-filters.png" alt="" className="h-3.5 w-3.5 opacity-40" />
+          Más filtros
+        </span>
       </div>
+
+      {(search || category) && (
+        <div className="mt-1.5 flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setSearch('')
+              setCategory(null)
+            }}
+            className="text-xs font-medium text-gray-400 hover:text-black hover:underline"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      )}
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         <button
