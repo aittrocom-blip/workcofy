@@ -66,7 +66,9 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
           className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm transition-colors"
         />
       </div>
-      <h3 className="mt-3 font-semibold tracking-tight">{space.name}</h3>
+      <h3 title={space.name} className="mt-3 line-clamp-2 min-h-[2.75rem] font-semibold leading-snug tracking-tight">
+        {space.name}
+      </h3>
       <p className="text-sm text-gray-500">{districtLabel(space.district)}</p>
       {space.data_source === 'mock' && (
         <span className="mt-1.5 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
