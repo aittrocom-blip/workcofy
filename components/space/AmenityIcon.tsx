@@ -19,7 +19,7 @@ const AMENITY_ICON_SRC: Record<string, string> = {
   pizarra: '/icons/amenity-pizarra.png',
   sala_reuniones: '/icons/amenity-sala-reuniones.png',
   proyector: '/icons/amenity-proyector.png',
-  aire_acondicionado: '/icons/amenity-aire-acondicionado.png',
+  clima: '/icons/amenity-aire-acondicionado.png',
   estacionamiento: '/icons/amenity-estacionamiento.png',
   terraza: '/icons/amenity-terraza.png',
   pet_friendly: '/icons/amenity-pet-friendly.png',
