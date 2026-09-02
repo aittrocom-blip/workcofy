@@ -94,14 +94,6 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
       dimmed: false,
     }))
 
-  // Every category, including the not-yet-filterable ones — this widget is
-  // informational only, so it's fine (and honest) to show a real 0 for a
-  // category with no filter behind it yet.
-  const categoryCounts = CATEGORY_OPTIONS.map((option) => ({
-    ...option,
-    count: withDistance.filter((space) => space.category === option.value).length,
-  }))
-
   // Districts actually present in the data, grouped by country and sorted
   // by how many spaces each one has — feeds the "Ubicación" dropdown.
   const districtGroups = useMemo(() => {
@@ -428,23 +420,6 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
                 <path d="M14 4h6v6M20 4l-8 8M6 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-1" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
-          </div>
-
-          <div className="rounded-2xl border border-gray-100 bg-white p-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Tipos de espacios</h3>
-              <span title="Próximamente" className="cursor-not-allowed text-xs font-semibold text-gray-300">
-                Ver todos →
-              </span>
-            </div>
-            <ul className="mt-3 flex flex-col gap-2.5">
-              {categoryCounts.map((option) => (
-                <li key={option.value} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700">{option.label}</span>
-                  <span className="text-gray-400">{option.count}</span>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="rounded-2xl border border-gray-100 bg-white p-4">
