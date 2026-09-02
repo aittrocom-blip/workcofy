@@ -25,6 +25,17 @@ export async function middleware(request: NextRequest) {
     return redirect
   }
 
+  // Mirrors the "Ver espacio" gate in SpaceCard.tsx — a direct/shared link to
+  // a space's ficha needs the same login wall the button already enforces,
+  // or the button gate would be trivially bypassed by pasting the URL.
+  if (!user && request.nextUrl.pathname.startsWith('/spaces/')) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('next', request.nextUrl.pathname)
+    const redirect = NextResponse.redirect(loginUrl)
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+    return redirect
+  }
+
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
       const loginUrl = new URL('/login', request.url)
