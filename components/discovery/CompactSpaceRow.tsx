@@ -4,6 +4,8 @@ import { formatDistanceKm } from '@/lib/geo/haversine'
 import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { districtLabel } from '@/lib/districts'
+import { CATEGORY_OPTIONS } from '@/lib/categories'
+import { CategoryIcon } from '@/components/discovery/CategoryIcon'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { isOpenNow } from '@/lib/hours/openingHours'
@@ -24,6 +26,7 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
   const priceLevel = formatPriceLevel(space.price_level)
   const openNow = isOpenNow(space.opening_hours, getLimaNow())
   const coverPhoto = space.photos?.find((photo) => photo.url)
+  const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label ?? space.category
 
   return (
     <div
@@ -78,6 +81,10 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
           {score != null && <span className="font-semibold text-workcofy-yellow">{score} Score</span>}
           {priceLevel && <span>{priceLevel}</span>}
         </div>
+      </div>
+      <div className="hidden flex-none items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600 sm:flex">
+        <CategoryIcon name={space.category} className="h-3.5 w-3.5" />
+        {categoryLabel}
       </div>
       <FavoriteButton
         spaceId={space.id}

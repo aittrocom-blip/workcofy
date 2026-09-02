@@ -12,6 +12,7 @@ import type { SortOption } from '@/lib/filters/discoveryFilters'
 import { SortDropdown } from '@/components/discovery/SortDropdown'
 import { CompactSpaceRow } from '@/components/discovery/CompactSpaceRow'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
+import { districtLabel } from '@/lib/districts'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import { MapView } from '@/components/map/MapView'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
@@ -36,6 +37,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
   const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<string | null>(searchParams.get('category'))
+  const [district, setDistrict] = useState<string | null>(null)
   const [sort, setSort] = useState<SortOption>('distance')
   const [page, setPage] = useState(1)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -46,6 +48,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
     const term = search.trim().toLowerCase()
     return withDistance.filter((space) => {
       if (category && space.category !== category) return false
+      if (district && space.district !== district) return false
       if (
         term &&
         !space.name.toLowerCase().includes(term) &&
@@ -55,7 +58,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
       }
       return true
     })
-  }, [withDistance, search, category])
+  }, [withDistance, search, category, district])
 
   const sortedFiltered = useMemo(() => sortSpaces(filtered, sort), [filtered, sort])
   const PAGE_SIZE = 10
@@ -96,6 +99,18 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
     ...option,
     count: withDistance.filter((space) => space.category === option.value).length,
   }))
+
+  // Districts actually present in the data, most populated first — feeds
+  // the "Ubicación" dropdown.
+  const districtOptions = useMemo(() => {
+    const counts = new Map<string, number>()
+    withDistance.forEach((space) => {
+      counts.set(space.district, (counts.get(space.district) ?? 0) + 1)
+    })
+    return Array.from(counts.entries())
+      .map(([value, count]) => ({ value, label: districtLabel(value), count }))
+      .sort((a, b) => b.count - a.count)
+  }, [withDistance])
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
@@ -142,17 +157,46 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
           <button
             type="button"
             onClick={() => setOpenDropdown((current) => (current === 'ubicacion' ? null : 'ubicacion'))}
-            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-black"
+            className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-medium shadow-sm transition-colors ${
+              district ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700 hover:border-black'
+            }`}
           >
             <PinIcon className="h-3.5 w-3.5" />
-            Ubicación
+            {district ? districtLabel(district) : 'Ubicación'}
             <ChevronIcon className={`h-3 w-3 transition-transform ${openDropdown === 'ubicacion' ? 'rotate-180' : ''}`} />
           </button>
           {openDropdown === 'ubicacion' && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setOpenDropdown(null)} />
-              <div className="absolute left-0 top-full z-20 mt-2 w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm text-gray-500 shadow-lg">
-                Muy pronto podrás filtrar por distrito y distancia.
+              <div className="absolute left-0 top-full z-20 mt-2 max-h-80 w-64 overflow-y-auto rounded-2xl border border-gray-100 bg-white p-2 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDistrict(null)
+                    setOpenDropdown(null)
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${
+                    district === null ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Todos los distritos
+                </button>
+                {districtOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setDistrict(option.value)
+                      setOpenDropdown(null)
+                    }}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${
+                      district === option.value ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {option.label}
+                    <span className={district === option.value ? 'text-white/70' : 'text-gray-400'}>{option.count}</span>
+                  </button>
+                ))}
               </div>
             </>
           )}
@@ -246,13 +290,14 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
         </div>
       </div>
 
-      {(search || category) && (
+      {(search || category || district) && (
         <div className="mt-1.5 flex justify-end">
           <button
             type="button"
             onClick={() => {
               setSearch('')
               setCategory(null)
+              setDistrict(null)
             }}
             className="text-xs font-medium text-gray-400 hover:text-black hover:underline"
           >
