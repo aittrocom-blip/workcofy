@@ -173,6 +173,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
       )}
 
       <h2 className="mt-10 text-xl font-bold tracking-tight">Amenities</h2>
+      {priceLevel && <p className="mt-2 text-sm font-medium text-gray-600">Precio: {priceLevel}</p>}
       <AmenitiesSection amenities={space.amenities} />
 
       {benefits.length > 0 && (

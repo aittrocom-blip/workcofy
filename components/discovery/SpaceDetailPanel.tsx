@@ -229,6 +229,7 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
         )}
 
         <h3 className="mt-8 text-lg font-bold tracking-tight">Amenities</h3>
+        {priceLevel && <p className="mt-2 text-sm font-medium text-gray-600">Precio: {priceLevel}</p>}
         <AmenitiesSection amenities={space.amenities} />
 
         {benefits.length > 0 && (
