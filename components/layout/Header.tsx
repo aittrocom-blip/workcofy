@@ -11,7 +11,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#F0F0F0] bg-white">
-      <div className="mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 md:h-[76px] md:px-8 lg:px-12">
+      <div className="mx-auto grid h-16 max-w-[1584px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 md:h-[76px] md:px-8 lg:px-12">
         <Link href="/" className="flex w-fit items-center py-2 transition-opacity hover:opacity-80">
           <Image
             src="/logo-wordmark.png"
