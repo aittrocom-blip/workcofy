@@ -16,7 +16,7 @@ export function ExplorarSection() {
     <section id="explorar" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-8">
       <div className="flex flex-col items-center gap-10 md:flex-row">
         <div className="flex-1">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">01 — Explorar</span>
+          <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">01 — Espacios</span>
           <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight md:text-4xl">
             Encuentra el lugar adecuado para lo que necesitas.
           </h2>
