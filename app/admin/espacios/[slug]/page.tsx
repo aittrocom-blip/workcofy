@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getSpaceBySlug } from '@/lib/data/spaces'
 import { VerificationForm } from './VerificationForm'
+import { AmenitiesEditorForm } from './AmenitiesEditorForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,6 +21,11 @@ export default async function AdminSpacePage({ params }: AdminSpacePageProps) {
         slug={space.slug}
         initialVerified={space.verified}
         initialVerifiedAmenities={space.verified_amenities}
+      />
+      <AmenitiesEditorForm
+        spaceId={space.id}
+        slug={space.slug}
+        initialAmenities={space.amenities}
       />
     </div>
   )
