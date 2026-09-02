@@ -113,6 +113,16 @@ export const AMENITY_LABELS: Record<string, string> = {
   terraza_exterior: 'Terraza / exterior',
 }
 
+// Flat list of every actual boolean amenity leaf key (para_trabajar,
+// para_llamadas, servicios) — distinct from AMENITY_LABELS, which also
+// carries ambiente/tipo_espacio VALUE labels. Use this whenever a consumer
+// needs to iterate only real toggleable amenities (e.g. VerificationForm).
+export const AMENITY_KEYS: string[] = [
+  ...Object.keys(DEFAULT_AMENITIES.para_trabajar),
+  ...Object.keys(DEFAULT_AMENITIES.para_llamadas),
+  ...Object.keys(DEFAULT_AMENITIES.servicios),
+]
+
 export const AMENITY_GROUP_LABELS: Record<keyof AmenitiesData, string> = {
   para_trabajar: 'Para trabajar',
   para_llamadas: 'Para llamadas',
@@ -148,7 +158,10 @@ export function parseAmenities(raw: unknown): AmenitiesData {
 
   function parseTipoEspacio(value: unknown): TipoEspacioValue[] {
     if (!Array.isArray(value)) return []
-    return value.filter((item): item is TipoEspacioValue => (TIPO_ESPACIO_VALUES as string[]).includes(item))
+    const filtered = value.filter((item): item is TipoEspacioValue =>
+      (TIPO_ESPACIO_VALUES as string[]).includes(item)
+    )
+    return [...new Set(filtered)]
   }
 
   return {

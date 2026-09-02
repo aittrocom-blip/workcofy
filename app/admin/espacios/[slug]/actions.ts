@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
-import type { AmenitiesData } from '@/lib/amenities/types'
+import { parseAmenities, type AmenitiesData } from '@/lib/amenities/types'
 
 async function requireAdmin() {
   const cookieStore = cookies()
@@ -67,7 +67,7 @@ export async function updateAmenities(spaceId: string, slug: string, amenities: 
   await requireAdmin()
 
   const admin = createAdminSupabaseClient()
-  const { error } = await admin.from('spaces').update({ amenities }).eq('id', spaceId)
+  const { error } = await admin.from('spaces').update({ amenities: parseAmenities(amenities) }).eq('id', spaceId)
 
   if (error) throw new Error(`No se pudo guardar: ${error.message}`)
 

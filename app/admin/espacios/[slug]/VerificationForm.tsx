@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AMENITY_LABELS } from '@/lib/amenities/types'
+import { AMENITY_KEYS, AMENITY_LABELS } from '@/lib/amenities/types'
 import { updateVerification } from './actions'
 
 interface VerificationFormProps {
@@ -59,12 +59,12 @@ export function VerificationForm({
         Amenities confirmadas
       </h2>
       <div className="mt-2 flex flex-col gap-2">
-        {Object.entries(AMENITY_LABELS).map(([key, label]) => (
+        {AMENITY_KEYS.map((key) => (
           <label
             key={key}
             className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-2.5 text-sm"
           >
-            {label}
+            {AMENITY_LABELS[key] ?? key}
             <input
               type="checkbox"
               checked={selectedAmenities.includes(key)}

@@ -97,11 +97,11 @@ export function AmenitiesSection({ amenities }: AmenitiesSectionProps) {
         <>
           <AmenityGroupRow title="Más para trabajar" entries={[wifiRapido, senalMovil]} />
           <AmenityGroupRow title="Más servicios" entries={serviciosResto} />
-          {amenities.tipo_espacio.length > 0 && (
+          {(amenities.tipo_espacio ?? []).length > 0 && (
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Tipo de espacio</h4>
               <div className="mt-2.5 flex flex-wrap gap-1.5">
-                {amenities.tipo_espacio.map((value) => (
+                {(amenities.tipo_espacio ?? []).map((value) => (
                   <span
                     key={value}
                     className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700"

@@ -74,4 +74,10 @@ describe('parseAmenities', () => {
     expect(parseAmenities({ tipo_espacio: ['sofa', 'jacuzzi'] }).tipo_espacio).toEqual(['sofa'])
     expect(parseAmenities({ tipo_espacio: 'sofa' }).tipo_espacio).toEqual([])
   })
+
+  it('deduplicates repeated tipo_espacio values', () => {
+    expect(parseAmenities({ tipo_espacio: ['sofa', 'sofa', 'mesa_grupal'] }).tipo_espacio).toEqual([
+      'sofa', 'mesa_grupal',
+    ])
+  })
 })

@@ -32,7 +32,13 @@ const AMENITY_ICON_SRC: Record<string, string> = {
 export function AmenityIcon({ name, className = 'h-4 w-4' }: AmenityIconProps) {
   const src = AMENITY_ICON_SRC[name]
   if (!src) {
-    return <span className={`${className} inline-block rounded-full bg-current opacity-60`} aria-hidden="true" />
+    // Never apply the caller's `invert` filter here: the dot already uses
+    // bg-current (white on the black "available" chip), so inverting it
+    // would turn it black and make it disappear against that background.
+    const fallbackClassName = className.replace(/\binvert\b/g, '').trim()
+    return (
+      <span className={`${fallbackClassName} inline-block rounded-full bg-current opacity-60`} aria-hidden="true" />
+    )
   }
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={src} alt="" className={`${className} object-contain`} />

@@ -123,7 +123,12 @@ export function AmenitiesEditorForm({ spaceId, slug, initialAmenities }: Ameniti
             <button
               key={value}
               type="button"
-              onClick={() => setAmenities((current) => ({ ...current, ambiente: value }))}
+              onClick={() =>
+                setAmenities((current) => ({
+                  ...current,
+                  ambiente: current.ambiente === value ? null : value,
+                }))
+              }
               className={`rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
                 amenities.ambiente === value
                   ? 'bg-black text-white'
