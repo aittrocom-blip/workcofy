@@ -6,6 +6,7 @@ import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { useIsDesktop } from '@/lib/hooks/useIsDesktop'
 import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
+import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { avatarFor } from '@/lib/avatars'
 import { MapView } from '@/components/map/MapView'
 import { SpaceList } from '@/components/discovery/SpaceList'
@@ -18,7 +19,6 @@ import { useUserLocation } from '@/lib/geo/useUserLocation'
 import type { MapViewHandle } from '@/lib/map/types'
 import { MapZoomControls } from '@/components/map/MapZoomControls'
 import { useFavorites } from '@/components/providers/FavoritesProvider'
-import { haversineDistanceKm } from '@/lib/geo/haversine'
 import { selectNearbyPopularSpaces } from '@/lib/discovery/selectNearbyPopularSpaces'
 import {
   parseDiscoveryFilters,
@@ -102,29 +102,13 @@ export function DiscoveryView({
     }
   }, [autoRequestLocation, status, requestLocation])
 
-  // Only a real, user-granted position yields a real distance. Before the user
-  // grants geolocation `coordinate` is the Miraflores fallback, and measuring
-  // from it would present an invented distance as fact — so distanceKm stays
-  // null, matching how `userLocation` and `origin` are already gated below.
-  const hasRealLocation = status === 'granted'
-
   // Always start at a city-wide scale (several districts visible), even once
   // a real position is known — the user explicitly asked to keep this wider
   // view as the starting point rather than auto-zooming in to ~500m; from
   // here they zoom in manually if they want to get closer.
   const mapZoom = 14
 
-  const withDistance = useMemo(
-    () =>
-      spaces.map((space) => ({
-        ...space,
-        distanceKm:
-          hasRealLocation && space.latitude != null && space.longitude != null
-            ? haversineDistanceKm(coordinate, { lat: space.latitude, lng: space.longitude })
-            : null,
-      })),
-    [spaces, coordinate, hasRealLocation]
-  )
+  const withDistance = useSpacesWithDistance(spaces)
 
   const sorted = useMemo(() => sortSpaces(withDistance, filters.sort), [withDistance, filters.sort])
 
