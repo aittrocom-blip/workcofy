@@ -50,7 +50,7 @@ export function Sidebar() {
   }, [user])
 
   return (
-    <aside className="flex h-screen w-[184px] flex-none flex-col border-r border-gray-100 bg-white">
+    <aside className="flex h-screen w-[221px] flex-none flex-col border-r border-gray-100 bg-white">
       <div className="px-4 pt-5">
         <Link href={LAUNCH_LOCKED ? '/' : '/near-me'} className="flex items-center gap-2" aria-label="Ir al mapa">
           <Image
