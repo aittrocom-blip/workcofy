@@ -333,7 +333,32 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
         </div>
       )}
 
-      <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="mt-10 rounded-2xl border border-gray-100 bg-white p-4">
+        <h3 className="text-sm font-semibold">Explorar en el mapa</h3>
+        <div className="mt-3 h-[300px] overflow-hidden rounded-xl">
+          <MapView
+            ref={mapRef}
+            center={coordinate}
+            zoom={12}
+            markers={sideMapMarkers}
+            selectedMarkerId={selectedId}
+            onMarkerSelect={setSelectedId}
+            userLocation={status === 'granted' ? coordinate : null}
+            hideNativeZoom
+          />
+        </div>
+        <Link
+          href="/near-me?view=map"
+          className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-black hover:underline"
+        >
+          Ver todos en el mapa
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 4h6v6M20 4l-8 8M6 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-1" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
         <div>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold tracking-tight">Explora espacios</h2>
@@ -397,31 +422,6 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
         </div>
 
         <aside className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-gray-100 bg-white p-4">
-            <h3 className="text-sm font-semibold">Explorar en el mapa</h3>
-            <div className="mt-3 h-[200px] overflow-hidden rounded-xl">
-              <MapView
-                ref={mapRef}
-                center={coordinate}
-                zoom={12}
-                markers={sideMapMarkers}
-                selectedMarkerId={selectedId}
-                onMarkerSelect={setSelectedId}
-                userLocation={status === 'granted' ? coordinate : null}
-                hideNativeZoom
-              />
-            </div>
-            <Link
-              href="/near-me?view=map"
-              className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-black hover:underline"
-            >
-              Ver todos en el mapa
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 4h6v6M20 4l-8 8M6 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-1" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </div>
-
           <div className="rounded-2xl border border-gray-100 bg-white p-4">
             <h3 className="text-sm font-semibold">Cerca de ti</h3>
             <p className="mt-0.5 text-xs text-gray-500">Actividad de la comunidad en las últimas horas.</p>
