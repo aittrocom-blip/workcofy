@@ -1,9 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { useMemo } from 'react'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { districtLabel } from '@/lib/districts'
+import { selectNearbyPopularSpaces } from '@/lib/discovery/selectNearbyPopularSpaces'
+import { SpaceCard } from '@/components/discovery/SpaceCard'
 
 interface EspaciosDashboardProps {
   spaces: SpaceRecord[]
@@ -30,6 +33,8 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
       topDistrictCount = count
     }
   }
+
+  const recommended = useMemo(() => selectNearbyPopularSpaces(withDistance, 8), [withDistance])
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
@@ -75,6 +80,19 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
           <p className="mt-1 text-xs text-gray-500">Ubicación más popular</p>
         </div>
       </div>
+      {recommended.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-bold tracking-tight">Recomendados para ti</h2>
+          <p className="mt-0.5 text-sm text-gray-500">Cerca de ti y populares en la comunidad.</p>
+          <div className="mt-3 flex gap-4 overflow-x-auto pb-2">
+            {recommended.map((space) => (
+              <div key={space.id} className="w-72 flex-none">
+                <SpaceCard space={space} isSelected={false} onSelect={() => {}} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
