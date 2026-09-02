@@ -163,7 +163,7 @@ export function FiltersBar({
               !filters.category ? chipActive : chipInactive
             }`}
           >
-            <CategoryIcon name="todos" className={`h-5 w-5 ${!filters.category ? 'invert' : ''}`} />
+            <CategoryIcon name="todos" className="h-5 w-5" active={!filters.category} />
             Todos
           </button>
           {TILE_ACTIVE.map((option) => (
@@ -176,7 +176,8 @@ export function FiltersBar({
             >
               <CategoryIcon
                 name={option.value}
-                className={`h-5 w-5 ${filters.category === option.value ? 'invert' : ''}`}
+                className="h-5 w-5"
+                active={filters.category === option.value}
               />
               {option.label}
             </button>
