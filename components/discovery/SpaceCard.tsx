@@ -12,6 +12,7 @@ import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { CategoryIcon } from '@/components/discovery/CategoryIcon'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
+import { useFavorites } from '@/components/providers/FavoritesProvider'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
 interface SpaceCardProps {
@@ -26,10 +27,14 @@ interface SpaceCardProps {
 }
 
 export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDetail, dimClosed = false }: SpaceCardProps) {
+  const { loggedIn } = useFavorites()
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayHours = formatPeriodForDay(space.opening_hours, now.getDay())
   const dimmed = dimClosed && !openNow
+  const spaceUrl = `/spaces/${space.slug}`
+  const viewSpaceButtonClass =
+    'whitespace-nowrap rounded-full border border-black bg-white px-3.5 py-2.5 text-xs font-semibold text-black transition-colors hover:bg-black hover:text-white active:scale-[0.97]'
   const score = computeWorkcofyScore(space)
   const priceLevel = formatPriceLevel(space.price_level)
   const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label ?? space.category
@@ -86,23 +91,31 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
       )}
       <p className="mt-1 text-xs text-gray-500">{openNow ? `Abierto · ${todayHours}` : 'Cerrado'}</p>
       <div className="mt-3.5 flex flex-wrap gap-1.5">
-        {onViewDetail ? (
+        {!loggedIn ? (
+          // Not signed in — always send to login (never onViewDetail, even
+          // inside the full-screen map), landing back on this space's own
+          // page afterward since the in-place map panel has no shareable URL
+          // of its own to return to.
+          <Link
+            href={`/login?next=${encodeURIComponent(spaceUrl)}`}
+            onClick={(event) => event.stopPropagation()}
+            className={viewSpaceButtonClass}
+          >
+            Ver espacio
+          </Link>
+        ) : onViewDetail ? (
           <button
             type="button"
             onClick={(event) => {
               event.stopPropagation()
               onViewDetail()
             }}
-            className="whitespace-nowrap rounded-full bg-black px-3.5 py-2.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
+            className={viewSpaceButtonClass}
           >
             Ver espacio
           </button>
         ) : (
-          <Link
-            href={`/spaces/${space.slug}`}
-            onClick={(event) => event.stopPropagation()}
-            className="whitespace-nowrap rounded-full bg-black px-3.5 py-2.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
-          >
+          <Link href={spaceUrl} onClick={(event) => event.stopPropagation()} className={viewSpaceButtonClass}>
             Ver espacio
           </Link>
         )}

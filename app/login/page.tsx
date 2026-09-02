@@ -8,8 +8,6 @@ import { translateAuthError, NETWORK_ERROR_MESSAGE } from '@/lib/supabase/authEr
 
 const LINK_EXPIRED_MESSAGE = 'Tu link de confirmación expiró. Ingresa aquí o regístrate de nuevo.'
 
-// Only a same-site relative path is a safe redirect target — anything else
-// (a full URL, a protocol-relative "//evil.com") could send the user off-site.
 // useSearchParams() forces this page to opt into client-side rendering;
 // Next requires it wrapped in Suspense or the build fails prerendering.
 export default function LoginPage() {
@@ -23,6 +21,10 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const nextParam = searchParams.get('next')
+  // Only a same-site relative path is safe — anything else (a full URL, a
+  // protocol-relative "//evil.com") could send the user off-site.
+  const redirectTo = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/near-me'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -43,7 +45,7 @@ function LoginForm() {
         setError(translateAuthError(signInError))
         return
       }
-      router.replace('/near-me')
+      router.replace(redirectTo)
       router.refresh()
     } catch {
       setError(NETWORK_ERROR_MESSAGE)
