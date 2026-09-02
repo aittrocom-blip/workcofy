@@ -13,6 +13,8 @@ import type { SortOption } from '@/lib/filters/discoveryFilters'
 import { SortDropdown } from '@/components/discovery/SortDropdown'
 import { CompactSpaceRow } from '@/components/discovery/CompactSpaceRow'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
+import { MapView } from '@/components/map/MapView'
+import { useUserLocation } from '@/lib/geo/useUserLocation'
 
 interface EspaciosDashboardProps {
   spaces: SpaceRecord[]
@@ -65,6 +67,25 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
 
   const sortedFiltered = useMemo(() => sortSpaces(filtered, sort), [filtered, sort])
   const visibleSpaces = sortedFiltered.slice(0, visibleCount)
+
+  const { coordinate } = useUserLocation()
+
+  const sideMapMarkers = sortedFiltered
+    .filter((space) => space.latitude != null && space.longitude != null)
+    .map((space) => ({
+      id: space.id,
+      position: { lat: space.latitude as number, lng: space.longitude as number },
+      label: space.name,
+      verified: space.verified,
+      photoUrl: space.photos?.find((photo) => photo.url)?.url ?? null,
+      favorited: false,
+      dimmed: false,
+    }))
+
+  const categoryCounts = CATEGORY_OPTIONS.filter((option) => option.active).map((option) => ({
+    ...option,
+    count: withDistance.filter((space) => space.category === option.value).length,
+  }))
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
@@ -202,7 +223,49 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
           )}
         </div>
 
-        <aside className="flex flex-col gap-4"></aside>
+        <aside className="flex flex-col gap-4">
+          <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+            <div className="h-[240px]">
+              <MapView
+                center={coordinate}
+                zoom={13}
+                markers={sideMapMarkers}
+                selectedMarkerId={null}
+                onMarkerSelect={() => {}}
+              />
+            </div>
+            <div className="p-4">
+              <Link href="/near-me?view=map" className="text-sm font-semibold text-black hover:underline">
+                Ver todos en el mapa →
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-4">
+            <h3 className="text-sm font-semibold">Tipos de espacios</h3>
+            <ul className="mt-3 flex flex-col gap-2">
+              {categoryCounts.map((option) => (
+                <li key={option.value} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700">{option.label}</span>
+                  <span className="text-gray-400">{option.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4">
+            <h3 className="text-sm font-semibold">¿Tienes un espacio?</h3>
+            <p className="mt-1 text-xs text-gray-500">
+              Únete a Workcofy y llega a miles de personas que buscan dónde trabajar.
+            </p>
+            <span
+              title="Próximamente"
+              className="mt-3 inline-flex cursor-not-allowed items-center rounded-full bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-400"
+            >
+              Agregar mi espacio
+            </span>
+          </div>
+        </aside>
       </div>
     </div>
   )
