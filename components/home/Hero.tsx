@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
 // The hero image is purely illustrative — it shows what Workcofy looks like
 // without repeating the app's own headline/copy. The CTA below is the real
@@ -29,14 +30,25 @@ export function Hero() {
       <p className="mt-4 text-xs font-medium uppercase tracking-wide text-gray-400 md:text-sm">
         Mapa · Filtros · Amenities · Experiencias reales
       </p>
-      <Link
-        href="/near-me"
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/nav-search.png" alt="" className="h-4 w-auto invert" />
-        Explora
-      </Link>
+      {LAUNCH_LOCKED ? (
+        <span
+          title="Próximamente"
+          className="mt-4 inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gray-200 px-8 py-3.5 text-base font-semibold text-gray-400"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-search.png" alt="" className="h-4 w-auto opacity-40" />
+          Explora
+        </span>
+      ) : (
+        <Link
+          href="/near-me"
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-search.png" alt="" className="h-4 w-auto invert" />
+          Explora
+        </Link>
+      )}
     </div>
   )
 }

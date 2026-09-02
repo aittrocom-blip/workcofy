@@ -11,15 +11,15 @@ import { AvatarPickerModal } from '@/components/account/AvatarPickerModal'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
+import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
 // Real artwork the user supplied for the sidebar, distinct from the
 // smaller mobile-menu icons NAV_LINKS.icon already points at (Header's
 // mobile dropdown keeps using those, unchanged, since it wasn't part of
 // this redesign).
 const SIDEBAR_ICONS: Record<string, string> = {
-  Explorar: '/icons/sidebar-explorar.png',
+  Espacios: '/icons/sidebar-explorar.png',
   Trabajo: '/icons/sidebar-equipo.png',
-  Comunidad: '/icons/sidebar-comunidad.png',
   Eventos: '/icons/sidebar-eventos.png',
   Rewards: '/icons/rewards-coin.png',
 }
@@ -52,7 +52,7 @@ export function Sidebar() {
   return (
     <aside className="flex h-screen w-[184px] flex-none flex-col border-r border-gray-100 bg-white">
       <div className="px-4 pt-5">
-        <Link href="/near-me" className="flex items-center gap-2" aria-label="Ir al mapa">
+        <Link href={LAUNCH_LOCKED ? '/' : '/near-me'} className="flex items-center gap-2" aria-label="Ir al mapa">
           <Image
             src="/logo-wordmark.png"
             alt="Workcofy"
@@ -68,7 +68,7 @@ export function Sidebar() {
         {NAV_LINKS.map((link) => {
           const iconSrc = SIDEBAR_ICONS[link.label] ?? link.icon
 
-          if (link.label === 'Explorar') {
+          if (link.label === 'Espacios' && !LAUNCH_LOCKED) {
             return (
               <Link
                 key={link.href}

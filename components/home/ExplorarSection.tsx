@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { CategoryIcon } from '@/components/discovery/CategoryIcon'
+import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
 const SCENARIOS = [
   { category: 'cafe', text: 'Un café tranquilo para concentrarte.' },
@@ -34,12 +35,21 @@ export function ExplorarSection() {
           </div>
 
           <p className="mt-6 text-sm font-semibold">Workcofy te ayuda a encontrarlo.</p>
-          <Link
-            href="/near-me"
-            className="mt-4 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
-          >
-            Explorar espacios
-          </Link>
+          {LAUNCH_LOCKED ? (
+            <span
+              title="Próximamente"
+              className="mt-4 inline-block cursor-not-allowed rounded-full bg-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-400"
+            >
+              Explorar espacios
+            </span>
+          ) : (
+            <Link
+              href="/near-me"
+              className="mt-4 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+            >
+              Explorar espacios
+            </Link>
+          )}
         </div>
 
         <div className="w-full flex-1 overflow-hidden rounded-3xl">

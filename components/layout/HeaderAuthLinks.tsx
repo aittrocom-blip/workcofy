@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
+import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
 interface HeaderAuthLinksProps {
   variant?: 'desktop' | 'mobile'
@@ -74,14 +75,24 @@ function MenuItem({
   onClick,
   icon,
   children,
+  disabled,
 }: {
   href?: string
   onClick?: () => void
   icon: React.ReactNode
   children: React.ReactNode
+  disabled?: boolean
 }) {
   const className =
     'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-[#FFF4D6] hover:text-black'
+  if (disabled) {
+    return (
+      <span title="Próximamente" className={`cursor-not-allowed text-gray-300 ${className} hover:bg-transparent hover:text-gray-300`}>
+        {icon}
+        {children}
+      </span>
+    )
+  }
   if (href) {
     return (
       <Link href={href} onClick={onClick} className={className}>
@@ -150,6 +161,15 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
               Cerrar sesión
             </button>
           </>
+        ) : LAUNCH_LOCKED ? (
+          <>
+            <span title="Próximamente" className="cursor-not-allowed rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-300">
+              Ingresa
+            </span>
+            <span title="Próximamente" className="cursor-not-allowed rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-300">
+              Regístrate
+            </span>
+          </>
         ) : (
           <>
             <Link
@@ -202,6 +222,15 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
               </MenuItem>
               <MenuItem onClick={handleSignOut} icon={<LogoutIcon />}>
                 Cerrar sesión
+              </MenuItem>
+            </>
+          ) : LAUNCH_LOCKED ? (
+            <>
+              <MenuItem icon={<UserIcon />} disabled>
+                Ingresa
+              </MenuItem>
+              <MenuItem icon={<UserPlusIcon />} disabled>
+                Regístrate
               </MenuItem>
             </>
           ) : (

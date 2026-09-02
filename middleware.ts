@@ -1,7 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { LAUNCH_LOCKED } from '@/lib/launchLock'
+
+// While the online version is under maintenance, these routes redirect back
+// to the marketing home instead of loading — Explora (the map at /near-me)
+// and the whole login/registro/reset flow. Everything else on the site
+// stays reachable. Local dev never sets NEXT_PUBLIC_LAUNCH_LOCKED, so none
+// of this applies there.
+const LOCKED_PATHS = ['/near-me', '/login', '/registro', '/recuperar', '/restablecer']
 
 export async function middleware(request: NextRequest) {
+  if (LAUNCH_LOCKED && LOCKED_PATHS.some((path) => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(`${path}/`))) {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   const { response, user, supabase } = await updateSession(request)
 
   // The signed-in experience is map-first: the public landing page remains
