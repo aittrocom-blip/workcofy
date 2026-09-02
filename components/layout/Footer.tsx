@@ -1,18 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { NAV_LINKS } from '@/lib/navLinks'
 
-export function Footer() {
+function FooterContent() {
   const year = new Date().getFullYear()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  // The full-screen map on /near-me is meant to use the entire viewport —
-  // a footer below it would just be scrollable dead space under the map.
-  if (pathname === '/near-me' && searchParams.get('view') === 'map') return null
 
   return (
     <footer className="border-t border-gray-100 px-4 py-12 md:px-8">
@@ -69,4 +64,31 @@ export function Footer() {
       </div>
     </footer>
   )
+}
+
+// The full-screen map on /near-me (?view=map) is meant to use the entire
+// viewport — a footer below it would just be scrollable dead space under
+// the map. Reading the `view` param needs useSearchParams(), which forces
+// a Suspense boundary above it during static prerendering; that check is
+// isolated to this tiny component (only ever mounted on /near-me, below)
+// instead of living in the outer Footer, so every other route's Footer
+// render never calls useSearchParams() at all and stays plain/static.
+function NearMeFooterGate() {
+  const searchParams = useSearchParams()
+  if (searchParams.get('view') === 'map') return null
+  return <FooterContent />
+}
+
+export function Footer() {
+  const pathname = usePathname()
+
+  if (pathname === '/near-me') {
+    return (
+      <Suspense fallback={null}>
+        <NearMeFooterGate />
+      </Suspense>
+    )
+  }
+
+  return <FooterContent />
 }
