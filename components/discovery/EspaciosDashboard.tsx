@@ -12,6 +12,7 @@ import type { SortOption } from '@/lib/filters/discoveryFilters'
 import { SortDropdown } from '@/components/discovery/SortDropdown'
 import { CompactSpaceRow } from '@/components/discovery/CompactSpaceRow'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
+import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import { MapView } from '@/components/map/MapView'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import type { MapViewHandle } from '@/lib/map/types'
@@ -186,9 +187,9 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
               Ver todos →
             </span>
           </div>
-          <div className="mt-4 flex gap-5 overflow-x-auto pb-2">
+          <HorizontalScroller className="mt-4 gap-4 pb-1">
             {recommended.map((space) => (
-              <div key={space.id} className="w-80 flex-none">
+              <div key={space.id} className="w-64 flex-none">
                 <SpaceCard
                   space={space}
                   isSelected={false}
@@ -197,7 +198,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
                 />
               </div>
             ))}
-          </div>
+          </HorizontalScroller>
         </div>
       )}
 
