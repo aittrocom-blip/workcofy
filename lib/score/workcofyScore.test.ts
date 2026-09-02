@@ -48,7 +48,7 @@ describe('computeWorkcofyScore', () => {
 
   it('scores from amenities alone when there is no rating', () => {
     const space = makeSpace({
-      amenities: { ...DEFAULT_AMENITIES, para_trabajar: { wifi: true, wifi_rapido: null, enchufes: true, mesas_comodas: null, iluminacion: null, aire_acondicionado: null } },
+      amenities: { ...DEFAULT_AMENITIES, para_trabajar: { wifi: true, wifi_rapido: null, enchufes: true, mesas_comodas: null, iluminacion: null, clima: null, senal_movil: null } },
     })
     expect(computeWorkcofyScore(space)).toBe(100)
   })
@@ -57,7 +57,7 @@ describe('computeWorkcofyScore', () => {
     const ratingOnly = makeSpace({ rating: 4.6, review_count: 300 })
     const both = makeSpace({
       rating: 4.6, review_count: 300,
-      amenities: { ...DEFAULT_AMENITIES, para_trabajar: { wifi: false, wifi_rapido: false, enchufes: false, mesas_comodas: false, iluminacion: false, aire_acondicionado: false } },
+      amenities: { ...DEFAULT_AMENITIES, para_trabajar: { wifi: false, wifi_rapido: false, enchufes: false, mesas_comodas: false, iluminacion: false, clima: false, senal_movil: false } },
     })
     const scoreRatingOnly = computeWorkcofyScore(ratingOnly) as number
     const scoreBoth = computeWorkcofyScore(both) as number
