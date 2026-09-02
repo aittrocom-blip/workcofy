@@ -76,7 +76,7 @@ export function AvatarMenu({ avatarId, name, lastSignInAt }: AvatarMenuProps) {
       {open && (
         <div className="absolute bottom-0 left-full z-40 ml-2 w-48 overflow-hidden rounded-2xl border border-gray-100 bg-white py-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.16)]">
           <Link
-            href="/near-me?favorites=1"
+            href="/near-me?view=map&favorites=1"
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >

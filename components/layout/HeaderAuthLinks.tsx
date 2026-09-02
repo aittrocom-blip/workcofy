@@ -217,7 +217,7 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
               <MenuItem href="/perfil" onClick={() => setOpen(false)} icon={<UserIcon />}>
                 Perfil
               </MenuItem>
-              <MenuItem href="/near-me?favorites=1" onClick={() => setOpen(false)} icon={<HeartIcon />}>
+              <MenuItem href="/near-me?view=map&favorites=1" onClick={() => setOpen(false)} icon={<HeartIcon />}>
                 Favoritos
               </MenuItem>
               <MenuItem onClick={handleSignOut} icon={<LogoutIcon />}>

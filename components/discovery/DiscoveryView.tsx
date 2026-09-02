@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
@@ -108,7 +109,7 @@ export function DiscoveryView({
   // here they zoom in manually if they want to get closer.
   const mapZoom = 14
 
-  const withDistance = useSpacesWithDistance(spaces)
+  const withDistance = useSpacesWithDistance(spaces, coordinate, status)
 
   const sorted = useMemo(() => sortSpaces(withDistance, filters.sort), [withDistance, filters.sort])
 
@@ -241,6 +242,19 @@ export function DiscoveryView({
             userAvatarSrc={userAvatarSrc}
             hideNativeZoom
           />
+        </div>
+
+        {/* The only way back to the Espacios dashboard from here besides the
+            browser's back button — the map itself has no other affordance
+            for it now that it's reached via a toggle instead of being the
+            page's only view. */}
+        <div className="pointer-events-none absolute right-3 top-3 z-30">
+          <Link
+            href="/near-me"
+            className="pointer-events-auto inline-flex items-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white shadow-md"
+          >
+            Lista
+          </Link>
         </div>
 
         {/* Desktop: floating card, docked top-left over the map. */}

@@ -2,16 +2,17 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { NAV_LINKS } from '@/lib/navLinks'
 
 export function Footer() {
   const year = new Date().getFullYear()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // The full-screen map on /near-me is meant to use the entire viewport —
   // a footer below it would just be scrollable dead space under the map.
-  if (pathname === '/near-me') return null
+  if (pathname === '/near-me' && searchParams.get('view') === 'map') return null
 
   return (
     <footer className="border-t border-gray-100 px-4 py-12 md:px-8">

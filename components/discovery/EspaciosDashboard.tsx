@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { districtLabel } from '@/lib/districts'
@@ -22,7 +22,14 @@ interface EspaciosDashboardProps {
 }
 
 export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
-  const withDistance = useSpacesWithDistance(spaces)
+  const { coordinate, status, requestLocation } = useUserLocation()
+  useEffect(() => {
+    if (status === 'idle') {
+      requestLocation()
+    }
+  }, [status, requestLocation])
+
+  const withDistance = useSpacesWithDistance(spaces, coordinate, status)
 
   const verifiedCount = withDistance.filter((space) => space.verified).length
   const wellRatedCount = withDistance.filter((space) => space.rating != null && space.rating >= 4).length
@@ -45,8 +52,9 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
   const recommended = useMemo(() => selectNearbyPopularSpaces(withDistance, 8), [withDistance])
 
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<string | null>(null)
+  const [category, setCategory] = useState<string | null>(searchParams.get('category'))
   const [sort, setSort] = useState<SortOption>('distance')
   const [visibleCount, setVisibleCount] = useState(10)
 
@@ -68,7 +76,9 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
   const sortedFiltered = useMemo(() => sortSpaces(filtered, sort), [filtered, sort])
   const visibleSpaces = sortedFiltered.slice(0, visibleCount)
 
-  const { coordinate } = useUserLocation()
+  useEffect(() => {
+    setVisibleCount(10)
+  }, [filtered])
 
   const sideMapMarkers = sortedFiltered
     .filter((space) => space.latitude != null && space.longitude != null)
@@ -232,6 +242,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
                 markers={sideMapMarkers}
                 selectedMarkerId={null}
                 onMarkerSelect={() => {}}
+                userLocation={status === 'granted' ? coordinate : null}
               />
             </div>
             <div className="p-4">
