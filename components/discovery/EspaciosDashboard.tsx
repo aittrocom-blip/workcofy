@@ -13,6 +13,7 @@ import { SortDropdown } from '@/components/discovery/SortDropdown'
 import { CompactSpaceRow } from '@/components/discovery/CompactSpaceRow'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { districtLabel } from '@/lib/districts'
+import { COUNTRY_OPTIONS } from '@/lib/countries'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import { MapView } from '@/components/map/MapView'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
@@ -100,16 +101,25 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
     count: withDistance.filter((space) => space.category === option.value).length,
   }))
 
-  // Districts actually present in the data, most populated first — feeds
-  // the "Ubicación" dropdown.
-  const districtOptions = useMemo(() => {
-    const counts = new Map<string, number>()
+  // Districts actually present in the data, grouped by country and sorted
+  // by how many spaces each one has — feeds the "Ubicación" dropdown.
+  const districtGroups = useMemo(() => {
+    const byCountry = new Map<string, Map<string, number>>()
     withDistance.forEach((space) => {
-      counts.set(space.district, (counts.get(space.district) ?? 0) + 1)
+      const districts = byCountry.get(space.country) ?? new Map<string, number>()
+      districts.set(space.district, (districts.get(space.district) ?? 0) + 1)
+      byCountry.set(space.country, districts)
     })
-    return Array.from(counts.entries())
-      .map(([value, count]) => ({ value, label: districtLabel(value), count }))
-      .sort((a, b) => b.count - a.count)
+    const countryOrder = [...COUNTRY_OPTIONS.map((option) => option.value), ...byCountry.keys()]
+    return Array.from(new Set(countryOrder))
+      .filter((countryValue) => byCountry.has(countryValue))
+      .map((countryValue) => ({
+        value: countryValue,
+        label: COUNTRY_OPTIONS.find((option) => option.value === countryValue)?.label ?? countryValue,
+        districts: Array.from(byCountry.get(countryValue)!.entries())
+          .map(([value, count]) => ({ value, label: districtLabel(value), count }))
+          .sort((a, b) => b.count - a.count),
+      }))
   }, [withDistance])
 
   return (
@@ -148,9 +158,8 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Buscar espacios, barrios o lugares..."
-            className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-11 text-sm font-medium text-black shadow-sm outline-none focus:border-black"
+            className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-black shadow-sm outline-none focus:border-black"
           />
-          <SearchIcon className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         </div>
 
         <div className="relative">
@@ -181,21 +190,28 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
                 >
                   Todos los distritos
                 </button>
-                {districtOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => {
-                      setDistrict(option.value)
-                      setOpenDropdown(null)
-                    }}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${
-                      district === option.value ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {option.label}
-                    <span className={district === option.value ? 'text-white/70' : 'text-gray-400'}>{option.count}</span>
-                  </button>
+                {districtGroups.map((group) => (
+                  <div key={group.value} className="mt-1 first:mt-0">
+                    <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                      {group.label}
+                    </p>
+                    {group.districts.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setDistrict(option.value)
+                          setOpenDropdown(null)
+                        }}
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${
+                          district === option.value ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {option.label}
+                        <span className={district === option.value ? 'text-white/70' : 'text-gray-400'}>{option.count}</span>
+                      </button>
+                    ))}
+                  </div>
                 ))}
               </div>
             </>

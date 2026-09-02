@@ -72,19 +72,31 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
             {openNow ? 'Abierto' : 'Cerrado'}
           </span>
           {space.rating != null && (
-            <span className="inline-flex items-center gap-0.5">
+            <span className="inline-flex items-center gap-0.5 sm:hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icons/nav-star.png" alt="" className="h-2.5 w-2.5" />
               {space.rating.toFixed(1)}
             </span>
           )}
           {score != null && <span className="font-semibold text-workcofy-yellow">{score} Score</span>}
-          {priceLevel && <span>{priceLevel}</span>}
+          {priceLevel && <span className="sm:hidden">{priceLevel}</span>}
         </div>
       </div>
-      <div className="hidden flex-none items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600 sm:flex">
-        <CategoryIcon name={space.category} className="h-3.5 w-3.5" />
-        {categoryLabel}
+      <div className="hidden flex-none flex-wrap items-center justify-end gap-1.5 sm:flex sm:max-w-[180px]">
+        <div className="flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600">
+          <CategoryIcon name={space.category} className="h-3.5 w-3.5" />
+          {categoryLabel}
+        </div>
+        {priceLevel && (
+          <span className="rounded-full bg-gray-50 px-2.5 py-1.5 text-xs font-medium text-gray-600">{priceLevel}</span>
+        )}
+        {space.rating != null && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1.5 text-xs font-medium text-gray-600">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/nav-star.png" alt="" className="h-3 w-3" />
+            {space.rating.toFixed(1)}
+          </span>
+        )}
       </div>
       <FavoriteButton
         spaceId={space.id}
