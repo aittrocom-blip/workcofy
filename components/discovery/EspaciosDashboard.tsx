@@ -14,6 +14,7 @@ import { CompactSpaceRow } from '@/components/discovery/CompactSpaceRow'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { districtLabel } from '@/lib/districts'
 import { COUNTRY_OPTIONS } from '@/lib/countries'
+import { avatarFor } from '@/lib/avatars'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import { MapView } from '@/components/map/MapView'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
@@ -121,6 +122,24 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
           .sort((a, b) => b.count - a.count),
       }))
   }, [withDistance])
+
+  // Illustrative "cerca de ti" activity — the app doesn't track real
+  // check-ins/events yet, so this pairs made-up people with real nearby
+  // space names to show what the widget will look like once it does.
+  const activityFeed = useMemo(() => {
+    const pool = recommended.length > 0 ? recommended : withDistance
+    const templates: { name: string; avatarId: string; time: string; action: (spaceName: string) => string }[] = [
+      { name: 'Camila R.', avatarId: 'chica', time: 'hace 6 min', action: (s) => `visitó ${s}` },
+      { name: 'Diego M.', avatarId: 'chico', time: 'hace 24 min', action: (s) => `está trabajando en ${s}` },
+      { name: 'Valentina S.', avatarId: 'intelectual', time: 'hace 1 h', action: (s) => `descubrió ${s}` },
+      { name: 'Rodrigo P.', avatarId: 'robotico', time: 'hace 2 h', action: () => 'va a un evento cerca de ti' },
+      { name: 'Sofía L.', avatarId: 'espacial', time: 'hace 3 h', action: (s) => `visitó ${s}` },
+    ]
+    return templates.map((entry, index) => {
+      const spaceName = pool[index % Math.max(pool.length, 1)]?.name ?? 'un espacio cercano'
+      return { ...entry, text: entry.action(spaceName) }
+    })
+  }, [recommended, withDistance])
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
@@ -331,9 +350,23 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
 
           <div className="mt-4 flex flex-col gap-2">
             {visibleSpaces.length === 0 ? (
-              <p className="py-8 text-center text-sm text-gray-500">
-                No encontramos espacios con estos filtros.
-              </p>
+              <div className="flex flex-col items-center rounded-2xl border border-dashed border-gray-200 px-6 py-12 text-center">
+                <p className="text-sm font-semibold text-black">No encontramos espacios aquí</p>
+                <p className="mt-1 max-w-xs text-sm text-gray-500">
+                  Prueba con otra zona o quita algún filtro para ampliar la búsqueda.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch('')
+                    setCategory(null)
+                    setDistrict(null)
+                  }}
+                  className="mt-4 rounded-full bg-black px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-gray-800"
+                >
+                  Quitar filtros
+                </button>
+              </div>
             ) : (
               visibleSpaces.map((space) => (
                 <CompactSpaceRow
@@ -409,6 +442,29 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
                 <li key={option.value} className="flex items-center justify-between text-sm">
                   <span className="text-gray-700">{option.label}</span>
                   <span className="text-gray-400">{option.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-4">
+            <h3 className="text-sm font-semibold">Cerca de ti</h3>
+            <p className="mt-0.5 text-xs text-gray-500">Actividad de la comunidad en las últimas horas.</p>
+            <ul className="mt-3 flex flex-col gap-3">
+              {activityFeed.map((entry) => (
+                <li key={entry.name} className="flex items-center gap-2.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={avatarFor(entry.avatarId).src}
+                    alt=""
+                    className="h-8 w-8 flex-none rounded-full bg-gray-50 object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs text-gray-600">
+                      <span className="font-semibold text-gray-800">{entry.name}</span> {entry.text}
+                    </p>
+                  </div>
+                  <span className="flex-none text-[11px] text-gray-400">{entry.time}</span>
                 </li>
               ))}
             </ul>
