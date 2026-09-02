@@ -53,11 +53,13 @@ function createMarkerElement(
   verified: boolean,
   photoUrl: string | null,
   favorited: boolean,
+  dimmed: boolean,
   onSelect: () => void
 ): HTMLElement {
   const wrapper = document.createElement('div')
   wrapper.style.position = 'relative'
   wrapper.style.cursor = 'pointer'
+  wrapper.style.opacity = dimmed ? '0.45' : '1'
 
   const el = document.createElement('div')
   el.style.display = 'flex'
@@ -172,6 +174,7 @@ export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function M
         markerData.verified,
         markerData.photoUrl,
         markerData.favorited,
+        markerData.dimmed,
         () => onMarkerSelect(markerData.id)
       )
 

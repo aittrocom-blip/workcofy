@@ -6,9 +6,11 @@ interface SpaceListProps {
   selectedId: string | null
   onSelect: (id: string) => void
   origin?: { lat: number; lng: number } | null
+  /** When true, spaces that are currently closed render dimmed instead of full-opacity — see SpaceCard. */
+  dimClosed?: boolean
 }
 
-export function SpaceList({ spaces, selectedId, onSelect, origin = null }: SpaceListProps) {
+export function SpaceList({ spaces, selectedId, onSelect, origin = null, dimClosed = false }: SpaceListProps) {
   if (spaces.length === 0) {
     return (
       <p className="p-8 text-center text-sm text-gray-500">
@@ -26,6 +28,7 @@ export function SpaceList({ spaces, selectedId, onSelect, origin = null }: Space
           isSelected={space.id === selectedId}
           onSelect={() => onSelect(space.id)}
           origin={origin}
+          dimClosed={dimClosed}
         />
       ))}
     </div>

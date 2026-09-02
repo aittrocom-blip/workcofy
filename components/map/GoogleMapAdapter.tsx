@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
 import type { MapViewProps, MapViewHandle } from '@/lib/map/types'
 
@@ -34,29 +34,13 @@ function CenterOnUserLocation({
 // inside <GoogleMap> since useMap() needs that context.
 function ZoomHandle({ forwardedRef }: { forwardedRef: React.Ref<MapViewHandle> }) {
   const map = useMap()
-  const [isDesktop, setIsDesktop] = useState(false)
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 768px)')
-    const updateViewport = () => setIsDesktop(mediaQuery.matches)
-    updateViewport()
-    mediaQuery.addEventListener('change', updateViewport)
-    return () => mediaQuery.removeEventListener('change', updateViewport)
-  }, [])
-
-  // The native Map/Satellite control defaults to the bottom-left corner,
-  // where it collides with NearbyPopularPanel — moved to the right edge,
-  // clear of every other floating overlay (search card top-left, zoom +
-  // view-toggle top-right, popular panel bottom-left).
+  // The native Map/Satellite control is hidden — it collided with other
+  // floating overlays and isn't something Workcofy's map needs.
   useEffect(() => {
     if (!map) return
-    map.setOptions({
-      mapTypeControl: isDesktop,
-      ...(isDesktop
-        ? { mapTypeControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } }
-        : {}),
-    })
-  }, [map, isDesktop])
+    map.setOptions({ mapTypeControl: false })
+  }, [map])
 
   useImperativeHandle(
     forwardedRef,
@@ -105,7 +89,7 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
               position={marker.position}
               onClick={() => onMarkerSelect(marker.id)}
             >
-              <div className="relative">
+              <div className={`relative transition-opacity duration-150 ${marker.dimmed ? 'opacity-45' : ''}`}>
                 {/* A circular photo of the space is the pin itself when one
                     exists. The border color keeps its one existing meaning —
                     yellow for Workcofy Verified, white otherwise — favorited

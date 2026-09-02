@@ -5,6 +5,8 @@ export interface MapMarkerData {
   verified: boolean
   photoUrl: string | null
   favorited: boolean
+  /** True when the "Abierto" filter is active and this space is currently closed — rendered at reduced opacity instead of being removed from the map. */
+  dimmed: boolean
 }
 
 export interface MapViewProps {

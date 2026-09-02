@@ -128,13 +128,15 @@ export function DiscoveryView({
 
   const sorted = useMemo(() => sortSpaces(withDistance, filters.sort), [withDistance, filters.sort])
 
-  // "Abierto ahora" and "Verified" narrow the list — they're filters, not
-  // sort orders (see lib/filters/discoveryFilters.ts) — applied after sort
-  // so the chosen order is preserved within the narrowed set.
+  // "Verified" narrows the list — it's a filter, not a sort order (see
+  // lib/filters/discoveryFilters.ts) — applied after sort so the chosen
+  // order is preserved within the narrowed set. "Abierto ahora" doesn't
+  // narrow anything: closed spaces stay in the list, just dimmed (see
+  // `markers` below and the `dimClosed` prop passed to SpaceList/SpaceCard),
+  // so someone can still see and tap a closed place.
   const filtered = useMemo(() => {
     const now = getLimaNow()
     return sorted.filter((space) => {
-      if (filters.openNow && !isOpenNow(space.opening_hours, now)) return false
       if (
         filters.openBetween &&
         !isOpenDuring(space.opening_hours, now, filters.openBetween.start, filters.openBetween.end)
@@ -144,7 +146,7 @@ export function DiscoveryView({
       if (filters.verifiedOnly && !space.verified) return false
       return true
     })
-  }, [sorted, filters.openNow, filters.openBetween, filters.verifiedOnly])
+  }, [sorted, filters.openBetween, filters.verifiedOnly])
 
   const selectedSpace = filtered.find((space) => space.id === selectedId) ?? null
 
@@ -231,6 +233,7 @@ export function DiscoveryView({
       verified: space.verified,
       photoUrl: space.photos?.find((photo) => photo.url)?.url ?? null,
       favorited: isFavorited(space.id),
+      dimmed: filters.openNow && !isOpenNow(space.opening_hours, getLimaNow()),
     }))
 
   if (fullScreen) {
@@ -385,6 +388,10 @@ export function DiscoveryView({
                   <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
                 </svg>
               </button>
+              {/* Not dimmed even when "Abierto" is active and this space is
+                  closed — dimming is a scanning aid for the map/list, but a
+                  space someone has already selected should always read
+                  clearly; "Cerrado" on the card itself is enough signal. */}
               <SpaceCard
                 space={selectedSpace}
                 isSelected
@@ -458,6 +465,7 @@ export function DiscoveryView({
           {selectedSpace && (
             <div className="pointer-events-none absolute inset-0 z-10 hidden items-end justify-end p-4 md:flex">
               <div className="pointer-events-auto w-80">
+                {/* Not dimmed for the same reason as the full-screen preview above. */}
                 <SpaceCard
                   space={selectedSpace}
                   isSelected
@@ -474,6 +482,7 @@ export function DiscoveryView({
             selectedId={selectedId}
             onSelect={setSelectedId}
             origin={status === 'granted' ? coordinate : null}
+            dimClosed={filters.openNow}
           />
         </div>
       </div>

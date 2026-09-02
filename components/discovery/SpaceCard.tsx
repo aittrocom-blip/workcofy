@@ -21,12 +21,15 @@ interface SpaceCardProps {
   origin?: { lat: number; lng: number } | null
   /** When provided, "Ver espacio" calls this instead of navigating to the standalone /spaces/[slug] page — used on the full-screen map so the detail opens in place instead of leaving the sidebar shell. */
   onViewDetail?: () => void
+  /** When true, this card renders dimmed if the space is currently closed — set from the "Abierto" filter, which highlights rather than hides. */
+  dimClosed?: boolean
 }
 
-export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDetail }: SpaceCardProps) {
+export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDetail, dimClosed = false }: SpaceCardProps) {
   const now = getLimaNow()
   const openNow = isOpenNow(space.opening_hours, now)
   const todayHours = formatPeriodForDay(space.opening_hours, now.getDay())
+  const dimmed = dimClosed && !openNow
   const score = computeWorkcofyScore(space)
   const priceLevel = formatPriceLevel(space.price_level)
   const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label ?? space.category
@@ -37,7 +40,7 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
       onClick={onSelect}
       className={`group cursor-pointer rounded-2xl border bg-white p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.14)] ${
         isSelected ? 'border-black' : 'border-transparent'
-      }`}
+      } ${dimmed ? 'opacity-45 hover:opacity-100' : ''}`}
     >
       <div className="relative h-32 w-full overflow-hidden rounded-xl bg-gray-100 transition-transform duration-200 group-hover:scale-[1.02]">
         {coverPhoto && (

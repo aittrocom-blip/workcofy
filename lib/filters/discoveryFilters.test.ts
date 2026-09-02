@@ -9,10 +9,14 @@ describe('discoveryFilters', () => {
       category: null,
       search: null,
       sort: 'distance',
-      openNow: false,
+      openNow: true,
       openBetween: null,
       verifiedOnly: false,
     })
+  })
+
+  it('parses an explicit open=0 as turned off, not the default', () => {
+    expect(parseDiscoveryFilters(new URLSearchParams('open=0')).openNow).toBe(false)
   })
 
   it('parses all fields from params', () => {
