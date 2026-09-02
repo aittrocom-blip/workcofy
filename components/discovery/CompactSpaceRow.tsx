@@ -3,7 +3,7 @@
 import { formatDistanceKm } from '@/lib/geo/haversine'
 import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
-import { CATEGORY_OPTIONS } from '@/lib/categories'
+import { districtLabel } from '@/lib/districts'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { isOpenNow } from '@/lib/hours/openingHours'
@@ -24,7 +24,6 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
   const priceLevel = formatPriceLevel(space.price_level)
   const openNow = isOpenNow(space.opening_hours, getLimaNow())
   const coverPhoto = space.photos?.find((photo) => photo.url)
-  const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label
 
   return (
     <div
@@ -48,11 +47,10 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
         )}
       </div>
       <div className="min-w-0 flex-1">
-        {categoryLabel && (
-          <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-gray-400">
-            {categoryLabel}
-          </p>
-        )}
+        <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+          {districtLabel(space.district)}
+          {space.distanceKm != null && ` · ${formatDistanceKm(space.distanceKm)}`}
+        </p>
         <div className="flex items-center gap-1.5">
           <h4 className="truncate text-sm font-semibold tracking-tight">{space.name}</h4>
           {space.verified && (
@@ -77,8 +75,7 @@ export function CompactSpaceRow({ space, isSelected, onSelect }: CompactSpaceRow
               {space.rating.toFixed(1)}
             </span>
           )}
-          {score != null && <span className="font-semibold text-workcofy-yellow">{score}</span>}
-          {space.distanceKm != null && <span>{formatDistanceKm(space.distanceKm)}</span>}
+          {score != null && <span className="font-semibold text-workcofy-yellow">{score} Score</span>}
           {priceLevel && <span>{priceLevel}</span>}
         </div>
       </div>

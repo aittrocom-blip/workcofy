@@ -128,12 +128,6 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
         >
           Cómo llegar
         </a>
-        <span
-          className="cursor-not-allowed whitespace-nowrap rounded-full border border-dashed border-gray-200 px-3.5 py-2.5 text-xs font-semibold text-gray-400"
-          title="Reserva de asiento o espacio — todavía no disponible"
-        >
-          Reservar
-        </span>
       </div>
     </div>
   )
