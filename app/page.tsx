@@ -3,7 +3,6 @@ import { Hero } from '@/components/home/Hero'
 import { ExplorarSection } from '@/components/home/ExplorarSection'
 import { EquiposSection } from '@/components/home/EquiposSection'
 import { EventosSection } from '@/components/home/EventosSection'
-import { VerifiedExplainer } from '@/components/home/VerifiedExplainer'
 import { CoinsSection } from '@/components/home/CoinsSection'
 import { BenefitsTeaser } from '@/components/home/BenefitsTeaser'
 
@@ -18,7 +17,6 @@ export default async function HomePage() {
       <ExplorarSection />
       <EquiposSection />
       <EventosSection />
-      <VerifiedExplainer />
       <CoinsSection />
       {hasBenefits && <BenefitsTeaser />}
     </div>
