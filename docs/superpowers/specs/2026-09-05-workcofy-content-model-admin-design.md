@@ -1,7 +1,7 @@
 # Workcofy — Modelo de contenido + Admin para Oportunidades y Aprende — Design Spec
 
 Fecha: 2026-09-05
-Estado: Escrito para revisión del usuario (decisiones de alcance aprobadas en chat)
+Estado: SUPERSEDED — reemplazado por `2026-09-05-workcofy-mvp-validation-design.md` (alcance recortado para validar el MVP; sin admin ni rutas)
 Documento maestro: `docs/workcofy-mvp-spec-2026-09.md` (§9–17, §39, §45)
 
 ## 1. Contexto y alcance
