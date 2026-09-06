@@ -1,24 +1,21 @@
-import { anySpaceHasBenefits } from '@/lib/data/benefits'
 import { Hero } from '@/components/home/Hero'
+import { PillarsSection } from '@/components/home/PillarsSection'
+import { OpportunitiesHomeSection } from '@/components/home/OpportunitiesHomeSection'
+import { AiSection } from '@/components/home/AiSection'
 import { ExplorarSection } from '@/components/home/ExplorarSection'
-import { EquiposSection } from '@/components/home/EquiposSection'
-import { EventosSection } from '@/components/home/EventosSection'
-import { CoinsSection } from '@/components/home/CoinsSection'
-import { BenefitsTeaser } from '@/components/home/BenefitsTeaser'
+import { CoursesHomeSection } from '@/components/home/CoursesHomeSection'
 
 export const dynamic = 'force-dynamic'
 
-export default async function HomePage() {
-  const hasBenefits = await anySpaceHasBenefits()
-
+export default function HomePage() {
   return (
     <div>
       <Hero />
+      <PillarsSection />
+      <OpportunitiesHomeSection />
+      <AiSection />
       <ExplorarSection />
-      <EquiposSection />
-      <EventosSection />
-      <CoinsSection />
-      {hasBenefits && <BenefitsTeaser />}
+      <CoursesHomeSection />
     </div>
   )
 }

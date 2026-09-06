@@ -16,9 +16,9 @@ export function ExplorarSection() {
     <section id="explorar" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-8">
       <div className="flex flex-col items-center gap-10 md:flex-row">
         <div className="flex-1">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">01 — Espacios</span>
+          <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Espacios</span>
           <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight md:text-4xl">
-            Encuentra el lugar adecuado para lo que necesitas.
+            Encuentra tu próximo lugar para trabajar.
           </h2>
           <p className="mt-3 max-w-xl text-gray-500">No siempre necesitas una oficina.</p>
 
@@ -44,7 +44,7 @@ export function ExplorarSection() {
             </span>
           ) : (
             <Link
-              href="/near-me"
+              href="/espacios"
               className="mt-4 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
             >
               Explorar espacios
