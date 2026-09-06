@@ -12,7 +12,9 @@
     "seed:mock": "tsx scripts/seed-mock.ts",
     "seed:google": "tsx scripts/seed-google-places.ts",
     "seed:expansion": "tsx scripts/seed-google-places-expansion.ts",
-    "backfill:photos": "tsx scripts/backfill-photos.ts"
+    "backfill:photos": "tsx scripts/backfill-photos.ts",
+    "seed:getonboard": "tsx --env-file-if-exists=.env.local scripts/seed-getonboard.ts",
+    "seed:courses": "tsx --env-file-if-exists=.env.local scripts/seed-courses.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
