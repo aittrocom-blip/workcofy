@@ -3,38 +3,22 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
 // While the online version is under maintenance, these routes redirect back
-// to the marketing home instead of loading — Explora (the map at /near-me)
-// and the whole login/registro/reset flow. Everything else on the site
-// stays reachable. Local dev never sets NEXT_PUBLIC_LAUNCH_LOCKED, so none
-// of this applies there.
-const LOCKED_PATHS = ['/near-me', '/login', '/registro', '/recuperar', '/restablecer']
+// to the marketing home instead of loading — Espacios and the whole
+// login/registro/reset flow. Everything else on the site stays reachable.
+// Local dev never sets NEXT_PUBLIC_LAUNCH_LOCKED, so none of this applies there.
+const LOCKED_PATHS = ['/espacios', '/login', '/registro', '/recuperar', '/restablecer']
 
 export async function middleware(request: NextRequest) {
-  if (LAUNCH_LOCKED && LOCKED_PATHS.some((path) => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(`${path}/`))) {
+  if (
+    LAUNCH_LOCKED &&
+    LOCKED_PATHS.some(
+      (path) => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(`${path}/`)
+    )
+  ) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
   const { response, user, supabase } = await updateSession(request)
-
-  // The signed-in experience is map-first: the public landing page remains
-  // available to visitors, while an authenticated user always continues in
-  // their active exploration context instead of returning to marketing home.
-  if (user && request.nextUrl.pathname === '/') {
-    const redirect = NextResponse.redirect(new URL('/near-me', request.url))
-    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
-    return redirect
-  }
-
-  // Mirrors the "Ver espacio" gate in SpaceCard.tsx — a direct/shared link to
-  // a space's ficha needs the same login wall the button already enforces,
-  // or the button gate would be trivially bypassed by pasting the URL.
-  if (!user && request.nextUrl.pathname.startsWith('/spaces/')) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('next', request.nextUrl.pathname)
-    const redirect = NextResponse.redirect(loginUrl)
-    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
-    return redirect
-  }
 
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {

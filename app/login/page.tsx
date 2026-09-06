@@ -24,7 +24,7 @@ function LoginForm() {
   const nextParam = searchParams.get('next')
   // Only a same-site relative path is safe — anything else (a full URL, a
   // protocol-relative "//evil.com") could send the user off-site.
-  const redirectTo = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/near-me'
+  const redirectTo = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/espacios'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)

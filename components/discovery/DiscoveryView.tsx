@@ -87,8 +87,8 @@ export function DiscoveryView({
   // already a client component rendered inside whichever shell AppShell
   // picked, so it can independently detect "am I currently inside the
   // Sidebar shell" rather than needing that fact threaded down from the
-  // (server) /near-me page component.
-  const insideSidebarShell = pathname === '/near-me' && !authLoading && user !== null && isDesktop
+  // (server) /espacios page component.
+  const insideSidebarShell = pathname === '/espacios' && !authLoading && user !== null && isDesktop
 
   const filters: DiscoveryFilterState = useMemo(() => {
     const parsed = parseDiscoveryFilters(searchParams)
@@ -260,7 +260,7 @@ export function DiscoveryView({
             page's only view. */}
         <div className="pointer-events-none absolute right-3 top-3 z-30">
           <Link
-            href="/near-me"
+            href="/espacios"
             className="pointer-events-auto inline-flex items-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white shadow-md"
           >
             Lista

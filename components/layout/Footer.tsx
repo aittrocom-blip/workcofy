@@ -66,11 +66,11 @@ function FooterContent() {
   )
 }
 
-// The full-screen map on /near-me (?view=map) is meant to use the entire
+// The full-screen map on /espacios (?view=map) is meant to use the entire
 // viewport — a footer below it would just be scrollable dead space under
 // the map. Reading the `view` param needs useSearchParams(), which forces
 // a Suspense boundary above it during static prerendering; that check is
-// isolated to this tiny component (only ever mounted on /near-me, below)
+// isolated to this tiny component (only ever mounted on /espacios, below)
 // instead of living in the outer Footer, so every other route's Footer
 // render never calls useSearchParams() at all and stays plain/static.
 function NearMeFooterGate() {
@@ -82,7 +82,7 @@ function NearMeFooterGate() {
 export function Footer() {
   const pathname = usePathname()
 
-  if (pathname === '/near-me') {
+  if (pathname === '/espacios') {
     return (
       <Suspense fallback={null}>
         <NearMeFooterGate />

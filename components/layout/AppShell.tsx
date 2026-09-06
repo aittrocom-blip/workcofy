@@ -15,7 +15,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Authenticated desktop routes share the same application shell so moving
   // from the map to profile never drops the user back into the marketing
   // header/footer layout.
-  const showSidebarLayout = (pathname === '/near-me' || pathname === '/perfil') && !loading && user !== null && isDesktop
+  const showSidebarLayout =
+    (pathname === '/espacios' || pathname.startsWith('/espacios/') || pathname === '/perfil') &&
+    !loading &&
+    user !== null &&
+    isDesktop
 
   if (showSidebarLayout) {
     return (

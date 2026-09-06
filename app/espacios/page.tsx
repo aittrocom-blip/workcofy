@@ -6,8 +6,9 @@ import { isCurrentUserAdmin } from '@/lib/admin/isCurrentUserAdmin'
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Espacios cerca de ti | Workcofy',
-  description: 'Encuentra los cafés y espacios Work-Friendly más cercanos a tu ubicación.',
+  title: 'Espacios para trabajar: cafeterías, coworkings y más | Workcofy',
+  description:
+    'Encuentra cafés, work cafés, coworkings, hoteles y bibliotecas donde trabajar cerca de ti, con WiFi, enchufes y ambiente verificados.',
 }
 
 interface NearMePageProps {

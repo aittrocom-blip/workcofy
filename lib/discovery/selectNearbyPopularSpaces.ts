@@ -1,6 +1,6 @@
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
-// Powers the floating carousel on the full-screen map (/near-me): the
+// Powers the floating carousel on the full-screen map (/espacios): the
 // nearest spaces to the user, ranked by how many people have actually
 // visited their page — "popular near you" rather than a global top list.
 // Falls back to plain popularity when no real distance is known yet (before

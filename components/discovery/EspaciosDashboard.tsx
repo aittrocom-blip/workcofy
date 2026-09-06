@@ -23,9 +23,11 @@ import type { MapViewHandle } from '@/lib/map/types'
 interface EspaciosDashboardProps {
   spaces: SpaceRecord[]
   isAdmin: boolean
+  /** Category baked into the route (/espacios/[categoria]); falls back to ?category= otherwise. */
+  initialCategory?: string | null
 }
 
-export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
+export function EspaciosDashboard({ spaces, isAdmin, initialCategory = null }: EspaciosDashboardProps) {
   const { coordinate, status, requestLocation } = useUserLocation()
   useEffect(() => {
     if (status === 'idle') {
@@ -38,7 +40,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
 
   const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<string | null>(searchParams.get('category'))
+  const [category, setCategory] = useState<string | null>(initialCategory ?? searchParams.get('category'))
   const [district, setDistrict] = useState<string | null>(null)
   const [sort, setSort] = useState<SortOption>('distance')
   const [page, setPage] = useState(1)
@@ -152,7 +154,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
             </Link>
           )}
           <Link
-            href="/near-me?view=map"
+            href="/espacios?view=map"
             className="rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-md active:scale-[0.97]"
           >
             Mapa
@@ -348,7 +350,7 @@ export function EspaciosDashboard({ spaces, isAdmin }: EspaciosDashboardProps) {
           />
         </div>
         <Link
-          href="/near-me?view=map"
+          href="/espacios?view=map"
           className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-black hover:underline"
         >
           Ver todos en el mapa
