@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { slugify, generateSpaceSlug } from './slug'
+import { slugify, generateSpaceSlug, generateContentSlug } from './slug'
 
 describe('slugify', () => {
   it('removes accents and lowercases', () => {
@@ -18,5 +18,12 @@ describe('slugify', () => {
 describe('generateSpaceSlug', () => {
   it('joins the slugified name and district slug', () => {
     expect(generateSpaceSlug('Neira Café Lab', 'miraflores')).toBe('neira-cafe-lab-miraflores')
+  })
+})
+
+describe('generateContentSlug', () => {
+  it('joins slugified parts, skipping empties', () => {
+    expect(generateContentSlug('Fundamentos de IA generativa', 'Microsoft Learn')).toBe('fundamentos-de-ia-generativa-microsoft-learn')
+    expect(generateContentSlug('Claude 101', '')).toBe('claude-101')
   })
 })
