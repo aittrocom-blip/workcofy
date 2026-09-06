@@ -23,8 +23,8 @@ function FooterContent() {
             />
           </Link>
           <p className="mt-3 text-sm text-gray-500">
-            Encuentra tu mejor lugar para trabajar, colaborar y aprender — descubierto y
-            verificado por nuestra comunidad.
+            Trabaja mejor. Desde cualquier lugar. Oportunidades, aprendizaje y espacios para trabajar en la
+            era de la IA.
           </p>
         </div>
 

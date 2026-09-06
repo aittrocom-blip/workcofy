@@ -1,10 +1,13 @@
-// Mirrors the landing page's own section order (Hero → 01 Explorar → 02
-// Equipos → 03 Eventos → 04 Rewards) so the header nav and footer always
-// match what's actually on the page — shared here instead of duplicated so
-// they can't drift apart.
+// The site's primary navigation (master spec §5), shared by Header, Sidebar
+// and Footer so they can't drift apart. Eventos is deliberately absent for
+// the validation MVP; Rewards lives inside Perfil, not here.
 export const NAV_LINKS = [
-  { href: '/#explorar', label: 'Espacios', icon: '/icons/nav-explorar.png' },
-  { href: '/#equipos', label: 'Trabajo', icon: '/icons/nav-equipos.png' },
-  { href: '/#eventos', label: 'Eventos', icon: '/icons/nav-eventos.png' },
-  { href: '/#rewards', label: 'Rewards', icon: '/icons/nav-rewards.png' },
+  { href: '/', label: 'Inicio', icon: '/icons/nav-menu.png' },
+  { href: '/oportunidades', label: 'Oportunidades', icon: '/icons/nav-equipos.png' },
+  { href: '/aprende', label: 'Aprende', icon: '/icons/event-laptop.png' },
+  { href: '/espacios', label: 'Espacios', icon: '/icons/nav-explorar.png' },
 ]
+
+export function isNavLinkActive(href: string, pathname: string): boolean {
+  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
+}
