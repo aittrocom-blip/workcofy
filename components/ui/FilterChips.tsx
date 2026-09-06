@@ -24,26 +24,31 @@ export const CHIP_INACTIVE =
 // re-rendered by the server with the new searchParams.
 export function FilterChips({ basePath, current, groups }: FilterChipsProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       {groups.map((group) => {
         const active = current[group.param] ?? null
         return (
-          <div key={group.param} className="flex items-center gap-3">
-            <span className="w-20 flex-none text-[11px] font-semibold uppercase tracking-wide text-gray-400">{group.label}</span>
-            <HorizontalScroller className="gap-1.5">
-              <Link href={filterHref(basePath, current, group.param, null)} className={active === null ? CHIP_ACTIVE : CHIP_INACTIVE}>
-                {group.allLabel ?? 'Todos'}
-              </Link>
-              {group.options.map((option) => (
-                <Link
-                  key={option.value}
-                  href={filterHref(basePath, current, group.param, option.value)}
-                  className={active === option.value ? CHIP_ACTIVE : CHIP_INACTIVE}
-                >
-                  {option.label}
+          // Each group is a full-width row: the label stays fixed and the
+          // chips scroll horizontally inside `min-w-0 flex-1`, so long groups
+          // (Área, País, Idioma) never push the page wider than the viewport.
+          <div key={group.param} className="flex w-full min-w-0 items-center gap-2 rounded-full border border-gray-200 bg-white px-2 py-1.5 shadow-sm">
+            <span className="w-20 flex-none px-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400">{group.label}</span>
+            <div className="min-w-0 flex-1">
+              <HorizontalScroller className="gap-1.5">
+                <Link href={filterHref(basePath, current, group.param, null)} className={active === null ? CHIP_ACTIVE : CHIP_INACTIVE}>
+                  {group.allLabel ?? 'Todos'}
                 </Link>
-              ))}
-            </HorizontalScroller>
+                {group.options.map((option) => (
+                  <Link
+                    key={option.value}
+                    href={filterHref(basePath, current, group.param, option.value)}
+                    className={active === option.value ? CHIP_ACTIVE : CHIP_INACTIVE}
+                  >
+                    {option.label}
+                  </Link>
+                ))}
+              </HorizontalScroller>
+            </div>
           </div>
         )
       })}

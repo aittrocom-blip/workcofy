@@ -38,9 +38,8 @@ export async function listPublishedOpportunities(filters: OpportunityFilters = {
     const term = `%${sanitized}%`
     query = query.or(`title.ilike.${term},company.ilike.${term}`)
   }
-  const { data, error, count } = await query
-    .order('published_at', { ascending: false })
-    .range(descriptor.from, descriptor.to)
+  const ordered = descriptor.sort === 'relevant' ? query.order('click_count', { ascending: false }).order('published_at', { ascending: false }) : query.order('published_at', { ascending: false })
+  const { data, error, count } = await ordered.range(descriptor.from, descriptor.to)
   if (error) throw new Error(`Failed to list opportunities: ${error.message}`)
   return {
     items: (data ?? []) as OpportunityRecord[],

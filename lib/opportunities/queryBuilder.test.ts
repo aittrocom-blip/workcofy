@@ -19,7 +19,7 @@ describe('parseOpportunityFilters', () => {
         ia: '1',
         page: '2',
       })
-    ).toEqual({ q: 'react', type: 'freelance', modality: 'remoto', level: 'junior', area: 'diseno', country: 'pe', ai: true, page: 2 })
+    ).toEqual({ q: 'react', type: 'freelance', modality: 'remoto', level: 'junior', area: 'diseno', country: 'pe', ai: true, sort: 'recent', page: 2 })
   })
   it('defaults to page 1, null ai, and takes the first value of repeated params', () => {
     expect(parseOpportunityFilters({ tipo: ['empleo', 'freelance'], page: 'abc' })).toMatchObject({ type: 'empleo', ai: null, page: 1 })
@@ -32,6 +32,11 @@ describe('opportunityFiltersToParams', () => {
     expect(opportunityFiltersToParams({ q: 'x', type: 'empleo', ai: false, page: 1 })).toEqual({ q: 'x', tipo: 'empleo', ia: '0' })
     expect(opportunityFiltersToParams({ page: 3, ai: null })).toEqual({ page: '3' })
   })
+
+  it('preserves the sort order in the URL only when it is non-default', () => {
+    expect(opportunityFiltersToParams({ q: 'x', sort: 'recent', page: 1 })).toEqual({ q: 'x' })
+    expect(opportunityFiltersToParams({ sort: 'relevant', page: 3 })).toEqual({ orden: 'relevant', page: '3' })
+  })
 })
 
 describe('buildOpportunityQueryDescriptor', () => {
@@ -43,6 +48,7 @@ describe('buildOpportunityQueryDescriptor', () => {
       area: 'marketing',
       country: 'pe',
       ai: true,
+      sort: 'relevant',
       page: 2,
       q: '  ux  ',
     })
@@ -54,6 +60,7 @@ describe('buildOpportunityQueryDescriptor', () => {
     ])
     expect(d.isAi).toBe(true)
     expect(d.searchTerm).toBe('ux')
+    expect(d.sort).toBe('relevant')
     expect(d.page).toBe(2)
     expect(d.from).toBe(OPPORTUNITY_PAGE_SIZE)
     expect(d.to).toBe(OPPORTUNITY_PAGE_SIZE * 2 - 1)
@@ -63,6 +70,7 @@ describe('buildOpportunityQueryDescriptor', () => {
       eqFilters: [],
       isAi: null,
       searchTerm: null,
+      sort: 'recent',
       page: 1,
       from: 0,
       to: OPPORTUNITY_PAGE_SIZE - 1,

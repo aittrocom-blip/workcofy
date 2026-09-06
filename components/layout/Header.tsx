@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { NAV_LINKS } from '@/lib/navLinks'
+import { usePathname } from 'next/navigation'
+import { NAV_LINKS, isNavLinkActive } from '@/lib/navLinks'
 import { HeaderAuthLinks } from '@/components/layout/HeaderAuthLinks'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#F0F0F0] bg-white">
@@ -24,15 +26,20 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-5 lg:gap-8 md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="py-2.5 text-base font-semibold leading-6 text-[#252A32] transition-colors hover:text-black"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const active = isNavLinkActive(link.href, pathname)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`py-2.5 text-base font-semibold leading-6 transition-colors ${
+                  active ? 'text-black' : 'text-[#252A32] hover:text-black'
+                }`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
         </nav>
 
         <div className="flex items-center justify-end gap-2">
@@ -56,18 +63,23 @@ export function Header() {
 
       {mobileMenuOpen && (
         <nav className="flex flex-col gap-1 border-t border-gray-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-sm font-medium shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex min-h-11 items-center gap-2.5 rounded-xl px-3 py-2.5 transition-colors hover:bg-gray-50"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={link.icon} alt="" className="h-4 w-4 opacity-70" />
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const active = isNavLinkActive(link.href, pathname)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex min-h-11 items-center gap-2.5 rounded-xl px-3 py-2.5 transition-colors ${
+                  active ? 'bg-workcofy-yellow/15 text-black' : 'hover:bg-gray-50'
+                }`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={link.icon} alt="" className="h-4 w-4 opacity-70" />
+                {link.label}
+              </Link>
+            )
+          })}
           <div className="mt-1 border-t border-gray-100 pt-1">
             <HeaderAuthLinks variant="mobile" onNavigate={() => setMobileMenuOpen(false)} />
           </div>

@@ -3,6 +3,9 @@ import { EXPERIENCE_LEVELS, OPPORTUNITY_COUNTRIES, OPPORTUNITY_MODALITIES, OPPOR
 
 export const OPPORTUNITY_PAGE_SIZE = 30
 
+export const OPPORTUNITY_SORT_OPTIONS = ['recent', 'relevant'] as const
+export type OpportunitySort = (typeof OPPORTUNITY_SORT_OPTIONS)[number]
+
 export interface OpportunityFilters {
   q?: string | null
   type?: string | null
@@ -11,6 +14,7 @@ export interface OpportunityFilters {
   area?: string | null
   country?: string | null
   ai?: boolean | null
+  sort?: OpportunitySort | null
   page?: number
 }
 
@@ -26,6 +30,7 @@ export function firstParam(value: string | string[] | undefined): string | null 
 export function parseOpportunityFilters(params: SearchParamsInput): OpportunityFilters {
   const page = Number.parseInt(firstParam(params.page) ?? '1', 10)
   const ia = firstParam(params.ia)
+  const sort = firstParam(params.orden)
   return {
     q: firstParam(params.q),
     type: firstParam(params.tipo),
@@ -34,6 +39,7 @@ export function parseOpportunityFilters(params: SearchParamsInput): OpportunityF
     area: firstParam(params.area),
     country: firstParam(params.pais),
     ai: ia === '1' ? true : ia === '0' ? false : null,
+    sort: sort === 'recent' || sort === 'relevant' ? sort : 'recent',
     page: Number.isFinite(page) && page > 0 ? page : 1,
   }
 }
@@ -48,6 +54,7 @@ export function opportunityFiltersToParams(filters: OpportunityFilters): Record<
   if (filters.country) out.pais = filters.country
   if (filters.ai === true) out.ia = '1'
   else if (filters.ai === false) out.ia = '0'
+  if (filters.sort && filters.sort !== 'recent') out.orden = filters.sort
   if (filters.page && filters.page > 1) out.page = String(filters.page)
   return out
 }
@@ -61,6 +68,7 @@ export interface OpportunityQueryDescriptor {
   eqFilters: OpportunityEqFilter[]
   isAi: boolean | null
   searchTerm: string | null
+  sort: OpportunitySort
   page: number
   from: number
   to: number
@@ -84,10 +92,13 @@ export function buildOpportunityQueryDescriptor(filters: OpportunityFilters): Op
   const page = filters.page && filters.page > 0 ? filters.page : 1
   const from = (page - 1) * OPPORTUNITY_PAGE_SIZE
   const trimmed = filters.q?.trim()
+  const sort: OpportunitySort = filters.sort === 'relevant' ? 'relevant' : 'recent'
+
   return {
     eqFilters,
     isAi: filters.ai ?? null,
     searchTerm: trimmed ? trimmed : null,
+    sort,
     page,
     from,
     to: from + OPPORTUNITY_PAGE_SIZE - 1,
