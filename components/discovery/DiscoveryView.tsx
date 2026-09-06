@@ -188,6 +188,16 @@ export function DiscoveryView({
     updateFilters({ sort: 'distance' })
   }
 
+  function clearDiscoveryFilters() {
+    updateFilters({
+      ...(lockedDistrict ? {} : { country: null, district: null }),
+      category: null,
+      search: null,
+      openBetween: null,
+      verifiedOnly: false,
+    })
+  }
+
   function updateFilters(partial: Partial<DiscoveryFilterState>) {
     // A district only makes sense within the country it belongs to — swapping
     // countries drops whatever district was selected in the old one.
@@ -479,6 +489,7 @@ export function DiscoveryView({
             spaces={filtered}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            onClearFilters={clearDiscoveryFilters}
             origin={status === 'granted' ? coordinate : null}
             dimClosed={filters.openNow}
           />

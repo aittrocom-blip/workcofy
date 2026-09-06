@@ -39,12 +39,7 @@ async function requireAdmin() {
   if (!profile?.is_admin) throw new Error('No autorizado')
 }
 
-export async function updateVerification(
-  spaceId: string,
-  slug: string,
-  verified: boolean,
-  verifiedAmenities: string[]
-) {
+export async function updateVerification(spaceId: string, slug: string, verified: boolean) {
   await requireAdmin()
 
   const admin = createAdminSupabaseClient()
@@ -52,7 +47,6 @@ export async function updateVerification(
     .from('spaces')
     .update({
       verified,
-      verified_amenities: verifiedAmenities,
       verified_at: verified ? new Date().toISOString() : null,
     })
     .eq('id', spaceId)
@@ -63,11 +57,30 @@ export async function updateVerification(
   revalidatePath(`/spaces/${slug}`)
 }
 
+// The "Workcofy comprobó este espacio" badge on the public ficha lists
+// verified_amenities — rather than maintain that list by hand in a second
+// form, it's derived here from whatever the admin just marked "Sí" below,
+// so there's exactly one place to confirm an amenity instead of two that
+// can drift out of sync.
+function deriveVerifiedAmenities(amenities: AmenitiesData): string[] {
+  return [
+    ...Object.entries(amenities.para_trabajar),
+    ...Object.entries(amenities.para_llamadas),
+    ...Object.entries(amenities.servicios),
+  ]
+    .filter(([, value]) => value === true)
+    .map(([key]) => key)
+}
+
 export async function updateAmenities(spaceId: string, slug: string, amenities: AmenitiesData) {
   await requireAdmin()
 
+  const parsed = parseAmenities(amenities)
   const admin = createAdminSupabaseClient()
-  const { error } = await admin.from('spaces').update({ amenities: parseAmenities(amenities) }).eq('id', spaceId)
+  const { error } = await admin
+    .from('spaces')
+    .update({ amenities: parsed, verified_amenities: deriveVerifiedAmenities(parsed) })
+    .eq('id', spaceId)
 
   if (error) throw new Error(`No se pudo guardar: ${error.message}`)
 
