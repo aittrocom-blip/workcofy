@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  hasActiveOpportunityFilters,
   OPPORTUNITY_PAGE_SIZE,
   buildOpportunityQueryDescriptor,
   opportunityFiltersToParams,
@@ -75,5 +76,15 @@ describe('buildOpportunityQueryDescriptor', () => {
       from: 0,
       to: OPPORTUNITY_PAGE_SIZE - 1,
     })
+  })
+})
+
+describe('hasActiveOpportunityFilters', () => {
+  it('ignores filters the route already bakes in, and sort/page', () => {
+    expect(hasActiveOpportunityFilters({ modality: 'remoto' }, { modality: 'remoto' })).toBe(false)
+    expect(hasActiveOpportunityFilters({ modality: 'remoto', level: 'senior' }, { modality: 'remoto' })).toBe(true)
+    expect(hasActiveOpportunityFilters({ sort: 'relevant', page: 2 })).toBe(false)
+    expect(hasActiveOpportunityFilters({ ai: true }, { ai: true })).toBe(false)
+    expect(hasActiveOpportunityFilters({})).toBe(false)
   })
 })

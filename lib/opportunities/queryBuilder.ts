@@ -104,3 +104,13 @@ export function buildOpportunityQueryDescriptor(filters: OpportunityFilters): Op
     to: from + OPPORTUNITY_PAGE_SIZE - 1,
   }
 }
+
+// True when the user narrowed the list beyond the route's own baked-in filters.
+export function hasActiveOpportunityFilters(filters: OpportunityFilters, fixed: OpportunityFilters = {}): boolean {
+  const keys: (keyof OpportunityFilters)[] = ['q', 'type', 'modality', 'level', 'area', 'country', 'ai']
+  return keys.some((key) => {
+    const value = filters[key]
+    if (value === undefined || value === null || value === '') return false
+    return fixed[key] === undefined || fixed[key] === null
+  })
+}

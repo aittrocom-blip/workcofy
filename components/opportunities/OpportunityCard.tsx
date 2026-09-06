@@ -15,7 +15,8 @@ interface OpportunityCardProps {
   now?: Date
 }
 
-const CHIP = 'rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] font-semibold text-gray-700'
+const BADGE = 'rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] font-semibold text-gray-700'
+const AI_BADGE = 'rounded-full bg-workcofy-yellow px-2.5 py-0.5 text-[11px] font-bold text-black'
 
 export function CompanyLogo({
   name,
@@ -40,11 +41,14 @@ export function CompanyLogo({
   )
 }
 
+// Redesign brief §10: logo, title, company, badges (modality/type/IA),
+// area · tags, "Publicado hace X", "Fuente: X", and a heart placeholder
+// (§12 — no favorites system exists for opportunities yet, so it's inert).
 export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCardProps) {
   const detailUrl = `/oportunidades/${opportunity.slug}`
-  const chips = [
-    optionLabel(OPPORTUNITY_TYPES, opportunity.type),
+  const badges = [
     optionLabel(OPPORTUNITY_MODALITIES, opportunity.modality),
+    optionLabel(OPPORTUNITY_TYPES, opportunity.type),
     optionLabel(EXPERIENCE_LEVELS, opportunity.experience_level),
   ].filter((label): label is string => label !== null)
   const area = professionLabel(opportunity.area)
@@ -53,36 +57,33 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
 
   return (
     <article className="group flex h-full flex-col rounded-[28px] border border-gray-200 bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.08)]">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <CompanyLogo name={opportunity.company} logoUrl={opportunity.company_logo_url} className="h-12 w-12" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-gray-500">{opportunity.company}</p>
-            <h3 className="mt-1 line-clamp-2 text-lg font-bold leading-tight tracking-tight text-black">
-              <Link href={detailUrl} className="hover:underline">
-                {opportunity.title}
-              </Link>
-            </h3>
-          </div>
+      <div className="flex items-start gap-3">
+        <CompanyLogo name={opportunity.company} logoUrl={opportunity.company_logo_url} className="h-12 w-12" />
+        <div className="min-w-0 flex-1">
+          <h3 className="line-clamp-2 text-lg font-bold leading-tight tracking-tight text-black">
+            <Link href={detailUrl} className="hover:underline">
+              {opportunity.title}
+            </Link>
+          </h3>
+          <p className="truncate text-sm font-medium text-gray-500">{opportunity.company}</p>
         </div>
-        {opportunity.is_ai && (
-          <span className="flex-none rounded-full bg-workcofy-yellow px-2 py-0.5 text-[11px] font-bold text-black">IA ✦</span>
-        )}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {chips.map((chip) => (
-          <span key={chip} className={CHIP}>
-            {chip}
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {badges.map((badge) => (
+          <span key={badge} className={BADGE}>
+            {badge}
           </span>
         ))}
+        {opportunity.is_ai && <span className={AI_BADGE}>IA ✦</span>}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-gray-600">
         {area && <span className="font-medium text-gray-700">{area}</span>}
-        {tags.length > 0 && <span className="text-gray-300">•</span>}
-        {tags.map((tag) => (
-          <span key={tag} className="rounded-full bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+        {tags.length > 0 && area && <span className="text-gray-300">·</span>}
+        {tags.map((tag, index) => (
+          <span key={tag}>
+            {index > 0 && <span className="text-gray-300"> · </span>}
             {tag}
           </span>
         ))}
@@ -93,16 +94,24 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
         {opportunity.salary_text && <span className="text-gray-400"> · {opportunity.salary_text}</span>}
       </p>
 
-      <div className="mt-auto pt-4">
-        <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
-          <span className="text-xs text-gray-500">
-            {formatRelativeDays(opportunity.published_at, now)} · Fuente: {source}
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
+        <div className="min-w-0">
+          <p className="truncate text-xs text-gray-500">Publicado {formatRelativeDays(opportunity.published_at, now).toLowerCase()}</p>
+          <p className="truncate text-xs text-gray-400">Fuente: {source}</p>
+        </div>
+        <div className="flex flex-none items-center gap-2">
+          <span
+            aria-hidden="true"
+            title="Guardar no está disponible todavía"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-lg text-gray-300"
+          >
+            ♡
           </span>
           <a
             href={`/ir/oportunidad/${opportunity.id}`}
             target="_blank"
             rel="noopener"
-            className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-white hover:text-black active:scale-[0.97]"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-black px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-white hover:text-black hover:ring-1 hover:ring-black active:scale-[0.97]"
           >
             Ver oportunidad <span aria-hidden="true">→</span>
           </a>
