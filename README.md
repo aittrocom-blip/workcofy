@@ -32,6 +32,17 @@ npm run seed:google
 
 Esto resuelve el `google_place_id` real de cada café vía Places API y sobreescribe (`upsert` por `slug`) los datos de ejemplo con datos reales. Cualquier nombre que no se pueda confirmar con confianza se omite y se reporta en consola para revisión manual.
 
+## Oportunidades y cursos
+
+Las tablas `opportunities` y `courses` (migración `0014`) se cargan por script y se editan en el Table Editor de Supabase:
+
+```bash
+npm run seed:getonboard   # trae vacantes de la API pública de GetOnBoard (últimos 45 días, LatAm + remoto)
+npm run seed:courses      # carga el catálogo de cursos oficiales de IA (lib/courses/seedCatalog.ts)
+```
+
+Ambos leen `.env.local` automáticamente. Re-ejecutarlos actualiza filas existentes (upsert). Los clics en "Ver oportunidad" / "Ver curso" se cuentan en `click_count`.
+
 ## Ejecutar localmente
 
 ```bash
