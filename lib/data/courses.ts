@@ -15,7 +15,22 @@ export async function listPublishedCourses(filters: CourseFilters = {}): Promise
   let query = publishedQuery()
   for (const filter of descriptor.eqFilters) query = query.eq(filter.column, filter.value)
   if (descriptor.certificate) query = query.eq('has_certificate', true)
-  const { data, error } = await query.order('featured', { ascending: false }).order('title', { ascending: true })
+  if (descriptor.searchTerm) {
+    // Same PostgREST-injection guard listSpaces() uses.
+    const sanitized = descriptor.searchTerm.replace(/[,()."*\\]/g, ' ')
+    const term = `%${sanitized}%`
+    query = query.or(`title.ilike.${term},provider.ilike.${term},summary.ilike.${term}`)
+  }
+  // "Relevant" = editor's picks first, then what people actually click;
+  // "recent" = newest additions to the catalog.
+  const ordered =
+    descriptor.sort === 'recent'
+      ? query.order('created_at', { ascending: false }).order('title', { ascending: true })
+      : query
+          .order('featured', { ascending: false })
+          .order('click_count', { ascending: false })
+          .order('title', { ascending: true })
+  const { data, error } = await ordered
   if (error) throw new Error(`Failed to list courses: ${error.message}`)
   return (data ?? []) as CourseRecord[]
 }

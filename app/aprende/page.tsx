@@ -1,23 +1,29 @@
 import type { Metadata } from 'next'
+import { AprendeHero } from '@/components/courses/AprendeHero'
+import { CategoryCards } from '@/components/courses/CategoryCards'
 import { CoursesListing } from '@/components/courses/CoursesListing'
-import type { SearchParamsInput } from '@/lib/opportunities/queryBuilder'
+import { LearningPaths } from '@/components/courses/LearningPaths'
+import { PopularTopics } from '@/components/courses/PopularTopics'
+import { firstParam, type SearchParamsInput } from '@/lib/opportunities/queryBuilder'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Aprende IA aplicada al trabajo: cursos y certificaciones oficiales | Workcofy',
+  title: 'Aprende IA y nuevas habilidades | Workcofy',
   description:
-    'Cursos y certificaciones oficiales de Anthropic, OpenAI, Google, Microsoft, AWS y más para usar inteligencia artificial en tu trabajo.',
+    'Descubre cursos, herramientas y certificaciones para aprender inteligencia artificial y desarrollar nuevas habilidades para el trabajo.',
 }
 
 export default function AprendePage({ searchParams }: { searchParams: SearchParamsInput }) {
   return (
-    <CoursesListing
-      basePath="/aprende"
-      fixed={{}}
-      heading="Aprende"
-      intro="Cursos y certificaciones oficiales para usar la inteligencia artificial en tu trabajo. Curados por Workcofy, dictados por quienes crean las herramientas."
-      searchParams={searchParams}
-    />
+    <div>
+      <AprendeHero currentQuery={firstParam(searchParams.q)} />
+      <CategoryCards activeHref="/aprende" />
+      <PopularTopics />
+      <div className="mx-auto max-w-7xl px-4 pt-12 md:px-8">
+        <CoursesListing id="cursos" basePath="/aprende" fixed={{}} searchParams={searchParams} />
+      </div>
+      <LearningPaths />
+    </div>
   )
 }
