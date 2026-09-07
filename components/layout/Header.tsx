@@ -6,9 +6,13 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { NAV_LINKS, isNavLinkActive } from '@/lib/navLinks'
 import { HeaderAuthLinks } from '@/components/layout/HeaderAuthLinks'
+import { SideDrawer } from '@/components/layout/SideDrawer'
 
+// Public website header. Desktop keeps the inline section nav + "Cuenta"
+// control; below md the hamburger opens the shared SideDrawer (the same one
+// the app shell uses), which carries the sections and Ingresa/Regístrate.
 export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
 
   return (
@@ -63,55 +67,19 @@ export function Header() {
         <div className="flex items-center justify-end gap-2">
           <HeaderAuthLinks />
           <button
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-            aria-expanded={mobileMenuOpen}
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Abrir menú"
+            aria-expanded={drawerOpen}
             className="flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-gray-200 transition-colors hover:border-black md:hidden"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-              )}
+              <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <nav className="flex flex-col gap-1 border-t border-gray-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden">
-          {NAV_LINKS.map((link) => {
-            if (link.disabled) {
-              return (
-                <span
-                  key={link.href}
-                  title="Próximamente"
-                  className="flex min-h-11 cursor-not-allowed items-center rounded-xl px-3 py-2.5 text-lg font-bold text-gray-300"
-                >
-                  {link.label}
-                </span>
-              )
-            }
-            const active = isNavLinkActive(link.href, pathname)
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex min-h-11 items-center rounded-xl px-3 py-2.5 text-lg font-bold text-black transition-colors ${
-                  active ? 'bg-workcofy-yellow/15' : 'hover:bg-gray-50'
-                }`}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
-          <div className="mt-1 border-t border-gray-100 pt-1">
-            <HeaderAuthLinks variant="mobile" onNavigate={() => setMobileMenuOpen(false)} />
-          </div>
-        </nav>
-      )}
+      <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </header>
   )
 }

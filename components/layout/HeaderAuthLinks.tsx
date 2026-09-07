@@ -12,12 +12,6 @@ import { RewardsBadge } from '@/components/layout/RewardsBadge'
 import { StreakBadge } from '@/components/layout/StreakBadge'
 import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
-interface HeaderAuthLinksProps {
-  variant?: 'desktop' | 'mobile'
-  /** Mobile only — closes the drawer this renders inside once an item is picked. */
-  onNavigate?: () => void
-}
-
 function UserIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
@@ -126,7 +120,7 @@ function MenuItem({
   )
 }
 
-export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthLinksProps) {
+export function HeaderAuthLinks() {
   const router = useRouter()
   const { user, loading, signOut } = useAuthUser()
   const avatarId = useUserAvatar()
@@ -145,76 +139,14 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
 
   async function handleSignOut() {
     setOpen(false)
-    onNavigate?.()
     await signOut()
     router.push('/')
     router.refresh()
   }
 
-  if (variant === 'mobile') {
-    return (
-      <div className="flex flex-col gap-1">
-        {user ? (
-          <>
-            <div className="flex items-center gap-3 px-2 py-1">
-              <RewardsBadge />
-              <StreakBadge />
-            </div>
-            <Link
-              href="/favoritos"
-              onClick={onNavigate}
-              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-            >
-              Favoritos
-            </Link>
-            <Link
-              href="/perfil"
-              onClick={onNavigate}
-              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-            >
-              Perfil
-            </Link>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="rounded-lg px-2 py-2.5 text-left text-sm font-semibold text-gray-500 hover:bg-gray-50 hover:text-black"
-            >
-              Cerrar sesión
-            </button>
-          </>
-        ) : LAUNCH_LOCKED ? (
-          <>
-            <span title="Próximamente" className="cursor-not-allowed rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-300">
-              Ingresa
-            </span>
-            <span title="Próximamente" className="cursor-not-allowed rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-300">
-              Regístrate
-            </span>
-          </>
-        ) : (
-          <>
-            <Link
-              href="/login"
-              onClick={onNavigate}
-              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-            >
-              Ingresa
-            </Link>
-            <Link
-              href="/registro"
-              onClick={onNavigate}
-              className="rounded-lg px-2 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-            >
-              Regístrate
-            </Link>
-          </>
-        )}
-      </div>
-    )
-  }
-
-  // Desktop — a single secondary "Cuenta" control instead of competing CTAs;
-  // its dropdown swaps content by session state but keeps the same shell.
+  // Desktop only (below md the Header's hamburger opens SideDrawer instead) —
+  // a single secondary "Cuenta" control whose dropdown swaps content by
+  // session state but keeps the same shell.
   if (loading) return <div className="h-11 w-[120px] rounded-full bg-gray-50" />
 
   return (

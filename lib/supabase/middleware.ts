@@ -35,5 +35,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  return { response, user, supabase }
+  // The root layout picks the public shell vs. the authenticated app shell
+  // from this header, so the choice is made server-side on the first paint
+  // (no flash of the wrong shell) without a second auth round trip. Always
+  // reset it: a client-supplied value must never survive into the request.
+  const forwardedHeaders = new Headers(request.headers)
+  forwardedHeaders.delete(USER_ID_HEADER)
+  if (user) forwardedHeaders.set(USER_ID_HEADER, user.id)
+  const withUser = NextResponse.next({ request: { headers: forwardedHeaders } })
+  response.cookies.getAll().forEach((cookie) => withUser.cookies.set(cookie))
+
+  return { response: withUser, user, supabase }
 }
+
+export const USER_ID_HEADER = 'x-workcofy-user-id'

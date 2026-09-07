@@ -8,6 +8,14 @@ import { LAUNCH_LOCKED } from '@/lib/launchLock'
 // Local dev never sets NEXT_PUBLIC_LAUNCH_LOCKED, so none of this applies there.
 const LOCKED_PATHS = ['/espacios', '/login', '/registro', '/recuperar', '/restablecer']
 
+// The authenticated app's own screens (see lib/navLinks.ts APP_NAV_LINKS).
+// /perfil and /favoritos guard themselves server-side already.
+const APP_ONLY_PATHS = ['/app', '/spots', '/mi-pass', '/beneficios', '/configuracion']
+
+function isAppOnlyPath(pathname: string): boolean {
+  return APP_ONLY_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))
+}
+
 export async function middleware(request: NextRequest) {
   if (
     LAUNCH_LOCKED &&
@@ -19,8 +27,25 @@ export async function middleware(request: NextRequest) {
   }
 
   const { response, user, supabase } = await updateSession(request)
+  const { pathname } = request.nextUrl
 
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  // Signed-in users live in the app shell — the marketing home becomes
+  // Explorar, and login/registro have nothing left to offer them.
+  if (user && (pathname === '/' || pathname === '/login' || pathname === '/registro')) {
+    const redirect = NextResponse.redirect(new URL('/app', request.url))
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+    return redirect
+  }
+
+  if (!user && isAppOnlyPath(pathname)) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('next', pathname)
+    const redirect = NextResponse.redirect(loginUrl)
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+    return redirect
+  }
+
+  if (pathname.startsWith('/admin')) {
     if (!user) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('next', request.nextUrl.pathname)

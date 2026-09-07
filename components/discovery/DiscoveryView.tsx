@@ -197,8 +197,10 @@ export function DiscoveryView({
     }))
 
   if (fullScreen) {
+    // --app-bottom-nav-height is only set inside the authenticated shell
+    // (fixed tab bar); on the public site it falls back to 0.
     return (
-      <div className="relative h-[calc(100vh-var(--app-header-height,4rem))] w-full overflow-hidden [@supports(height:100dvh)]:h-[calc(100dvh-var(--app-header-height,4rem))]">
+      <div className="relative h-[calc(100vh-var(--app-header-height,4rem)-var(--app-bottom-nav-height,0px))] w-full overflow-hidden [@supports(height:100dvh)]:h-[calc(100dvh-var(--app-header-height,4rem)-var(--app-bottom-nav-height,0px))]">
         <div className="absolute inset-0">
           <MapView
             ref={mapRef}

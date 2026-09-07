@@ -40,5 +40,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/espacios`)
+  return NextResponse.redirect(`${origin}/app`)
 }

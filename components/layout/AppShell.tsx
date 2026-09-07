@@ -1,16 +1,23 @@
-// components/layout/AppShell.tsx
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+'use client'
 
-// Every page shares the same shell — the top navbar plus its footer. Perfil
-// used to swap this out for a left sidebar; it's a normal page like any
-// other now, so Perfil/Favoritos just render under the standard Header.
-export function AppShell({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
-    </>
-  )
+import { useAuthUser } from '@/lib/hooks/useAuthUser'
+import { PublicShell } from '@/components/layout/PublicShell'
+import { AuthenticatedShell } from '@/components/layout/AuthenticatedShell'
+
+interface AppShellProps {
+  /** Resolved server-side by middleware (see RootLayout) so the first paint already shows the right shell. */
+  initialUserId: string | null
+  children: React.ReactNode
+}
+
+// The one fork between the two Workcofy experiences: signed out → the public
+// website (Header + Footer); signed in → the mobile-first app (MobileHeader +
+// BottomNavigation). Server value wins until the browser session resolves,
+// then the live auth state takes over (so logout flips the shell in place).
+export function AppShell({ initialUserId, children }: AppShellProps) {
+  const { user, loading } = useAuthUser()
+  const authenticated = loading ? initialUserId !== null : user !== null
+
+  if (authenticated) return <AuthenticatedShell>{children}</AuthenticatedShell>
+  return <PublicShell>{children}</PublicShell>
 }

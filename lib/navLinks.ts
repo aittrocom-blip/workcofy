@@ -20,3 +20,21 @@ export const NAV_LINKS: NavLink[] = [
 export function isNavLinkActive(href: string, pathname: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
+
+// The authenticated app's primary navigation (bottom tab bar on mobile, top
+// tabs on desktop). Icons are inline SVGs in BottomNavigation.tsx keyed by
+// `icon`, not PNGs — they need currentColor for the active state.
+export type AppNavIcon = 'explorar' | 'spots' | 'pass' | 'beneficios'
+
+export interface AppNavLink {
+  href: string
+  label: string
+  icon: AppNavIcon
+}
+
+export const APP_NAV_LINKS: AppNavLink[] = [
+  { href: '/app', label: 'Explorar', icon: 'explorar' },
+  { href: '/spots', label: 'Spots', icon: 'spots' },
+  { href: '/mi-pass', label: 'Mi Pass', icon: 'pass' },
+  { href: '/beneficios', label: 'Beneficios', icon: 'beneficios' },
+]

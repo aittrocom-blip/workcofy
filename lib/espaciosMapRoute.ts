@@ -9,5 +9,6 @@ export function isEspaciosMapRoute(pathname: string): boolean {
   if (NON_MAP_ESPACIOS_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
     return false
   }
-  return pathname === '/espacios' || pathname.startsWith('/espacios/')
+  // /spots is the app shell's own full-screen map (same DiscoveryView).
+  return pathname === '/espacios' || pathname.startsWith('/espacios/') || pathname === '/spots'
 }
