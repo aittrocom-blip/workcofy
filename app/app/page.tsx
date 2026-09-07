@@ -3,7 +3,7 @@ import { listSpaces } from '@/lib/data/spaces'
 import { listAllSpaceBenefits } from '@/lib/data/benefits'
 import { listRewardEvents, rewardsBalanceFrom } from '@/lib/data/rewards'
 import { countPublishedOpportunities, listRecentOpportunities } from '@/lib/data/opportunities'
-import { countPublishedCourses, listFeaturedCourses } from '@/lib/data/courses'
+import { countPublishedCourses, listPublishedCourses } from '@/lib/data/courses'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { passHolderFrom } from '@/lib/pass'
 import { ExplorarHome } from '@/components/app/ExplorarHome'
@@ -30,7 +30,9 @@ export default async function ExplorarPage() {
       supabase.from('space_checkins').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
       supabase.from('profiles').select('streak_count').eq('id', user.id).maybeSingle(),
       listRecentOpportunities(6),
-      listFeaturedCourses(6),
+      // Default sort = featured first, then most clicked — so the strip fills
+      // to 8 even when fewer than 8 courses are flagged featured.
+      listPublishedCourses().then((all) => all.slice(0, 8)),
       countPublishedOpportunities(),
       countPublishedCourses(),
       createServerSupabaseClient().from('courses').select('id', { count: 'exact', head: true }).eq('status', 'published').eq('has_certificate', true),
