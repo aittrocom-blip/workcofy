@@ -14,7 +14,7 @@ export interface CategoryOption {
 }
 
 export const CATEGORY_OPTIONS: CategoryOption[] = [
-  { value: 'cafe', label: 'Café', active: true },
+  { value: 'cafe', label: 'Workfriendly', active: true },
   { value: 'work_cafe', label: 'Work Café', active: true },
   { value: 'coworking', label: 'Coworking', active: true },
   { value: 'meeting_room', label: 'Sala de reunión', active: false },
