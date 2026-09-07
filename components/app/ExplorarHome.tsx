@@ -5,7 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { SpaceRecord, SpaceWithDistance } from '@/lib/data/spaceTypes'
 import type { SpaceBenefitWithSpace } from '@/lib/data/benefits'
+import type { OpportunityRecord } from '@/lib/data/opportunityTypes'
+import type { CourseRecord } from '@/lib/data/courseTypes'
 import type { PassHolder } from '@/lib/pass'
+import { OpportunityTile, CourseTile } from '@/components/app/DiscoverTiles'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
@@ -21,6 +24,8 @@ interface ExplorarHomeProps {
   holder: PassHolder
   spaces: SpaceRecord[]
   benefits: SpaceBenefitWithSpace[]
+  opportunities: OpportunityRecord[]
+  courses: CourseRecord[]
   stats: { coins: number; streak: number; favorites: number; checkins: number }
 }
 
@@ -65,7 +70,7 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // The signed-in home. Location is requested once on mount (same hook the
 // map uses); until it's granted "Cerca de ti" falls back to the best-scored
 // spaces rather than pretending a fallback centre is the user's position.
-export function ExplorarHome({ holder, spaces, benefits, stats }: ExplorarHomeProps) {
+export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, stats }: ExplorarHomeProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [passOpen, setPassOpen] = useState(false)
@@ -155,6 +160,30 @@ export function ExplorarHome({ holder, spaces, benefits, stats }: ExplorarHomePr
 
       <Section title="Workcofy Spots" subtitle="Establecimientos verificados de la red" href="/spots?verified=1">
         <Strip spaces={spots} />
+      </Section>
+
+      <Section title="Trabajos remotos" subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
+        {opportunities.length === 0 ? (
+          <p className="px-4 text-sm text-gray-400 md:px-0">No hay oportunidades nuevas por ahora.</p>
+        ) : (
+          <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
+            {opportunities.map((opportunity) => (
+              <OpportunityTile key={opportunity.id} opportunity={opportunity} now={now} />
+            ))}
+          </HorizontalScroller>
+        )}
+      </Section>
+
+      <Section title="Aprende" subtitle="Cursos destacados para trabajar con IA" href="/aprende">
+        {courses.length === 0 ? (
+          <p className="px-4 text-sm text-gray-400 md:px-0">Pronto habrá cursos destacados aquí.</p>
+        ) : (
+          <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
+            {courses.map((course) => (
+              <CourseTile key={course.id} course={course} />
+            ))}
+          </HorizontalScroller>
+        )}
       </Section>
 
       <section className="mt-10 px-4 md:px-0">
