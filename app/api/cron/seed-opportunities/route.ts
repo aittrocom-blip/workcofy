@@ -4,6 +4,8 @@ import { verifyCronSecret } from '@/lib/cron/verifyCronSecret'
 import { runGetOnBoardIngestion } from '@/lib/opportunities/sources/runGetOnBoardIngestion'
 import { runWeRemotoIngestion } from '@/lib/opportunities/sources/runWeRemotoIngestion'
 import { sendDailySignupDigest } from '@/lib/reports/signupDigest'
+import { sendWeeklyContentDigest } from '@/lib/reports/weeklyContentDigest'
+import { runOpportunityAlerts } from '@/lib/reports/opportunityAlerts'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -39,6 +41,21 @@ export async function GET(request: Request) {
     results.signupDigest = await sendDailySignupDigest(supabase)
   } catch (error) {
     results.signupDigest = { error: error instanceof Error ? error.message : String(error) }
+  }
+
+  try {
+    results.opportunityAlerts = await runOpportunityAlerts(supabase)
+  } catch (error) {
+    results.opportunityAlerts = { error: error instanceof Error ? error.message : String(error) }
+  }
+
+  try {
+    // Weekly, not daily — this same route just runs the check every day and
+    // no-ops unless it's Monday, since Vercel Hobby's cron-count cap is why
+    // every daily task already shares this one entry.
+    results.weeklyDigest = new Date().getUTCDay() === 1 ? await sendWeeklyContentDigest(supabase) : { skipped: 'not Monday' }
+  } catch (error) {
+    results.weeklyDigest = { error: error instanceof Error ? error.message : String(error) }
   }
 
   return NextResponse.json(results)

@@ -5,6 +5,7 @@ import { ProfileForm } from '@/components/account/ProfileForm'
 import { listMissions, listMissionProgress } from '@/lib/data/missions'
 import { listRewardEvents, rewardsBalanceFrom } from '@/lib/data/rewards'
 import { RewardsPanel } from '@/components/account/RewardsPanel'
+import { SavedAlertsPanel, type SavedAlertSummary } from '@/components/account/SavedAlertsPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,9 +50,14 @@ export default async function PerfilPage() {
   const missions = await listMissions()
   const progress = await listMissionProgress(supabase, user.id)
   const completedMissionKeys = new Set(progress.map((entry) => entry.missionKey))
-  const [{ count: favoritesCount }, { count: reviewsCount }] = await Promise.all([
+  const [{ count: favoritesCount }, { count: reviewsCount }, { data: savedAlerts }] = await Promise.all([
     supabase.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
     supabase.from('reviews').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+    supabase
+      .from('saved_opportunity_alerts')
+      .select('id, label, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
   ])
 
   return (
@@ -74,6 +80,9 @@ export default async function PerfilPage() {
       </section>
       <div className="mt-10 max-w-2xl">
         <RewardsPanel balance={balance} events={events} missions={missions} completedMissionKeys={completedMissionKeys} />
+      </div>
+      <div className="mt-10 max-w-2xl">
+        <SavedAlertsPanel alerts={(savedAlerts ?? []) as SavedAlertSummary[]} />
       </div>
     </div>
   )

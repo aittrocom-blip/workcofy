@@ -18,6 +18,8 @@ interface OpportunityCardProps {
 
 const BADGE = 'rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] font-semibold text-gray-700'
 const AI_BADGE = 'rounded-full bg-workcofy-yellow px-2.5 py-0.5 text-[11px] font-bold text-black'
+const NEW_BADGE = 'rounded-full bg-black px-2.5 py-0.5 text-[11px] font-bold text-white'
+const NEW_WINDOW_MS = 48 * 60 * 60 * 1000
 
 export function CompanyLogo({
   name,
@@ -55,6 +57,7 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
   const area = professionLabel(opportunity.area)
   const source = optionLabel(OPPORTUNITY_SOURCES, opportunity.source)
   const tags = (opportunity.tags ?? []).slice(0, 3)
+  const isNew = now.getTime() - new Date(opportunity.published_at).getTime() < NEW_WINDOW_MS
 
   return (
     <article className="group flex h-full flex-col rounded-[28px] border border-gray-200 bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.08)]">
@@ -71,6 +74,7 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
       </div>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
+        {isNew && <span className={NEW_BADGE}>Nuevo</span>}
         {badges.map((badge) => (
           <span key={badge} className={BADGE}>
             {badge}

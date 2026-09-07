@@ -13,11 +13,13 @@ import {
   type OpportunityFilters,
   type SearchParamsInput,
 } from '@/lib/opportunities/queryBuilder'
-import { PROFESSION_OPTIONS } from '@/lib/professions'
+import { PROFESSION_OPTIONS, professionLabel } from '@/lib/professions'
+import { optionLabel } from '@/lib/optionLabel'
 import type { ChipGroup } from '@/components/ui/FilterChips'
 import { FilterDropdowns } from '@/components/ui/FilterDropdowns'
 import { Pagination } from '@/components/ui/Pagination'
 import { OpportunityCard } from './OpportunityCard'
+import { SaveAlertButton } from './SaveAlertButton'
 
 interface OpportunitiesListingProps {
   basePath: string
@@ -64,6 +66,23 @@ export async function OpportunitiesListing({ basePath, category, searchParams, i
   const clearHref = hasActiveOpportunityFilters(filters, fixed) ? basePath : null
   const sortHidden = Object.entries(current).filter(([key]) => key !== 'orden')
 
+  const alertLabelParts = [
+    effective.type ? optionLabel(OPPORTUNITY_TYPES, effective.type) : null,
+    effective.modality ? optionLabel(OPPORTUNITY_MODALITIES, effective.modality) : null,
+    effective.area ? professionLabel(effective.area) : null,
+    effective.level ? optionLabel(EXPERIENCE_LEVELS, effective.level) : null,
+    effective.country ? optionLabel(OPPORTUNITY_COUNTRIES, effective.country) : null,
+    effective.ai ? 'con IA' : null,
+    filters.q ? `"${filters.q}"` : null,
+  ].filter((part): part is string => Boolean(part))
+  const alertLabel = alertLabelParts.length > 0 ? alertLabelParts.join(' · ') : 'Todas las oportunidades'
+  // Stored as the OpportunityFilters shape (English keys) rather than the
+  // URL's Spanish params, since the cron replays it straight into
+  // listPublishedOpportunities(). Uses `effective` (not `filters`) so a
+  // category page's baked-in constraint (e.g. /oportunidades/ia's ai=true)
+  // is captured in the saved alert too.
+  const alertFilters = effective
+
   return (
     <section id={id} className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-8 md:px-8">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -72,28 +91,31 @@ export async function OpportunitiesListing({ basePath, category, searchParams, i
           {result.total === 1 ? 'oportunidad encontrada' : 'oportunidades encontradas'}
           {filters.q && <span className="text-gray-500"> para “{filters.q}”</span>}
         </p>
-        <form action={basePath} method="get" className="flex items-center gap-2">
-          {sortHidden.map(([key, value]) => (
-            <input key={key} type="hidden" name={key} value={value} />
-          ))}
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <span>Ordenar por</span>
-            <select
-              name="orden"
-              defaultValue={filters.sort ?? 'recent'}
-              className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 outline-none focus:border-black"
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="submit" className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:border-black">
-            Aplicar
-          </button>
-        </form>
+        <div className="flex flex-wrap items-center gap-2">
+          <form action={basePath} method="get" className="flex items-center gap-2">
+            {sortHidden.map(([key, value]) => (
+              <input key={key} type="hidden" name={key} value={value} />
+            ))}
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Ordenar por</span>
+              <select
+                name="orden"
+                defaultValue={filters.sort ?? 'recent'}
+                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 outline-none focus:border-black"
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button type="submit" className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:border-black">
+              Aplicar
+            </button>
+          </form>
+          <SaveAlertButton filters={alertFilters} label={alertLabel} />
+        </div>
       </div>
 
       <div className="mt-4">
