@@ -172,18 +172,22 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
                   <Row disabled>Regístrate</Row>
                 </>
               ) : (
-                <>
-                  <Row href="/login" onClick={onClose} active={pathname === '/login'}>
+                <div className="flex flex-col gap-2.5 px-1 pt-1">
+                  <Link
+                    href="/login"
+                    onClick={onClose}
+                    className="flex min-h-12 items-center justify-center rounded-full bg-workcofy-yellow px-5 text-[15px] font-bold text-black transition-all hover:shadow-md active:scale-[0.98]"
+                  >
                     Ingresa
-                  </Row>
+                  </Link>
                   <Link
                     href="/registro"
                     onClick={onClose}
-                    className="mt-2 flex min-h-12 items-center justify-center rounded-full bg-black px-5 text-[15px] font-semibold text-white transition-all hover:shadow-md active:scale-[0.98]"
+                    className="flex min-h-12 items-center justify-center rounded-full bg-black px-5 text-[15px] font-bold text-white transition-all hover:shadow-md active:scale-[0.98]"
                   >
                     Regístrate
                   </Link>
-                </>
+                </div>
               )}
             </>
           )}
