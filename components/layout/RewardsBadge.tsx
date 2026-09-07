@@ -61,10 +61,13 @@ export function RewardsBadge({ size = 'sm' }: RewardsBadgeProps) {
     )
   }
 
+  // Sized and colored to match the "Cuenta" pill it sits beside in the
+  // Header (h-11, text-[15px], #252A32) rather than reading as a small
+  // secondary label next to a much larger control.
   return (
-    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500">
+    <span className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-[#252A32]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/icons/rewards-coin.png" alt="" className="h-3.5 w-3.5" />
+      <img src="/icons/rewards-coin.png" alt="" className="h-5 w-5" />
       {balance}
     </span>
   )

@@ -20,7 +20,10 @@ export function ExplorarSection() {
           <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight md:text-4xl">
             Encuentra tu próximo lugar para trabajar.
           </h2>
-          <p className="mt-3 max-w-xl text-gray-500">No siempre necesitas una oficina.</p>
+          <p className="mt-3 max-w-xl text-gray-500">
+            No siempre necesitas una oficina — y Workcofy es más que espacios: también encuentras trabajo remoto y
+            aprendes con IA, todo en un mismo lugar.
+          </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {SCENARIOS.map((scenario) => (

@@ -16,7 +16,7 @@ export interface CategoryOption {
 export const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'cafe', label: 'Café', active: true },
   { value: 'work_cafe', label: 'Work Café', active: true },
-  { value: 'coworking', label: 'Coworking', active: false },
+  { value: 'coworking', label: 'Coworking', active: true },
   { value: 'meeting_room', label: 'Sala de reunión', active: false },
   { value: 'hotel', label: 'Lobby Café', active: true },
   { value: 'library', label: 'Biblioteca', active: false },
@@ -25,6 +25,14 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
 export const ACTIVE_CATEGORY_VALUES: CategoryValue[] = CATEGORY_OPTIONS.filter(
   (c) => c.active
 ).map((c) => c.value)
+
+// Shared by every `?category=` reader (discoveryFilters, /espacios,
+// /[district]) so a comma-separated multi-select list is parsed the same
+// way everywhere: `"cafe,work_cafe"` -> ['cafe', 'work_cafe'], missing/empty -> [].
+export function parseCategoryListParam(value: string | null | undefined): string[] {
+  if (!value) return []
+  return value.split(',').filter(Boolean)
+}
 
 // Public URL slugs for /espacios/[categoria] (master spec §38).
 export interface SpaceCategorySlug {

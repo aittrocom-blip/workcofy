@@ -13,7 +13,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#F0F0F0] bg-white">
-      <div className="mx-auto grid h-16 max-w-[1584px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 md:h-[76px] md:px-8 lg:px-12">
+      {/* Below md the middle nav doesn't render at all (see NAV_LINKS' nav
+          below, hidden until md:flex) — grid-cols-[1fr_auto_1fr] with an
+          empty middle column collapses that column to 0 and splits the
+          other two 1fr tracks 50/50, which visually strands the menu button
+          around the horizontal center instead of the right edge. A plain
+          flex row avoids that entirely; the grid only kicks in once the nav
+          actually has content to center against. */}
+      <div className="mx-auto flex h-16 max-w-[1584px] items-center justify-between px-4 sm:px-6 md:grid md:h-[76px] md:grid-cols-[1fr_auto_1fr] md:px-8 lg:px-12">
         <Link href="/" className="flex w-fit items-center py-2 transition-opacity hover:opacity-80">
           <Image
             src="/logo-wordmark.png"
@@ -27,12 +34,23 @@ export function Header() {
 
         <nav className="hidden items-center gap-5 lg:gap-8 md:flex">
           {NAV_LINKS.map((link) => {
+            if (link.disabled) {
+              return (
+                <span
+                  key={link.href}
+                  title="Próximamente"
+                  className="cursor-not-allowed py-2.5 text-lg font-bold leading-6 text-gray-300"
+                >
+                  {link.label}
+                </span>
+              )
+            }
             const active = isNavLinkActive(link.href, pathname)
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`py-2.5 text-base font-semibold leading-6 transition-colors ${
+                className={`py-2.5 text-lg font-bold leading-6 transition-colors ${
                   active ? 'text-black' : 'text-[#252A32] hover:text-black'
                 }`}
               >
@@ -62,20 +80,29 @@ export function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <nav className="flex flex-col gap-1 border-t border-gray-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-sm font-medium shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden">
+        <nav className="flex flex-col gap-1 border-t border-gray-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden">
           {NAV_LINKS.map((link) => {
+            if (link.disabled) {
+              return (
+                <span
+                  key={link.href}
+                  title="Próximamente"
+                  className="flex min-h-11 cursor-not-allowed items-center rounded-xl px-3 py-2.5 text-lg font-bold text-gray-300"
+                >
+                  {link.label}
+                </span>
+              )
+            }
             const active = isNavLinkActive(link.href, pathname)
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex min-h-11 items-center gap-2.5 rounded-xl px-3 py-2.5 transition-colors ${
-                  active ? 'bg-workcofy-yellow/15 text-black' : 'hover:bg-gray-50'
+                className={`flex min-h-11 items-center rounded-xl px-3 py-2.5 text-lg font-bold text-black transition-colors ${
+                  active ? 'bg-workcofy-yellow/15' : 'hover:bg-gray-50'
                 }`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={link.icon} alt="" className="h-4 w-4 opacity-70" />
                 {link.label}
               </Link>
             )

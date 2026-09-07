@@ -48,6 +48,8 @@ export interface SpaceRecord {
   data_source: 'mock' | 'google'
   active: boolean
   view_count: number
+  /** "Me gusta" — a public trust signal, distinct from favorites (private save-for-later). */
+  like_count: number
   special_menu_enabled: boolean
   special_menu_content: string | null
 }

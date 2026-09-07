@@ -51,7 +51,7 @@ export function LearningPaths() {
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <div className="flex flex-col gap-4 rounded-[32px] bg-black px-6 py-8 text-white md:flex-row md:items-center md:justify-between md:px-10">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Aprende → Oportunidades</p>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Aprende → Trabajos remotos</p>
             <h2 className="mt-2 text-xl font-bold tracking-tight md:text-2xl">Aprender IA puede abrir nuevas oportunidades.</h2>
             <p className="mt-1 text-sm text-gray-300">Las habilidades que desarrollas aquí aparecen cada vez más en las vacantes.</p>
           </div>

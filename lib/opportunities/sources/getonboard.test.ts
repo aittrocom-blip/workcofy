@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  GETONBOARD_MAX_AGE_DAYS,
   countryCodeFor,
   formatSalary,
   isFresh,
@@ -78,11 +79,12 @@ describe('field mappers', () => {
 })
 
 describe('shouldKeep / isFresh', () => {
-  it('keeps remote jobs and on-site jobs in LatAm or Spain, drops the rest', () => {
-    expect(shouldKeep(job())).toBe(true)
+  it('keeps only remote jobs, dropping on-site and hybrid regardless of country', () => {
+    expect(shouldKeep(job())).toBe(false)
     expect(shouldKeep(job({ remote_modality: 'fully_remote', countries: ['Remote'] }))).toBe(true)
     expect(shouldKeep(job({ remote_modality: 'no_remote', countries: ['United States'] }))).toBe(false)
-    expect(shouldKeep(job({ remote_modality: 'hybrid', countries: ['España'] }))).toBe(true)
+    expect(shouldKeep(job({ remote_modality: 'hybrid', countries: ['España'] }))).toBe(false)
+    expect(shouldKeep(job({ remote_modality: 'remote_local', countries: ['Peru'] }))).toBe(true)
   })
   it('drops jobs older than the max age', () => {
     expect(isFresh(job(), now)).toBe(true)
@@ -115,7 +117,9 @@ describe('mapGetOnBoardJob', () => {
     })
     expect(row.description).toBe('Requisitos\nExperiencia en testing.\n\nFunciones\n• Probar\n• Reportar')
     expect(row.summary).toBe('• Probar • Reportar')
-    expect(new Date(row.expires_at!).getTime() - new Date(row.published_at).getTime()).toBe(45 * 86_400_000)
+    expect(new Date(row.expires_at!).getTime() - new Date(row.published_at).getTime()).toBe(
+      GETONBOARD_MAX_AGE_DAYS * 86_400_000
+    )
   })
   it('labels remote jobs and falls back when the company is missing', () => {
     const row = mapGetOnBoardJob(

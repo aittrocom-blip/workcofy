@@ -6,12 +6,19 @@ import {
   OPPORTUNITY_SOURCES,
   OPPORTUNITY_TYPES,
 } from '@/lib/opportunities/constants'
+import { buildJobPostingJsonLd } from '@/lib/opportunities/jobPostingJsonLd'
 import { optionLabel } from '@/lib/optionLabel'
 import { professionLabel } from '@/lib/professions'
 import { formatRelativeDays } from '@/lib/text/relativeDays'
+import { toSafeJsonLdString } from '@/lib/text/jsonLdScript'
+import { ShareButton } from '@/components/ui/ShareButton'
 import { CompanyLogo } from './OpportunityCard'
 
 const CHIP = 'rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700'
+
+function siteUrl(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://workcofy.com').replace(/\/$/, '')
+}
 
 export function OpportunityDetail({ opportunity }: { opportunity: OpportunityRecord }) {
   const chips = [
@@ -22,9 +29,16 @@ export function OpportunityDetail({ opportunity }: { opportunity: OpportunityRec
   ].filter((label): label is string => label !== null)
   const source = optionLabel(OPPORTUNITY_SOURCES, opportunity.source)
   const paragraphs = (opportunity.description ?? '').split('\n\n').filter(Boolean)
+  const detailUrl = `/oportunidades/${opportunity.slug}`
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 md:px-8 md:py-14">
+      {/* Google for Jobs structured data — see lib/opportunities/jobPostingJsonLd.ts */}
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: toSafeJsonLdString(buildJobPostingJsonLd(opportunity, siteUrl())) }}
+      />
       <Link href="/oportunidades" className="text-sm text-gray-500 hover:text-black">
         ← Todas las oportunidades
       </Link>
@@ -78,6 +92,12 @@ export function OpportunityDetail({ opportunity }: { opportunity: OpportunityRec
         >
           Ver oportunidad en {source}
         </a>
+        <ShareButton
+          title={opportunity.title}
+          path={detailUrl}
+          kind="oportunidad"
+          className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
+        />
         <span className="text-xs text-gray-400">La postulación se realiza en el sitio original.</span>
       </div>
 

@@ -1,18 +1,35 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { SEARCH_EXAMPLES } from '@/lib/opportunities/discovery'
 
-// Redesign brief §2, §4, §5: an inspirational hero built around one big
-// search box, not a database-style header.
+// Redesign brief §2, §4, §5: an inspirational hero — text + illustration side
+// by side like Aprende's — built around one big search box below, not a
+// database-style header.
 export function OportunidadesHero({ currentQuery }: { currentQuery: string | null }) {
   return (
     <section className="mx-auto max-w-7xl px-4 pt-8 md:px-8 md:pt-12">
-      <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Oportunidades</span>
-      <h1 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">
-        Encuentra tu próxima oportunidad.
-      </h1>
-      <p className="mt-4 max-w-xl text-base text-gray-600 md:text-lg">
-        Trabajo remoto, freelance, proyectos y prácticas de Perú, Latinoamérica y el mundo.
-      </p>
+      <div className="grid items-center gap-8 md:grid-cols-[1.1fr_0.9fr] md:gap-12">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Trabajos remotos</span>
+          <h1 className="mt-3 max-w-xl text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">
+            Encuentra tu próxima oportunidad.
+          </h1>
+          <p className="mt-4 max-w-lg text-base text-gray-600 md:text-lg">
+            Trabajo remoto, freelance, proyectos y prácticas de Perú, Latinoamérica y el mundo.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-[32px]">
+          <Image
+            src="/section-oportunidades.png"
+            alt="Personas encontrando oportunidades de trabajo remoto y freelance"
+            width={1536}
+            height={1024}
+            priority
+            className="h-auto w-full"
+          />
+        </div>
+      </div>
 
       <div className="mt-8 rounded-[32px] border border-gray-200 bg-white p-5 shadow-[0_16px_38px_rgba(0,0,0,0.05)] md:p-8">
         <label htmlFor="oportunidades-search" className="text-xl font-bold tracking-tight md:text-2xl">

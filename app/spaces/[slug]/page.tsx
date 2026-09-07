@@ -10,7 +10,8 @@ import { formatPriceLevel } from '@/lib/priceLevel'
 import { WorkcofyScoreBadge } from '@/components/space/WorkcofyScoreBadge'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
-import { ShareButton } from '@/components/space/ShareButton'
+import { LikeButton } from '@/components/space/LikeButton'
+import { ShareButton } from '@/components/ui/ShareButton'
 import { AmenitiesSection } from '@/components/space/AmenitiesSection'
 import { SocialLinks } from '@/components/space/SocialLinks'
 import { EventsSection } from '@/components/space/EventsSection'
@@ -121,12 +122,9 @@ export default async function SpacePage({ params }: SpacePageProps) {
       </div>
       {space.address && <p className="mt-2 text-sm text-gray-600">{space.address}</p>}
 
+      {/* space.phone (a WhatsApp/contact number) is kept in the DB for our
+          own outreach — deliberately not shown on the public ficha. */}
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-        {space.phone && (
-          <a href={`tel:${space.phone}`} className="hover:text-black">
-            {space.phone}
-          </a>
-        )}
         {space.website && (
           <a href={space.website} target="_blank" rel="noreferrer" className="hover:text-black">
             Sitio web
@@ -143,13 +141,19 @@ export default async function SpacePage({ params }: SpacePageProps) {
         >
           Cómo llegar
         </a>
+        <LikeButton
+          spaceId={space.id}
+          likeCount={space.like_count}
+          className="inline-flex min-h-11 items-center gap-1.5 touch-manipulation rounded-full border border-gray-200 px-4 transition-colors hover:border-black"
+        />
         <FavoriteButton
           spaceId={space.id}
           className="flex h-11 w-11 flex-none touch-manipulation items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
         />
         <ShareButton
-          spaceName={space.name}
-          slug={space.slug}
+          title={space.name}
+          path={`/spaces/${space.slug}`}
+          kind="espacio"
           className="flex h-11 w-11 flex-none touch-manipulation items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
         />
       </div>

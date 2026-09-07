@@ -37,7 +37,7 @@ export default async function OportunidadSlugPage({ params, searchParams }: Page
       <div>
         <section className="mx-auto max-w-7xl px-4 pt-8 md:px-8 md:pt-12">
           <Link href="/oportunidades" className="text-sm text-gray-500 hover:text-black">
-            ← Oportunidades
+            ← Trabajos remotos
           </Link>
           <h1 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight md:text-5xl">{category.title}</h1>
           <p className="mt-3 max-w-xl text-gray-600 md:text-lg">{category.description}</p>

@@ -1,17 +1,20 @@
 export interface SpaceFilters {
   country?: string | null
   district?: string | null
-  category?: string | null
+  /** Zero, one, or several category values — empty/undefined means no category filter. */
+  category?: string[] | null
   search?: string | null
 }
 
 export interface SpaceQueryFilter {
-  column: 'country' | 'district' | 'category'
+  column: 'country' | 'district'
   value: string
 }
 
 export interface SpaceQueryDescriptor {
   eqFilters: SpaceQueryFilter[]
+  /** Non-null means "narrow to these categories" (`.in('category', categoryIn)`); null means no category filter. */
+  categoryIn: string[] | null
   searchTerm: string | null
 }
 
@@ -19,9 +22,9 @@ export function buildSpaceQueryDescriptor(filters: SpaceFilters): SpaceQueryDesc
   const eqFilters: SpaceQueryFilter[] = []
   if (filters.country) eqFilters.push({ column: 'country', value: filters.country })
   if (filters.district) eqFilters.push({ column: 'district', value: filters.district })
-  if (filters.category) eqFilters.push({ column: 'category', value: filters.category })
 
+  const categoryIn = filters.category && filters.category.length > 0 ? filters.category : null
   const trimmedSearch = filters.search?.trim()
 
-  return { eqFilters, searchTerm: trimmedSearch ? trimmedSearch : null }
+  return { eqFilters, categoryIn, searchTerm: trimmedSearch ? trimmedSearch : null }
 }

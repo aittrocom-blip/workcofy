@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { spaceCategoryFromSlug } from '@/lib/categories'
 import { listSpaces } from '@/lib/data/spaces'
-import { isCurrentUserAdmin } from '@/lib/admin/isCurrentUserAdmin'
-import { EspaciosDashboard } from '@/components/discovery/EspaciosDashboard'
+import { DiscoveryView } from '@/components/discovery/DiscoveryView'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,11 +16,11 @@ export function generateMetadata({ params }: PageProps): Metadata {
   return { title: `${category.title} | Workcofy`, description: category.description }
 }
 
-// Same dashboard as /espacios with the category pre-selected — a crawlable
-// URL per space type, reusing the list-first shell unchanged.
+// Same full-screen map as /espacios, pre-filtered server-side to one
+// category — a crawlable URL per space type.
 export default async function EspaciosCategoriaPage({ params }: PageProps) {
   const category = spaceCategoryFromSlug(params.categoria)
   if (!category) notFound()
-  const [spaces, isAdmin] = await Promise.all([listSpaces(), isCurrentUserAdmin()])
-  return <EspaciosDashboard spaces={spaces} isAdmin={isAdmin} initialCategory={category.value} />
+  const spaces = await listSpaces({ category: [category.value] })
+  return <DiscoveryView spaces={spaces} autoRequestLocation initialSort="distance" fullScreen />
 }

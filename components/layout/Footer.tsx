@@ -1,10 +1,10 @@
 'use client'
 
-import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { NAV_LINKS } from '@/lib/navLinks'
+import { isEspaciosMapRoute } from '@/lib/espaciosMapRoute'
 
 function FooterContent() {
   const year = new Date().getFullYear()
@@ -14,18 +14,8 @@ function FooterContent() {
       <div className="mx-auto flex max-w-7xl flex-col gap-10 md:flex-row md:justify-between">
         <div className="max-w-xs">
           <Link href="/" className="inline-block">
-            <Image
-              src="/logo-wordmark.png"
-              alt="Workcofy"
-              width={1251}
-              height={476}
-              className="h-5 w-auto opacity-60"
-            />
+            <Image src="/logo-solo-alpha.png" alt="Workcofy" width={616} height={838} className="h-10 w-auto" />
           </Link>
-          <p className="mt-3 text-sm text-gray-500">
-            Trabaja mejor. Desde cualquier lugar. Oportunidades, aprendizaje y espacios para trabajar en la
-            era de la IA.
-          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-8">
@@ -34,9 +24,15 @@ function FooterContent() {
             <ul className="mt-3 flex flex-col gap-2.5 text-sm text-gray-600">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="hover:text-black">
-                    {link.label}
-                  </Link>
+                  {link.disabled ? (
+                    <span title="Próximamente" className="cursor-not-allowed text-gray-300">
+                      {link.label}
+                    </span>
+                  ) : (
+                    <Link href={link.href} className="hover:text-black">
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -66,29 +62,15 @@ function FooterContent() {
   )
 }
 
-// The full-screen map on /espacios (?view=map) is meant to use the entire
-// viewport — a footer below it would just be scrollable dead space under
-// the map. Reading the `view` param needs useSearchParams(), which forces
-// a Suspense boundary above it during static prerendering; that check is
-// isolated to this tiny component (only ever mounted on /espacios, below)
-// instead of living in the outer Footer, so every other route's Footer
-// render never calls useSearchParams() at all and stays plain/static.
-function NearMeFooterGate() {
-  const searchParams = useSearchParams()
-  if (searchParams.get('view') === 'map') return null
-  return <FooterContent />
-}
-
 export function Footer() {
   const pathname = usePathname()
 
-  if (pathname === '/espacios') {
-    return (
-      <Suspense fallback={null}>
-        <NearMeFooterGate />
-      </Suspense>
-    )
-  }
+  // The full-screen map is the only Espacios experience now — it already
+  // fills the viewport on its own (see DiscoveryView's fullScreen branch);
+  // a footer below it would just be dead scrollable space under the map,
+  // and any scrolling that happens here should only be inside the space
+  // ficha's own side panel, not the page.
+  if (isEspaciosMapRoute(pathname)) return null
 
   return <FooterContent />
 }

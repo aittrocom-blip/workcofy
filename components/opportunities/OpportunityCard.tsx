@@ -9,6 +9,7 @@ import {
 import { optionLabel } from '@/lib/optionLabel'
 import { professionLabel } from '@/lib/professions'
 import { formatRelativeDays } from '@/lib/text/relativeDays'
+import { ShareButton } from '@/components/ui/ShareButton'
 
 interface OpportunityCardProps {
   opportunity: OpportunityRecord
@@ -94,12 +95,14 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
         {opportunity.salary_text && <span className="text-gray-400"> · {opportunity.salary_text}</span>}
       </p>
 
-      <div className="mt-auto flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-3 border-t border-gray-100 pt-4">
         <div className="min-w-0">
           <p className="truncate text-xs text-gray-500">Publicado {formatRelativeDays(opportunity.published_at, now).toLowerCase()}</p>
           <p className="truncate text-xs text-gray-400">Fuente: {source}</p>
         </div>
-        <div className="flex flex-none items-center gap-2">
+        {/* ml-auto keeps this group right-aligned even when it wraps to its
+            own line on narrow phones — see CourseCard.tsx for the same fix. */}
+        <div className="ml-auto flex flex-none items-center gap-2">
           <span
             aria-hidden="true"
             title="Guardar no está disponible todavía"
@@ -107,6 +110,12 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
           >
             ♡
           </span>
+          <ShareButton
+            title={opportunity.title}
+            path={detailUrl}
+            kind="oportunidad"
+            className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-500 transition-colors hover:border-black hover:text-black"
+          />
           <a
             href={`/ir/oportunidad/${opportunity.id}`}
             target="_blank"

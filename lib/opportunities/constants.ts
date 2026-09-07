@@ -29,6 +29,7 @@ export type OpportunityLanguage = (typeof OPPORTUNITY_LANGUAGES)[number]['value'
 
 export const OPPORTUNITY_SOURCES = [
   { value: 'getonboard', label: 'Get on Board' },
+  { value: 'weremoto', label: 'WeRemoto' },
   { value: 'manual', label: 'Workcofy' },
 ] as const
 export type OpportunitySource = (typeof OPPORTUNITY_SOURCES)[number]['value']
@@ -62,8 +63,9 @@ export const OPPORTUNITY_COUNTRIES = [
 ] as const
 export type OpportunityCountry = (typeof OPPORTUNITY_COUNTRIES)[number]['value']
 
-// The five "categorías" of the master spec §9 are URL views over three
-// orthogonal columns (see design spec §2.1) — each slug is a fixed filter.
+// The "categorías" (originally the five from master spec §9, plus Empleo)
+// are URL views over three orthogonal columns (see design spec §2.1) — each
+// slug is a fixed filter.
 export interface OpportunityCategory {
   slug: string
   label: string
@@ -79,6 +81,13 @@ export const OPPORTUNITY_CATEGORY_SLUGS: OpportunityCategory[] = [
     title: 'Trabajo remoto',
     description: 'Oportunidades de trabajo remoto para Perú, LatAm y el mundo.',
     filter: { modality: 'remoto' },
+  },
+  {
+    slug: 'empleo',
+    label: 'Empleo',
+    title: 'Empleos',
+    description: 'Puestos de trabajo a tiempo completo o medio tiempo.',
+    filter: { type: 'empleo' },
   },
   {
     slug: 'freelance',

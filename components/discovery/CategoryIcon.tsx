@@ -5,12 +5,15 @@ interface CategoryIconProps {
   active?: boolean
 }
 
+// cafe, work_cafe and hotel ("Lobby Café") are all coffee-shop variants, so
+// they intentionally share the same cup icon instead of each having its own
+// distinct illustration.
 const CATEGORY_ICON_SRC: Record<string, string> = {
   todos: '/icons/cat-todos.png',
   cafe: '/icons/cat-cafe.png',
-  work_cafe: '/icons/cat-work-cafe.png',
+  work_cafe: '/icons/cat-cafe.png',
   coworking: '/icons/cat-coworking.png',
-  hotel: '/icons/cat-hotel.png',
+  hotel: '/icons/cat-cafe.png',
   meeting_room: '/icons/cat-meeting-room.png',
   library: '/icons/cat-biblioteca.png',
 }

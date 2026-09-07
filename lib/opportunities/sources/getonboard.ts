@@ -60,7 +60,9 @@ export const GETONBOARD_CATEGORY_IDS = [
   'other',
 ]
 
-export const GETONBOARD_MAX_AGE_DAYS = 45
+// Also the public-visibility window: expires_at (below) hides a listing
+// past this age, though the row itself is never deleted. 4 weeks.
+export const GETONBOARD_MAX_AGE_DAYS = 28
 const DAY_MS = 86_400_000
 
 const COUNTRY_CODE_BY_NAME: Record<string, string> = {
@@ -93,9 +95,6 @@ const COUNTRY_CODE_BY_NAME: Record<string, string> = {
   'united states': 'us',
   usa: 'us',
 }
-
-// Countries whose on-site/hybrid jobs we still list (design spec §3).
-const KEEP_COUNTRY_CODES = new Set<string>(OPPORTUNITY_COUNTRIES.map((c) => c.value).filter((code) => code !== 'us'))
 
 export function countryCodeFor(name: string): string | null {
   return COUNTRY_CODE_BY_NAME[name.trim().toLowerCase()] ?? null
@@ -160,12 +159,10 @@ function isRemote(job: GetOnBoardJob): boolean {
   return mapModality(job.attributes.remote_modality) === 'remoto'
 }
 
+// Remote is Workcofy's defining characteristic for Oportunidades — on-site
+// and hybrid listings are dropped entirely regardless of country.
 export function shouldKeep(job: GetOnBoardJob): boolean {
-  if (isRemote(job)) return true
-  return job.attributes.countries.some((name) => {
-    const code = countryCodeFor(name)
-    return code !== null && KEEP_COUNTRY_CODES.has(code)
-  })
+  return isRemote(job)
 }
 
 export function isFresh(job: GetOnBoardJob, now: Date): boolean {

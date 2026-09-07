@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
-import { CATEGORY_OPTIONS } from '@/lib/categories'
+import Link from 'next/link'
 import { COUNTRY_OPTIONS } from '@/lib/countries'
-import { CategoryIcon } from '@/components/discovery/CategoryIcon'
 import { FiltersPanel } from '@/components/discovery/FiltersPanel'
 import { SortDropdown } from '@/components/discovery/SortDropdown'
 import { OpenHoursFilter } from '@/components/discovery/OpenHoursFilter'
+import { CategoryFilterDropdown } from '@/components/discovery/CategoryFilterDropdown'
 import type { DiscoveryFilterState } from '@/lib/filters/discoveryFilters'
 
 interface FiltersBarProps {
@@ -27,9 +27,6 @@ interface FiltersBarProps {
   /** Gives the full-screen map its own compact, unified control surface. */
   mapOverlay?: boolean
 }
-
-const TILE_ACTIVE = CATEGORY_OPTIONS.filter((option) => option.active)
-const TILE_MORE = CATEGORY_OPTIONS.filter((option) => !option.active)
 
 export function FiltersBar({
   filters,
@@ -61,15 +58,6 @@ export function FiltersBar({
     'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
 
   const isMapOverlay = floating && mapOverlay
-
-  // Slimmer, single-line chip matching the 42px location button — used only
-  // in the map overlay row, kept separate from chipBase/chipActive above so
-  // the district-page toolbar's chips (bigger, bolder) are untouched.
-  function overlayChipClass(active: boolean) {
-    return `flex h-[42px] flex-none items-center gap-2 rounded-full px-4 text-sm font-medium transition-all ${
-      active ? 'bg-black text-white shadow-sm' : chipInactive
-    }`
-  }
 
   return (
     <div
@@ -135,16 +123,9 @@ export function FiltersBar({
         {!floating && <SortDropdown value={filters.sort} onChange={(sort) => onChange({ sort })} />}
       </div>
 
-      {/* Piso 2 — categorías y zonas populares */}
+      {/* Piso 2 — tipo de espacio y zonas populares */}
       <div className="mt-2.5 flex flex-wrap items-center gap-4">
-        <div className="relative min-w-0">
-        <div
-          className={`gap-1.5 ${
-            isMapOverlay
-              ? 'no-scrollbar -mx-3 flex flex-nowrap overflow-x-auto px-3 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0'
-              : 'flex flex-wrap'
-          }`}
-        >
+        <div className="flex flex-wrap items-center gap-1.5">
           {isMapOverlay && (
             <button
               type="button"
@@ -157,51 +138,17 @@ export function FiltersBar({
             </button>
           )}
           {isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} variant="chip" />}
-          <button
-            onClick={() => onChange({ category: null })}
-            className={isMapOverlay ? overlayChipClass(!filters.category) : `flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-              !filters.category ? chipActive : chipInactive
-            }`}
-          >
-            <CategoryIcon name="todos" className="h-5 w-5" active={!filters.category} />
-            Todos
-          </button>
-          {TILE_ACTIVE.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => onChange({ category: option.value })}
-              className={isMapOverlay ? overlayChipClass(filters.category === option.value) : `flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                filters.category === option.value ? chipActive : chipInactive
-              }`}
+          <CategoryFilterDropdown selected={filters.category} onChange={(category) => onChange({ category })} />
+          {isMapOverlay && (
+            <Link
+              href="/espacios/sugerir"
+              aria-label="Sugerir un local"
+              title="Sugerir un local"
+              className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full border border-gray-200 bg-white text-lg font-semibold text-gray-600 shadow-sm hover:border-black hover:text-black"
             >
-              <CategoryIcon
-                name={option.value}
-                className="h-5 w-5"
-                active={filters.category === option.value}
-              />
-              {option.label}
-            </button>
-          ))}
-          {!isMapOverlay && TILE_MORE.map((option) => (
-            <div
-              key={option.value}
-              title="Próximamente"
-              className="flex flex-none cursor-not-allowed items-center gap-2 rounded-full bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-300 shadow-sm"
-            >
-              <CategoryIcon name={option.value} className="h-5 w-5 opacity-40" />
-              {option.label}
-            </div>
-          ))}
-        </div>
-        {isMapOverlay && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex w-9 items-center justify-end bg-gradient-to-l from-white to-transparent md:hidden">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm">
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
-              </svg>
-            </span>
-          </div>
-        )}
+              +
+            </Link>
+          )}
         </div>
 
         {!hideLocationFilters && (

@@ -37,7 +37,7 @@ Esto resuelve el `google_place_id` real de cada café vía Places API y sobreesc
 Las tablas `opportunities` y `courses` (migración `0014`) se cargan por script y se editan en el Table Editor de Supabase:
 
 ```bash
-npm run seed:getonboard   # trae vacantes de la API pública de GetOnBoard (últimos 45 días, LatAm + remoto)
+npm run seed:getonboard   # trae vacantes de la API pública de GetOnBoard (últimas 4 semanas, LatAm + remoto)
 npm run seed:courses      # carga el catálogo de cursos oficiales de IA (lib/courses/seedCatalog.ts)
 ```
 

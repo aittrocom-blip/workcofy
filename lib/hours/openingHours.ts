@@ -61,6 +61,15 @@ export function isOpenDuring(
   })
 }
 
+// "Abierto 24 horas" filter — a space qualifies if today's period has no
+// close time at all (per Google's own convention: `close: null` means open
+// straight through that day).
+export function isOpen24HoursToday(hours: OpeningHours | null | undefined, now: Date): boolean {
+  if (!hours || hours.periods.length === 0) return false
+  const day = now.getDay()
+  return hours.periods.some((period) => period.open.day === day && period.close === null)
+}
+
 export function formatPeriodForDay(hours: OpeningHours | null | undefined, day: number): string {
   if (!hours) return 'Horario no disponible'
   const period = hours.periods.find((p) => p.open.day === day)

@@ -40,9 +40,9 @@ export function AprendeHero({ currentQuery }: { currentQuery: string | null }) {
 
         <div className="overflow-hidden rounded-[32px]">
           <Image
-            src="/section-trabajo.png"
+            src="/section-aprende.png"
             alt="Una persona aprendiendo y trabajando con su laptop"
-            width={1535}
+            width={1536}
             height={1024}
             priority
             className="h-auto w-full"

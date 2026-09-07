@@ -1,11 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import type { SpaceRecord } from '@/lib/data/spaceTypes'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
-import { useIsDesktop } from '@/lib/hooks/useIsDesktop'
 import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { avatarFor } from '@/lib/avatars'
@@ -13,9 +11,8 @@ import { MapView } from '@/components/map/MapView'
 import { SpaceList } from '@/components/discovery/SpaceList'
 import { FiltersBar } from '@/components/discovery/FiltersBar'
 import { SpaceCard } from '@/components/discovery/SpaceCard'
-import { CompactSpaceRow } from '@/components/discovery/CompactSpaceRow'
 import { SpaceDetailPanel } from '@/components/discovery/SpaceDetailPanel'
-import { NearbyPopularPanel } from '@/components/discovery/NearbyPopularPanel'
+import { NearbyPopularStrip } from '@/components/discovery/NearbyPopularStrip'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import type { MapViewHandle } from '@/lib/map/types'
 import { MapZoomControls } from '@/components/map/MapZoomControls'
@@ -29,7 +26,7 @@ import {
 } from '@/lib/filters/discoveryFilters'
 import { sortSpaces } from '@/lib/filters/sortSpaces'
 import { districtLabel, districtSlugFromValue } from '@/lib/districts'
-import { isOpenNow, isOpenDuring } from '@/lib/hours/openingHours'
+import { isOpenNow, isOpenDuring, isOpen24HoursToday } from '@/lib/hours/openingHours'
 import { getLimaNow } from '@/lib/geo/limaTime'
 
 interface DiscoveryViewProps {
@@ -65,30 +62,13 @@ export function DiscoveryView({
   const pathname = usePathname()
   const { coordinate, status, requestLocation } = useUserLocation()
   const { isFavorited } = useFavorites()
-  const { user, loading: authLoading } = useAuthUser()
+  const { user } = useAuthUser()
   // Falls back to Worky (avatarFor's own default) while logged out or before
   // the user has chosen one — only a genuinely chosen avatar overrides it.
   const chosenAvatarId = useUserAvatar()
   const userAvatarSrc = chosenAvatarId ? avatarFor(chosenAvatarId).src : '/icons/worky-location.png'
-  const isDesktop = useIsDesktop()
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  // Desktop map view starts a selection as the small preview card; "Ver
-  // espacio" upgrades it to the full ficha in place instead of navigating to
-  // /spaces/[slug], which would leave the sidebar shell. Resets whenever the
-  // selection itself changes, so a new marker click always starts compact.
-  const [detailOpen, setDetailOpen] = useState(false)
-  useEffect(() => {
-    setDetailOpen(false)
-  }, [selectedId])
   const mapRef = useRef<MapViewHandle>(null)
-
-  // Re-derives the exact same condition AppShell.tsx uses to decide whether
-  // to show the Sidebar shell instead of Header/Footer. DiscoveryView is
-  // already a client component rendered inside whichever shell AppShell
-  // picked, so it can independently detect "am I currently inside the
-  // Sidebar shell" rather than needing that fact threaded down from the
-  // (server) /espacios page component.
-  const insideSidebarShell = pathname === '/espacios' && !authLoading && user !== null && isDesktop
 
   const filters: DiscoveryFilterState = useMemo(() => {
     const parsed = parseDiscoveryFilters(searchParams)
@@ -122,6 +102,7 @@ export function DiscoveryView({
   const filtered = useMemo(() => {
     const now = getLimaNow()
     return sorted.filter((space) => {
+      if (filters.open24h && !isOpen24HoursToday(space.opening_hours, now)) return false
       if (
         filters.openBetween &&
         !isOpenDuring(space.opening_hours, now, filters.openBetween.start, filters.openBetween.end)
@@ -131,7 +112,7 @@ export function DiscoveryView({
       if (filters.verifiedOnly && !space.verified) return false
       return true
     })
-  }, [sorted, filters.openBetween, filters.verifiedOnly])
+  }, [sorted, filters.open24h, filters.openBetween, filters.verifiedOnly])
 
   const selectedSpace = filtered.find((space) => space.id === selectedId) ?? null
 
@@ -158,28 +139,11 @@ export function DiscoveryView({
 
   // Independent of the active search/category filters — always "what's
   // popular near you", not "what's popular within your current narrowing".
-  const nearbyPopular = useMemo(() => selectNearbyPopularSpaces(withDistance), [withDistance])
-
-  // Opened from the sidebar's AvatarMenu via a query param instead of
-  // navigating to the standalone /favoritos page, so it opens as an overlay
-  // over the map (like a space ficha) instead of leaving the sidebar shell.
-  // Read off `withDistance` (not `filtered`) so an active category/search
-  // filter never hides a favorite that doesn't match it.
-  const favoritesOpen = searchParams.get('favorites') === '1'
-  const favoriteSpaces = useMemo(
-    () => withDistance.filter((space) => isFavorited(space.id)),
-    [withDistance, isFavorited]
+  // Prioritizes what's open right now (see selectNearbyPopularSpaces).
+  const nearbyPopular = useMemo(
+    () => selectNearbyPopularSpaces(withDistance, getLimaNow()),
+    [withDistance]
   )
-  // Avoids the favorites panel and a selected space's ficha docking to the
-  // same right-hand edge at once.
-  useEffect(() => {
-    if (favoritesOpen) setSelectedId(null)
-  }, [favoritesOpen])
-
-  function closeFavorites() {
-    const query = serializeDiscoveryFilters(filters)
-    router.push(query ? `?${query}` : pathname)
-  }
 
   const locationUnavailable = status === 'denied' || status === 'unavailable'
 
@@ -191,8 +155,9 @@ export function DiscoveryView({
   function clearDiscoveryFilters() {
     updateFilters({
       ...(lockedDistrict ? {} : { country: null, district: null }),
-      category: null,
+      category: [],
       search: null,
+      open24h: false,
       openBetween: null,
       verifiedOnly: false,
     })
@@ -233,13 +198,7 @@ export function DiscoveryView({
 
   if (fullScreen) {
     return (
-      <div
-        className={`relative w-full overflow-hidden ${
-          insideSidebarShell
-            ? 'h-full'
-            : 'h-[calc(100vh-var(--app-header-height,4rem))] [@supports(height:100dvh)]:h-[calc(100dvh-var(--app-header-height,4rem))]'
-        }`}
-      >
+      <div className="relative h-[calc(100vh-var(--app-header-height,4rem))] w-full overflow-hidden [@supports(height:100dvh)]:h-[calc(100dvh-var(--app-header-height,4rem))]">
         <div className="absolute inset-0">
           <MapView
             ref={mapRef}
@@ -252,19 +211,6 @@ export function DiscoveryView({
             userAvatarSrc={userAvatarSrc}
             hideNativeZoom
           />
-        </div>
-
-        {/* The only way back to the Espacios dashboard from here besides the
-            browser's back button — the map itself has no other affordance
-            for it now that it's reached via a toggle instead of being the
-            page's only view. */}
-        <div className="pointer-events-none absolute right-3 top-3 z-30">
-          <Link
-            href="/espacios"
-            className="pointer-events-auto inline-flex items-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white shadow-md"
-          >
-            Lista
-          </Link>
         </div>
 
         {/* Desktop: floating card, docked top-left over the map. */}
@@ -325,93 +271,21 @@ export function DiscoveryView({
           />
         </div>
 
-        {/* Favoritos — opened from the sidebar's AvatarMenu via ?favorites=1
-            instead of navigating to /favoritos, so it overlays the map the
-            same way a space ficha does, keeping the sidebar visible. */}
-        {favoritesOpen && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-30 hidden w-full max-w-md md:block">
-            <div className="pointer-events-auto flex h-full flex-col bg-white shadow-2xl">
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white/95 px-4 py-3 backdrop-blur-sm">
-                <div>
-                  <p className="text-sm font-semibold">Mis favoritos</p>
-                  <p className="text-xs text-gray-500">{favoriteSpaces.length} espacios guardados</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeFavorites}
-                  aria-label="Cerrar favoritos"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:border-black hover:text-black"
-                >
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-3">
-                {favoriteSpaces.length === 0 ? (
-                  <p className="mt-8 px-2 text-center text-sm text-gray-500">
-                    Todavía no guardaste ningún espacio — toca el corazón en cualquier ficha para agregarlo acá.
-                  </p>
-                ) : (
-                  <div className="flex flex-col gap-1">
-                    {favoriteSpaces.map((space) => (
-                      <CompactSpaceRow
-                        key={space.id}
-                        space={space}
-                        isSelected={space.id === selectedId}
-                        onSelect={() => {
-                          closeFavorites()
-                          setSelectedId(space.id)
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Compact rotating "popular near you" widget, hidden once a space is selected. */}
+        {/* Bottom horizontal carousel of nearby spaces, hidden once a space
+            is selected — same rule Google Maps follows: the side panel takes
+            over instead of overlapping the bottom strip. */}
         {!selectedSpace && (
-          <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden w-full max-w-xs md:block">
-            <NearbyPopularPanel spaces={nearbyPopular} selectedId={selectedId} onSelect={setSelectedId} />
-          </div>
-        )}
-
-        {/* Selected space — desktop: starts as a lightweight floating card
-            that doesn't cover the map; "Ver espacio" upgrades it to the full
-            ficha docked to the right edge, still inside the map window so
-            the sidebar stays visible (no navigation to /spaces/[slug]). */}
-        {selectedSpace && !detailOpen && (
-          <div className="pointer-events-none absolute inset-0 z-30 hidden items-end justify-end p-4 md:flex">
-            <div className="pointer-events-auto relative w-80">
-              <button
-                type="button"
-                onClick={() => setSelectedId(null)}
-                aria-label="Cerrar ficha"
-                className="absolute -top-2 -right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md hover:border-black"
-              >
-                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
-                </svg>
-              </button>
-              {/* Not dimmed even when "Abierto" is active and this space is
-                  closed — dimming is a scanning aid for the map/list, but a
-                  space someone has already selected should always read
-                  clearly; "Cerrado" on the card itself is enough signal. */}
-              <SpaceCard
-                space={selectedSpace}
-                isSelected
-                onSelect={() => {}}
-                origin={status === 'granted' ? coordinate : null}
-                onViewDetail={() => setDetailOpen(true)}
-              />
+          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 hidden md:block">
+            <div className="pointer-events-auto">
+              <NearbyPopularStrip spaces={nearbyPopular} selectedId={selectedId} onSelect={setSelectedId} />
             </div>
           </div>
         )}
 
-        {selectedSpace && detailOpen && (
+        {/* Selected space — desktop: the full ficha docks to the right edge
+            immediately on click (no small-preview step first), same as the
+            mobile sheet below and matching Google Maps' own side panel. */}
+        {selectedSpace && (
           <div className="pointer-events-none absolute inset-y-0 right-0 z-30 hidden w-full max-w-md md:block">
             <div className="pointer-events-auto h-full bg-white shadow-2xl">
               <SpaceDetailPanel

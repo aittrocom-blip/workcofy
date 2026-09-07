@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractCheckValues, readMigration } from '@/lib/testing/sqlCheckValues'
+import { extractAlterCheckValues, extractCheckValues, readMigration } from '@/lib/testing/sqlCheckValues'
 import { PROFESSION_VALUES } from '@/lib/professions'
 import {
   CONTENT_STATUSES,
@@ -13,6 +13,8 @@ import {
 } from './constants'
 
 const sql = readMigration('0014_opportunities_courses.sql')
+// 0018 widened the source check (added 'weremoto') after 0014 first defined it.
+const sourceSql = readMigration('0018_weremoto_source.sql')
 const values = (options: readonly { value: string }[]) => options.map((o) => o.value)
 
 describe('opportunity constants match the migration', () => {
@@ -22,14 +24,22 @@ describe('opportunity constants match the migration', () => {
     expect(extractCheckValues(sql, 'opportunities', 'experience_level')).toEqual(values(EXPERIENCE_LEVELS)))
   it('area', () => expect(extractCheckValues(sql, 'opportunities', 'area')).toEqual(PROFESSION_VALUES))
   it('language', () => expect(extractCheckValues(sql, 'opportunities', 'language')).toEqual(values(OPPORTUNITY_LANGUAGES)))
-  it('source', () => expect(extractCheckValues(sql, 'opportunities', 'source')).toEqual(values(OPPORTUNITY_SOURCES)))
+  it('source', () => expect(extractAlterCheckValues(sourceSql, 'source')).toEqual(values(OPPORTUNITY_SOURCES)))
   it('status', () => expect(extractCheckValues(sql, 'opportunities', 'status')).toEqual([...CONTENT_STATUSES]))
 })
 
 describe('opportunityCategoryFromSlug', () => {
-  it('resolves the five master-spec categories', () => {
-    expect(OPPORTUNITY_CATEGORY_SLUGS.map((c) => c.slug)).toEqual(['remoto', 'freelance', 'proyectos', 'practicas', 'ia'])
+  it('resolves the master-spec categories plus Empleo', () => {
+    expect(OPPORTUNITY_CATEGORY_SLUGS.map((c) => c.slug)).toEqual([
+      'remoto',
+      'empleo',
+      'freelance',
+      'proyectos',
+      'practicas',
+      'ia',
+    ])
     expect(opportunityCategoryFromSlug('ia')?.filter).toEqual({ ai: true })
+    expect(opportunityCategoryFromSlug('empleo')?.filter).toEqual({ type: 'empleo' })
     expect(opportunityCategoryFromSlug('proyectos')?.filter).toEqual({ type: 'proyecto' })
   })
   it('returns null for anything else', () => {

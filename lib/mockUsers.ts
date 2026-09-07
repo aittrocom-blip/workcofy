@@ -17,6 +17,14 @@ const NAMES = [
   'Camila Vega', 'Diego Torres', 'Valentina Ríos', 'Sebastián Cruz', 'Lucía Fernández',
   'Mateo Gómez', 'Antonella Reyes', 'Nicolás Salazar', 'Fernanda Vargas', 'Emilio Aguirre',
   'Renata Ibáñez', 'Tomás Herrera', 'Alejandra Nuñez', 'Gabriel Espinoza', 'Isabela Moreno',
+  'Daniela Flores', 'Rodrigo Chávez', 'Paola Guerrero', 'Alonso Mendoza', 'Carla Rojas',
+  'Fabrizio León', 'Ximena Delgado', 'Joaquín Campos', 'Milagros Quispe', 'Bruno Palacios',
+  'Adriana Cáceres', 'Leonardo Medina', 'Kiara Huamán', 'Martín Zevallos', 'Brenda Ramos',
+  'Cristian Vidal', 'Yamile Cornejo', 'Franco Alvarado', 'Estefanía Rivas', 'Gonzalo Bustamante',
+  'Mariana Del Solar', 'Ricardo Pinto', 'Ariana Loayza', 'Samuel Yupanqui', 'Melissa Chumpitaz',
+  'Iván Solórzano', 'Zoe Cavero', 'Adrián Villalobos', 'Nataly Espejo', 'Kevin Ponce',
+  'Grecia Farfán', 'Óscar Manrique', 'Danna Requena', 'Luis Fernando Ochoa', 'Sofía Bravo',
+  'Cristopher Salinas', 'Ana Lucía Peña', 'Jhon Contreras', 'Katherine Rentería', 'Marcelo Ugarte',
 ]
 
 function initialsFrom(name: string): string {
@@ -61,4 +69,20 @@ export function pickExampleVisitors(seed: string, count = 3): ExampleVisitor[] {
     visitors.push({ ...MOCK_USERS[userIndex], daysAgo })
   }
   return visitors
+}
+
+// Client-only re-roll (real Math.random, not seeded) — used to make the
+// strip drift every so often after mount, so the same space doesn't show
+// the exact same three names forever. Never called during SSR: the first
+// render always uses the deterministic pickExampleVisitors above so
+// hydration has something stable to match.
+export function pickRandomVisitors(count = 3): ExampleVisitor[] {
+  const indices = new Set<number>()
+  while (indices.size < Math.min(count, MOCK_USERS.length)) {
+    indices.add(Math.floor(Math.random() * MOCK_USERS.length))
+  }
+  return Array.from(indices).map((userIndex) => ({
+    ...MOCK_USERS[userIndex],
+    daysAgo: Math.floor(Math.random() * 6) + 1,
+  }))
 }

@@ -9,6 +9,7 @@ import {
   COURSE_PRICES,
   COURSE_TOOLS,
   courseCategoryFromSlug,
+  coursePriceDisplay,
 } from './constants'
 
 const sql = readMigration('0014_opportunities_courses.sql')
@@ -29,5 +30,22 @@ describe('courseCategoryFromSlug', () => {
     expect(courseCategoryFromSlug('ia-desde-cero')?.value).toBe('ia_desde_cero')
     expect(courseCategoryFromSlug('certificaciones')?.value).toBe('certificaciones')
     expect(courseCategoryFromSlug('nope')).toBeNull()
+  })
+})
+
+describe('coursePriceDisplay', () => {
+  it('always uses a plain Gratis/Pago label, keeping price_text as the detail', () => {
+    expect(coursePriceDisplay('pago', 'USD 99 aprox. el examen (varía por país); preparación gratuita en Microsoft Learn')).toEqual({
+      label: 'Pago',
+      detail: 'USD 99 aprox. el examen (varía por país); preparación gratuita en Microsoft Learn',
+    })
+    expect(coursePriceDisplay('gratis', 'Auditar gratis; certificado de Coursera de pago')).toEqual({
+      label: 'Gratis',
+      detail: 'Auditar gratis; certificado de Coursera de pago',
+    })
+  })
+  it('has no detail when price_text is missing', () => {
+    expect(coursePriceDisplay('gratis', null)).toEqual({ label: 'Gratis', detail: null })
+    expect(coursePriceDisplay('pago', null)).toEqual({ label: 'Pago', detail: null })
   })
 })

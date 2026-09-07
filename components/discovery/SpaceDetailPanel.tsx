@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { districtLabel } from '@/lib/districts'
 import { isOpenNow, formatPeriodForDay, DAY_LABELS, WEEK_DISPLAY_ORDER } from '@/lib/hours/openingHours'
 import { buildDirectionsUrl } from '@/lib/directions'
@@ -10,7 +10,8 @@ import { formatPriceLevel } from '@/lib/priceLevel'
 import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
-import { ShareButton } from '@/components/space/ShareButton'
+import { LikeButton } from '@/components/space/LikeButton'
+import { ShareButton } from '@/components/ui/ShareButton'
 import { SocialLinks } from '@/components/space/SocialLinks'
 import { EventsSection } from '@/components/space/EventsSection'
 import { ReviewsSection } from '@/components/space/ReviewsSection'
@@ -105,14 +106,57 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
     (photo): photo is typeof photo & { url: string } => Boolean(photo.url)
   )
 
+  // Distance · price · rating, in that order — each only shows up when the
+  // space actually has that data, so the "|" dividers never surround a gap.
+  const topBarItems: { key: string; node: ReactNode }[] = []
+  if (space.distanceKm != null) {
+    topBarItems.push({
+      key: 'distance',
+      node: (
+        <span className="inline-flex items-center gap-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-near-me.png" alt="" className="h-3.5 w-auto" />
+          {formatDistanceKm(space.distanceKm)}
+        </span>
+      ),
+    })
+  }
+  if (priceLevel) {
+    topBarItems.push({ key: 'price', node: <span>{priceLevel}</span> })
+  }
+  if (space.rating != null) {
+    topBarItems.push({
+      key: 'rating',
+      node: (
+        <span className="inline-flex items-center gap-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/nav-star.png" alt="" className="h-3 w-3" />
+          {space.rating.toFixed(1)} ({space.review_count ?? 0})
+        </span>
+      ),
+    })
+  }
+
   return (
     <div className="flex h-full flex-col">
-      <div className="sticky top-0 z-10 flex items-center justify-end border-b border-gray-100 bg-white/95 px-3 py-2 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-gray-100 bg-white/95 px-3 py-2 backdrop-blur-sm">
+        <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-gray-700">
+          {topBarItems.map((item, index) => (
+            <Fragment key={item.key}>
+              {index > 0 && (
+                <span aria-hidden="true" className="text-gray-300">
+                  |
+                </span>
+              )}
+              {item.node}
+            </Fragment>
+          ))}
+        </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Cerrar ficha"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:border-black hover:text-black"
+          className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:border-black hover:text-black"
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
@@ -120,7 +164,10 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
         </button>
       </div>
 
-      <div className="no-scrollbar flex-1 overflow-y-auto px-4 pb-10 pt-4 md:px-6">
+      {/* Visible scrollbar on purpose — this panel has a lot of content
+          below the fold (horario, reseñas, etc.) and hiding the scrollbar
+          left no visual cue that there was more to scroll to. */}
+      <div className="flex-1 overflow-y-auto px-4 pb-10 pt-4 md:px-6">
         {renderablePhotos.length > 0 ? (
           <HorizontalScroller className="gap-2">
             {renderablePhotos.map((photo, index) => (
@@ -146,15 +193,6 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
         <p className="mt-1 text-sm text-gray-500">{districtLabel(space.district)}</p>
 
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-          {space.rating != null && (
-            <span className="inline-flex items-center gap-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icons/nav-star.png" alt="" className="h-3 w-3" />
-              {space.rating.toFixed(1)} ({space.review_count ?? 0})
-            </span>
-          )}
-          {space.distanceKm != null && <span>{formatDistanceKm(space.distanceKm)}</span>}
-          {priceLevel && <span className="text-gray-500">{priceLevel}</span>}
           <span className={`inline-flex items-center gap-1 ${openNow ? 'font-semibold text-black' : 'text-gray-500'}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -167,12 +205,9 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
         </div>
         {space.address && <p className="mt-2 text-sm text-gray-600">{space.address}</p>}
 
+        {/* space.phone (a WhatsApp/contact number) is kept in the DB for our
+            own outreach — deliberately not shown on the public ficha. */}
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-          {space.phone && (
-            <a href={`tel:${space.phone}`} className="hover:text-black">
-              {space.phone}
-            </a>
-          )}
           {space.website && (
             <a href={space.website} target="_blank" rel="noreferrer" className="hover:text-black">
               Sitio web
@@ -189,21 +224,21 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           >
             Cómo llegar
           </a>
+          <LikeButton
+            spaceId={space.id}
+            likeCount={space.like_count}
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-2.5 transition-colors hover:border-black"
+          />
           <FavoriteButton
             spaceId={space.id}
             className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 hover:border-black"
           />
           <ShareButton
-            spaceName={space.name}
-            slug={space.slug}
+            title={space.name}
+            path={`/spaces/${space.slug}`}
+            kind="espacio"
             className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
           />
-          <a
-            href={`/spaces/${space.slug}`}
-            className="inline-block rounded-full border border-gray-200 px-5 py-2.5 text-sm font-semibold transition-colors hover:border-black"
-          >
-            Ver ficha completa
-          </a>
         </div>
 
         <WorkcofyScoreBadge space={space} />
@@ -219,7 +254,6 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           </div>
         )}
 
-        {priceLevel && <p className="mt-8 text-sm font-medium text-gray-600">Precio: {priceLevel}</p>}
         <AmenitiesSection amenities={space.amenities} />
 
         {benefits.length > 0 && (

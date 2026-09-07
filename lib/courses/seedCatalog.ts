@@ -821,4 +821,18 @@ export const COURSE_SEED_CATALOG: CourseSeed[] = [
     tags: ['nvidia', 'certificación', 'llm', 'ia generativa'],
     last_verified_at: '2026-09-05',
   },
+  {
+    title: 'Claude Certified Associate – Foundations',
+    provider: 'Anthropic',
+    category: 'certificaciones',
+    level: 'principiante',
+    price: 'pago',
+    price_text: 'USD 99 el examen',
+    has_certificate: true,
+    language: 'en',
+    url: 'https://anthropic-partners.skilljar.com/claude-certified-associate-foundations-certification',
+    summary: 'Examen de certificación oficial de Anthropic que valida conocimientos fundamentales sobre Claude: capacidades, prompting y buenas prácticas de uso.',
+    tags: ['anthropic', 'claude', 'certificación', 'skilljar'],
+    last_verified_at: '2026-09-06',
+  },
 ]

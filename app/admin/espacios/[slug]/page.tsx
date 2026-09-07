@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
-import { getSpaceBySlug } from '@/lib/data/spaces'
+import { getSpaceBySlugForAdmin } from '@/lib/data/spaces'
 import { VerificationForm } from './VerificationForm'
 import { AmenitiesEditorForm } from './AmenitiesEditorForm'
+import { DeleteSpaceForm } from './DeleteSpaceForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,7 +11,9 @@ interface AdminSpacePageProps {
 }
 
 export default async function AdminSpacePage({ params }: AdminSpacePageProps) {
-  const space = await getSpaceBySlug(params.slug)
+  // Admin-only fetch (not the public getSpaceBySlug) — a deactivated space
+  // must still open here, otherwise "Reactivar" would be unreachable.
+  const space = await getSpaceBySlugForAdmin(params.slug)
   if (!space) notFound()
 
   return (
@@ -22,6 +25,7 @@ export default async function AdminSpacePage({ params }: AdminSpacePageProps) {
         slug={space.slug}
         initialAmenities={space.amenities}
       />
+      <DeleteSpaceForm spaceId={space.id} slug={space.slug} initialActive={space.active} />
     </div>
   )
 }

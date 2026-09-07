@@ -3,12 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --app-header-height: 4rem;
+  /* Header.tsx's inner bar is h-16, plus its border-b (1px) that the bar
+     height itself doesn't include — omitting that 1px here was leaving
+     the full-screen map exactly 1px taller than the real remaining
+     viewport, which is enough to trigger a page-level scrollbar. */
+  --app-header-height: calc(4rem + 1px);
 }
 
 @media (min-width: 768px) {
   :root {
-    --app-header-height: 4.75rem;
+    --app-header-height: calc(4.75rem + 1px);
   }
 }
 

@@ -3,7 +3,7 @@ import { buildSpaceQueryDescriptor } from './spaceQueryBuilder'
 
 describe('buildSpaceQueryDescriptor', () => {
   it('returns no filters for empty input', () => {
-    expect(buildSpaceQueryDescriptor({})).toEqual({ eqFilters: [], searchTerm: null })
+    expect(buildSpaceQueryDescriptor({})).toEqual({ eqFilters: [], categoryIn: null, searchTerm: null })
   })
 
   it('adds an eq filter for district', () => {
@@ -11,17 +11,23 @@ describe('buildSpaceQueryDescriptor', () => {
     expect(result.eqFilters).toEqual([{ column: 'district', value: 'miraflores' }])
   })
 
-  it('adds eq filters for both district and category', () => {
-    const result = buildSpaceQueryDescriptor({ district: 'barranco', category: 'cafe' })
-    expect(result.eqFilters).toEqual([
-      { column: 'district', value: 'barranco' },
-      { column: 'category', value: 'cafe' },
-    ])
-  })
-
   it('adds an eq filter for country', () => {
     const result = buildSpaceQueryDescriptor({ country: 'cl' })
     expect(result.eqFilters).toEqual([{ column: 'country', value: 'cl' }])
+  })
+
+  it('sets categoryIn for a single category (e.g. from /espacios/[categoria])', () => {
+    const result = buildSpaceQueryDescriptor({ district: 'barranco', category: ['cafe'] })
+    expect(result.eqFilters).toEqual([{ column: 'district', value: 'barranco' }])
+    expect(result.categoryIn).toEqual(['cafe'])
+  })
+
+  it('sets categoryIn for several categories (multi-select "Espacio" filter)', () => {
+    expect(buildSpaceQueryDescriptor({ category: ['cafe', 'work_cafe'] }).categoryIn).toEqual(['cafe', 'work_cafe'])
+  })
+
+  it('treats an empty category array as no filter', () => {
+    expect(buildSpaceQueryDescriptor({ category: [] }).categoryIn).toBeNull()
   })
 
   it('trims and includes a search term', () => {

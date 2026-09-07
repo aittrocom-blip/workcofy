@@ -3,17 +3,12 @@ import { generateSpaceSlug } from '@/lib/slug'
 import { DISTRICTS, districtLabel } from '@/lib/districts'
 import { SEED_TARGETS, type SeedTarget } from '@/lib/places/seedTargets'
 import type { SeedSpaceInput } from '@/lib/places/types'
-import type { OpeningPeriod } from '@/lib/hours/openingHours'
-
-const PLACES_TEXT_SEARCH_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
-const PLACE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json'
+import { fetchPlaceDetails, fetchPlaceTextSearch, type GooglePlaceDetails } from '@/lib/places/googlePlacesClient'
 
 async function findPlaceId(target: SeedTarget, apiKey: string): Promise<string | null> {
   const label = districtLabel(target.district)
   const query = `${target.name}, ${label}, Lima, Peru`
-  const url = `${PLACES_TEXT_SEARCH_URL}?query=${encodeURIComponent(query)}&key=${apiKey}`
-  const response = await fetch(url)
-  const body = await response.json()
+  const body = await fetchPlaceTextSearch(query, apiKey)
 
   if (body.status !== 'OK' || !body.results?.length) {
     console.warn(`No Google Place match for "${target.name}" (${label}): ${body.status}`)
@@ -32,35 +27,6 @@ async function findPlaceId(target: SeedTarget, apiKey: string): Promise<string |
   }
 
   return bestMatch.place_id
-}
-
-async function fetchPlaceDetails(placeId: string, apiKey: string) {
-  const fields = [
-    'name', 'formatted_address', 'geometry', 'formatted_phone_number',
-    'website', 'rating', 'user_ratings_total', 'price_level',
-    'opening_hours', 'photos', 'url',
-  ].join(',')
-  const url = `${PLACE_DETAILS_URL}?place_id=${placeId}&fields=${fields}&key=${apiKey}`
-  const response = await fetch(url)
-  const body = await response.json()
-
-  if (body.status !== 'OK') {
-    throw new Error(`Place Details failed for ${placeId}: ${body.status}`)
-  }
-  return body.result
-}
-
-interface GooglePlaceDetails {
-  formatted_address?: string
-  geometry?: { location?: { lat: number; lng: number } }
-  formatted_phone_number?: string
-  website?: string
-  rating?: number
-  user_ratings_total?: number
-  price_level?: number
-  opening_hours?: { periods?: OpeningPeriod[] }
-  photos?: { photo_reference: string; width: number; height: number }[]
-  url?: string
 }
 
 function toSeedInput(target: SeedTarget, placeId: string, details: GooglePlaceDetails): SeedSpaceInput {

@@ -7,10 +7,13 @@ interface HorizontalScrollerProps {
   className?: string
 }
 
-// Hidden below md: on touch devices swipe already covers this interaction,
-// and a small arrow floating over swipeable content is an easy mis-tap.
+// Always rendered (not gated behind a viewport-width breakpoint): several
+// consumers — the space ficha's side panel among them — are narrow
+// containers regardless of how wide the browser window itself is, so a
+// `md:` viewport check hid these arrows even on desktop. Harmless on touch
+// too: swipe still works, this is just an extra tappable affordance.
 const ARROW_BUTTON =
-  'absolute top-1/2 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/90 opacity-80 shadow-sm backdrop-blur-sm transition-all hover:border-black hover:opacity-100 md:flex'
+  'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/90 opacity-80 shadow-sm backdrop-blur-sm transition-all hover:border-black hover:opacity-100'
 
 // Wraps a row of horizontally-scrolling items with the native scrollbar
 // hidden and edge arrow buttons that page back/forward instead — used by

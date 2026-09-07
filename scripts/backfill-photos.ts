@@ -1,14 +1,15 @@
-import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import { createServiceRoleClient } from './lib/serviceRoleClient'
+import { downloadAndUploadPlacePhotos } from '@/lib/places/downloadPlacePhotos'
 import type { SpacePhoto } from '@/lib/data/spaceTypes'
 
 // Downloads real photos for spaces that only have a Google `photo_reference`
 // on file (or no photos at all) and re-hosts them in Supabase Storage. This
 // covers the original Lima seed (scripts/seed-google-places.ts), which never
-// downloaded photos — only scripts/seed-google-places-expansion.ts does.
+// downloaded photos — only scripts/seed-google-places-expansion.ts does —
+// and any space added later via the admin "Agregar espacio" flow before its
+// photo download step succeeded.
 
 const PLACE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json'
-const PLACE_PHOTO_URL = 'https://maps.googleapis.com/maps/api/place/photo'
-const PHOTO_BUCKET = 'space-photos'
 const MAX_PHOTOS_PER_SPACE = 10
 
 interface SpaceRow {
@@ -29,39 +30,6 @@ async function fetchPlacePhotos(placeId: string, apiKey: string) {
   return (body.result?.photos ?? []) as { photo_reference: string; width: number; height: number }[]
 }
 
-async function downloadPhotos(
-  photos: { photo_reference: string; width: number; height: number }[],
-  apiKey: string,
-  slug: string,
-  supabase: ReturnType<typeof createAdminSupabaseClient>
-): Promise<SpacePhoto[]> {
-  const picked = photos.slice(0, MAX_PHOTOS_PER_SPACE)
-  const uploaded: SpacePhoto[] = []
-
-  for (let i = 0; i < picked.length; i++) {
-    const photo = picked[i]
-    try {
-      const photoUrl = `${PLACE_PHOTO_URL}?maxwidth=1200&photoreference=${photo.photo_reference}&key=${apiKey}`
-      const response = await fetch(photoUrl)
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      const bytes = new Uint8Array(await response.arrayBuffer())
-      const path = `${slug}/${i}.jpg`
-
-      const { error } = await supabase.storage
-        .from(PHOTO_BUCKET)
-        .upload(path, bytes, { contentType: 'image/jpeg', upsert: true })
-      if (error) throw error
-
-      const { data } = supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path)
-      uploaded.push({ url: data.publicUrl, width: photo.width, height: photo.height })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      console.warn(`  Photo ${i} failed for "${slug}": ${message}`)
-    }
-  }
-  return uploaded
-}
-
 async function main() {
   const apiKey = process.env.GOOGLE_MAPS_SERVER_API_KEY
   if (!apiKey) {
@@ -69,7 +37,7 @@ async function main() {
     process.exit(1)
   }
 
-  const supabase = createAdminSupabaseClient()
+  const supabase = createServiceRoleClient()
   const { data, error } = await supabase
     .from('spaces')
     .select('id, slug, name, google_place_id, photos')
@@ -100,7 +68,7 @@ async function main() {
         continue
       }
 
-      const photos = await downloadPhotos(placePhotos, apiKey, row.slug, supabase)
+      const photos = await downloadAndUploadPlacePhotos(supabase, placePhotos, apiKey, row.slug)
       if (photos.length === 0) {
         skipped.push(row.name)
         continue

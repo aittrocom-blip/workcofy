@@ -1,35 +1,11 @@
 // components/layout/AppShell.tsx
-'use client'
-
-import { usePathname } from 'next/navigation'
-import { useAuthUser } from '@/lib/hooks/useAuthUser'
-import { useIsDesktop } from '@/lib/hooks/useIsDesktop'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { Sidebar } from '@/components/layout/Sidebar'
 
+// Every page shares the same shell — the top navbar plus its footer. Perfil
+// used to swap this out for a left sidebar; it's a normal page like any
+// other now, so Perfil/Favoritos just render under the standard Header.
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const { user, loading } = useAuthUser()
-  const isDesktop = useIsDesktop()
-  // Authenticated desktop routes share the same application shell so moving
-  // from the map to profile never drops the user back into the marketing
-  // header/footer layout.
-  const showSidebarLayout =
-    (pathname === '/espacios' || pathname.startsWith('/espacios/') || pathname === '/perfil') &&
-    !loading &&
-    user !== null &&
-    isDesktop
-
-  if (showSidebarLayout) {
-    return (
-      <div className="flex h-screen w-full overflow-hidden">
-        <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
-      </div>
-    )
-  }
-
   return (
     <>
       <Header />

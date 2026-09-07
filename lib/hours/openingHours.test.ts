@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isOpenNow, isOpenDuring, formatPeriodForDay, DAY_LABELS, WEEK_DISPLAY_ORDER } from './openingHours'
+import { isOpenNow, isOpenDuring, isOpen24HoursToday, formatPeriodForDay, DAY_LABELS, WEEK_DISPLAY_ORDER } from './openingHours'
 import type { OpeningHours } from './openingHours'
 
 function weekdayHours(day: number): OpeningHours {
@@ -83,5 +83,29 @@ describe('DAY_LABELS and WEEK_DISPLAY_ORDER', () => {
 
   it('displays Monday through Sunday in that order', () => {
     expect(WEEK_DISPLAY_ORDER).toEqual([1, 2, 3, 4, 5, 6, 0])
+  })
+})
+
+describe('isOpen24HoursToday', () => {
+  it('is false when hours are missing', () => {
+    expect(isOpen24HoursToday(null, new Date(2026, 7, 24, 10, 0))).toBe(false)
+  })
+
+  it('is true when today\'s period has no close time', () => {
+    const now = new Date(2026, 7, 24, 10, 0)
+    const hours: OpeningHours = { periods: [{ open: { day: now.getDay(), time: '0000' }, close: null }] }
+    expect(isOpen24HoursToday(hours, now)).toBe(true)
+  })
+
+  it('is false when today has a normal closing time', () => {
+    const now = new Date(2026, 7, 24, 10, 0)
+    expect(isOpen24HoursToday(weekdayHours(now.getDay()), now)).toBe(false)
+  })
+
+  it('is false on a day with no period', () => {
+    const now = new Date(2026, 7, 24, 10, 0)
+    const otherDay = (now.getDay() + 1) % 7
+    const hours: OpeningHours = { periods: [{ open: { day: otherDay, time: '0000' }, close: null }] }
+    expect(isOpen24HoursToday(hours, now)).toBe(false)
   })
 })

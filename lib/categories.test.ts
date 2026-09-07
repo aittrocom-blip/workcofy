@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { CATEGORY_OPTIONS, ACTIVE_CATEGORY_VALUES, SPACE_CATEGORY_SLUGS, spaceCategoryFromSlug } from './categories'
+import { CATEGORY_OPTIONS, ACTIVE_CATEGORY_VALUES, SPACE_CATEGORY_SLUGS, spaceCategoryFromSlug, parseCategoryListParam } from './categories'
 
 describe('categories', () => {
-  it('marks cafe, work_cafe, and hotel as active', () => {
-    expect(ACTIVE_CATEGORY_VALUES).toEqual(['cafe', 'work_cafe', 'hotel'])
+  it('marks cafe, work_cafe, coworking, and hotel as active', () => {
+    expect(ACTIVE_CATEGORY_VALUES).toEqual(['cafe', 'work_cafe', 'coworking', 'hotel'])
   })
 
   it('includes reserved future categories as inactive', () => {
-    const coworking = CATEGORY_OPTIONS.find((c) => c.value === 'coworking')
-    expect(coworking?.active).toBe(false)
+    const meetingRoom = CATEGORY_OPTIONS.find((c) => c.value === 'meeting_room')
+    expect(meetingRoom?.active).toBe(false)
   })
 
   it('includes an active hotel option labeled Lobby Café', () => {
@@ -29,5 +29,16 @@ describe('spaceCategoryFromSlug', () => {
     expect(spaceCategoryFromSlug('bibliotecas')?.value).toBe('library')
     expect(spaceCategoryFromSlug('gimnasios')).toBeNull()
     expect(SPACE_CATEGORY_SLUGS.map((c) => c.slug)).toEqual(['cafeterias', 'work-cafe', 'coworking', 'hoteles', 'bibliotecas'])
+  })
+})
+
+describe('parseCategoryListParam', () => {
+  it('splits a comma-separated list', () => {
+    expect(parseCategoryListParam('cafe,work_cafe')).toEqual(['cafe', 'work_cafe'])
+  })
+  it('returns an empty array for missing or empty input', () => {
+    expect(parseCategoryListParam(undefined)).toEqual([])
+    expect(parseCategoryListParam(null)).toEqual([])
+    expect(parseCategoryListParam('')).toEqual([])
   })
 })

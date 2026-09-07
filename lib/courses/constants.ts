@@ -56,6 +56,17 @@ export const COURSE_LANGUAGES = [
 ] as const
 export type CourseLanguage = (typeof COURSE_LANGUAGES)[number]['value']
 
+// price_text can be a full sentence (e.g. "USD 99 aprox. el examen; preparación
+// gratuita en Microsoft Learn") — too long to be the card's headline without
+// overflowing it. The headline is always the plain Gratis/Pago chip; the raw
+// price_text (if any) is shown underneath instead, small and out of the way.
+export function coursePriceDisplay(
+  price: CoursePrice,
+  priceText: string | null
+): { label: string; detail: string | null } {
+  return { label: price === 'gratis' ? 'Gratis' : 'Pago', detail: priceText }
+}
+
 export function courseCategoryFromSlug(slug: string) {
   return COURSE_CATEGORIES.find((category) => category.slug === slug) ?? null
 }

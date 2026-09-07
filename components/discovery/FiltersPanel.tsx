@@ -78,7 +78,7 @@ export function FiltersPanel({ filters, onChange, resultCount }: FiltersPanelPro
           <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
             <button
               type="button"
-              onClick={() => onChange({ category: null, district: null, openNow: false, verifiedOnly: false })}
+              onClick={() => onChange({ category: [], district: null, openNow: false, verifiedOnly: false })}
               className="text-xs font-semibold text-gray-500 hover:text-black"
             >
               Limpiar filtros

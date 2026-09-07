@@ -98,6 +98,7 @@ export default function RegistroPage() {
             id="name"
             type="text"
             required
+            maxLength={120}
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Tu nombre"
@@ -162,6 +163,7 @@ export default function RegistroPage() {
             id="city"
             type="text"
             required
+            maxLength={120}
             value={city}
             onChange={(event) => setCity(event.target.value)}
             placeholder="Tu ciudad"

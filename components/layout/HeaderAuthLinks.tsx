@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthUser } from '@/lib/hooks/useAuthUser'
+import { useIsAdmin } from '@/lib/hooks/useIsAdmin'
+import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
+import { useUserName } from '@/lib/hooks/useUserName'
+import { avatarFor } from '@/lib/avatars'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
 import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
@@ -39,6 +43,18 @@ function HeartIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) 
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z"
+      />
+    </svg>
+  )
+}
+
+function AdminIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"
       />
     </svg>
   )
@@ -112,6 +128,9 @@ function MenuItem({
 export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthLinksProps) {
   const router = useRouter()
   const { user, loading, signOut } = useAuthUser()
+  const avatarId = useUserAvatar()
+  const isAdmin = useIsAdmin()
+  const userName = useUserName()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -203,10 +222,17 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="inline-flex h-11 items-center gap-2 rounded-full border border-[#D9DDE3] px-4 text-[15px] font-medium text-[#252A32] transition-colors hover:border-black"
+        className="inline-flex h-11 max-w-[180px] items-center gap-2 rounded-full border border-[#D9DDE3] px-4 text-[15px] font-medium text-[#252A32] transition-colors hover:border-black"
       >
-        <UserIcon />
-        Cuenta
+        {user ? (
+          <span className="h-6 w-6 flex-none overflow-hidden rounded-full border border-gray-200">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={avatarFor(avatarId ?? null).src} alt="" className="h-full w-full object-cover" />
+          </span>
+        ) : (
+          <UserIcon />
+        )}
+        <span className="truncate">{user && userName ? userName : 'Cuenta'}</span>
         <ChevronIcon open={open} />
       </button>
 
@@ -217,9 +243,14 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
               <MenuItem href="/perfil" onClick={() => setOpen(false)} icon={<UserIcon />}>
                 Perfil
               </MenuItem>
-              <MenuItem href="/espacios?view=map&favorites=1" onClick={() => setOpen(false)} icon={<HeartIcon />}>
+              <MenuItem href="/favoritos" onClick={() => setOpen(false)} icon={<HeartIcon />}>
                 Favoritos
               </MenuItem>
+              {isAdmin && (
+                <MenuItem href="/admin/espacios" onClick={() => setOpen(false)} icon={<AdminIcon />}>
+                  Admin
+                </MenuItem>
+              )}
               <MenuItem onClick={handleSignOut} icon={<LogoutIcon />}>
                 Cerrar sesión
               </MenuItem>

@@ -49,10 +49,29 @@ export async function listPublishedOpportunities(filters: OpportunityFilters = {
   }
 }
 
+// Remote-only: this feeds the Home showcase, and remote is Workcofy's core
+// promise for Trabajo — older presencial/híbrido rows (ingested before that
+// became the rule) shouldn't show up here even while they age out elsewhere.
 export async function listRecentOpportunities(limit = 3): Promise<OpportunityRecord[]> {
-  const { data, error } = await publishedQuery().order('published_at', { ascending: false }).limit(limit)
+  const { data, error } = await publishedQuery()
+    .eq('modality', 'remoto')
+    .order('published_at', { ascending: false })
+    .limit(limit)
   if (error) throw new Error(`Failed to list recent opportunities: ${error.message}`)
   return (data ?? []) as OpportunityRecord[]
+}
+
+// Lightweight count-only read for the Home's "Ver todas las oportunidades
+// (N)" CTA — a head request, no rows fetched.
+export async function countPublishedOpportunities(): Promise<number> {
+  const supabase = createServerSupabaseClient()
+  const { count, error } = await supabase
+    .from('opportunities')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'published')
+    .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+  if (error) throw new Error(`Failed to count opportunities: ${error.message}`)
+  return count ?? 0
 }
 
 export async function getOpportunityBySlug(slug: string): Promise<OpportunityRecord | null> {
@@ -85,4 +104,34 @@ export async function incrementOpportunityClicks(id: string, currentCount: numbe
   const supabase = createAdminSupabaseClient()
   const { error } = await supabase.from('opportunities').update({ click_count: currentCount + 1 }).eq('id', id)
   if (error) console.warn(`Failed to increment click_count for opportunity ${id}: ${error.message}`)
+}
+
+export interface OpportunityClickStats {
+  totalPublished: number
+  totalClicks: number
+  top: Pick<OpportunityRecord, 'id' | 'slug' | 'title' | 'company' | 'click_count' | 'published_at'>[]
+}
+
+// Admin-only read for /admin/estadisticas — service role so it can see every
+// published row's history regardless of expires_at (a since-expired listing
+// can still be the one worth knowing performed well).
+export async function getOpportunityClickStats(limit = 20): Promise<OpportunityClickStats> {
+  const supabase = createAdminSupabaseClient()
+  const { data, error, count } = await supabase
+    .from('opportunities')
+    .select('id, slug, title, company, click_count, published_at', { count: 'exact' })
+    .eq('status', 'published')
+    .order('click_count', { ascending: false })
+    .order('published_at', { ascending: false })
+    .limit(limit)
+  if (error) throw new Error(`Failed to load opportunity click stats: ${error.message}`)
+
+  const { data: sumRows, error: sumError } = await supabase.from('opportunities').select('click_count').eq('status', 'published')
+  if (sumError) throw new Error(`Failed to sum opportunity clicks: ${sumError.message}`)
+
+  return {
+    totalPublished: count ?? 0,
+    totalClicks: (sumRows ?? []).reduce((sum, row) => sum + (row.click_count as number), 0),
+    top: data ?? [],
+  }
 }

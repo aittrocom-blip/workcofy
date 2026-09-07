@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { districtValueFromSlug, districtLabel } from '@/lib/districts'
 import { listSpaces } from '@/lib/data/spaces'
+import { parseCategoryListParam } from '@/lib/categories'
 import { DiscoveryView } from '@/components/discovery/DiscoveryView'
 
 export const dynamic = 'force-dynamic'
@@ -29,7 +30,7 @@ export default async function DistrictPage({ params, searchParams }: DistrictPag
   // Category and search from the URL still narrow the results within it.
   const spaces = await listSpaces({
     district: districtValue,
-    category: searchParams.category,
+    category: parseCategoryListParam(searchParams.category),
     search: searchParams.q,
   })
   const label = districtLabel(districtValue)

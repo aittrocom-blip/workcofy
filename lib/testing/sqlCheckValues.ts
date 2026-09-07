@@ -16,3 +16,14 @@ export function extractCheckValues(sql: string, table: string, column: string): 
   if (!match) throw new Error(`No check constraint for ${table}.${column}`)
   return match[1].split(',').map((value) => value.trim().replace(/^'|'$/g, ''))
 }
+
+// Same idea, for a later `alter table ... add constraint ... check (<column>
+// in (...))` migration that widens a check originally defined by
+// extractCheckValues above (e.g. adding a new enum value) — no "create
+// table"/"\n);" block to anchor on, so this just matches the `in (...)`
+// clause directly against the whole file.
+export function extractAlterCheckValues(sql: string, column: string): string[] {
+  const match = sql.match(new RegExp(`\\b${column} in \\(([^)]*)\\)`))
+  if (!match) throw new Error(`No check constraint for ${column}`)
+  return match[1].split(',').map((value) => value.trim().replace(/^'|'$/g, ''))
+}

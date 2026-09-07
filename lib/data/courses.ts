@@ -41,6 +41,15 @@ export async function listFeaturedCourses(limit = 3): Promise<CourseRecord[]> {
   return (data ?? []) as CourseRecord[]
 }
 
+// Lightweight count-only read for the Home's "Explorar cursos (N)" CTA — a
+// head request, no rows fetched.
+export async function countPublishedCourses(): Promise<number> {
+  const supabase = createServerSupabaseClient()
+  const { count, error } = await supabase.from('courses').select('id', { count: 'exact', head: true }).eq('status', 'published')
+  if (error) throw new Error(`Failed to count courses: ${error.message}`)
+  return count ?? 0
+}
+
 export async function getCourseById(id: string): Promise<CourseRecord | null> {
   if (!UUID_RE.test(id)) return null
   const { data, error } = await publishedQuery().eq('id', id).maybeSingle()
@@ -52,4 +61,32 @@ export async function incrementCourseClicks(id: string, currentCount: number): P
   const supabase = createAdminSupabaseClient()
   const { error } = await supabase.from('courses').update({ click_count: currentCount + 1 }).eq('id', id)
   if (error) console.warn(`Failed to increment click_count for course ${id}: ${error.message}`)
+}
+
+export interface CourseClickStats {
+  totalPublished: number
+  totalClicks: number
+  top: Pick<CourseRecord, 'id' | 'slug' | 'title' | 'provider' | 'click_count'>[]
+}
+
+// Admin-only read for /admin/estadisticas.
+export async function getCourseClickStats(limit = 20): Promise<CourseClickStats> {
+  const supabase = createAdminSupabaseClient()
+  const { data, error, count } = await supabase
+    .from('courses')
+    .select('id, slug, title, provider, click_count', { count: 'exact' })
+    .eq('status', 'published')
+    .order('click_count', { ascending: false })
+    .order('title', { ascending: true })
+    .limit(limit)
+  if (error) throw new Error(`Failed to load course click stats: ${error.message}`)
+
+  const { data: sumRows, error: sumError } = await supabase.from('courses').select('click_count').eq('status', 'published')
+  if (sumError) throw new Error(`Failed to sum course clicks: ${sumError.message}`)
+
+  return {
+    totalPublished: count ?? 0,
+    totalClicks: (sumRows ?? []).reduce((sum, row) => sum + (row.click_count as number), 0),
+    top: data ?? [],
+  }
 }

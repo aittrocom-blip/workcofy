@@ -1,26 +1,37 @@
 'use client'
 
 import { useState, type MouseEvent } from 'react'
+import { track } from '@vercel/analytics'
 
 interface ShareButtonProps {
-  spaceName: string
-  slug: string
+  /** Shown in the native share sheet; not used for the clipboard fallback. */
+  title: string
+  /** Site-relative path to share, e.g. `/oportunidades/${slug}` — resolved against window.location.origin. */
+  path: string
+  /** What's being shared — recorded on the "share" Vercel Analytics event so it can be filtered/broken down there. */
+  kind: 'espacio' | 'oportunidad' | 'curso'
   className?: string
 }
 
-export function ShareButton({ spaceName, slug, className = '' }: ShareButtonProps) {
+// Generic share control: native share sheet where available, clipboard copy
+// otherwise. Used by spaces, opportunities and courses alike — each just
+// passes its own title/path/kind. A successful share (sheet opened, or link
+// copied) fires a "share" analytics event — there's no click_count-style
+// column for shares, so Vercel Analytics is the record of this, not Supabase.
+export function ShareButton({ title, path, kind, className = '' }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
 
   async function handleShare(event: MouseEvent) {
     event.stopPropagation()
-    const url = `${window.location.origin}/spaces/${slug}`
+    const url = `${window.location.origin}${path}`
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: spaceName, url })
+        await navigator.share({ title, url })
+        track('share', { kind, path })
       } catch {
         // User closed the native share sheet without picking anything —
-        // not an error worth surfacing.
+        // not an error worth surfacing, and not a completed share to track.
       }
       return
     }
@@ -28,6 +39,7 @@ export function ShareButton({ spaceName, slug, className = '' }: ShareButtonProp
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
+      track('share', { kind, path })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       // Clipboard access denied or unavailable — nothing more to do here.
@@ -38,7 +50,7 @@ export function ShareButton({ spaceName, slug, className = '' }: ShareButtonProp
     <button
       type="button"
       onClick={handleShare}
-      aria-label={copied ? 'Link copiado' : 'Compartir espacio'}
+      aria-label={copied ? 'Link copiado' : 'Compartir'}
       title={copied ? '¡Copiado!' : 'Compartir'}
       className={className}
     >
