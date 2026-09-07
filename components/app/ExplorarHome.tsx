@@ -26,15 +26,19 @@ interface ExplorarHomeProps {
   benefits: SpaceBenefitWithSpace[]
   opportunities: OpportunityRecord[]
   courses: CourseRecord[]
+  counts: { opportunities: number; courses: number; certificates: number }
   stats: { coins: number; streak: number; favorites: number; checkins: number }
 }
 
-function Section({ title, subtitle, href, children }: { title: string; subtitle?: string; href?: string; children: React.ReactNode }) {
+function Section({ title, subtitle, href, badge, children }: { title: string; subtitle?: string; href?: string; badge?: string; children: React.ReactNode }) {
   return (
     <section className="mt-8">
       <div className="mb-3 flex items-end justify-between px-4 md:px-0">
         <div>
-          <h2 className="text-lg font-extrabold tracking-tight">{title}</h2>
+          <h2 className="flex items-center gap-2 text-lg font-extrabold tracking-tight">
+            {title}
+            {badge && <span className="rounded-full bg-workcofy-yellow/20 px-2 py-0.5 text-[11px] font-bold tabular-nums text-black">{badge}</span>}
+          </h2>
           {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
         </div>
         {href && (
@@ -69,7 +73,7 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // The signed-in home. Location is requested once on mount (same hook the
 // map uses); until it's granted "Cerca de ti" falls back to the best-scored
 // spaces rather than pretending a fallback centre is the user's position.
-export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, stats }: ExplorarHomeProps) {
+export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, counts, stats }: ExplorarHomeProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [passOpen, setPassOpen] = useState(false)
@@ -86,10 +90,6 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
   const nearby = useMemo(
     () => (located ? [...withDistance].sort(byDistance) : [...withDistance].sort(byScore)).slice(0, 10),
     [withDistance, located]
-  )
-  const recommended = useMemo(
-    () => withDistance.filter((s) => !s.verified && (computeWorkcofyScore(s) ?? 0) > 0).sort(byScore).slice(0, 10),
-    [withDistance]
   )
   const workFriendly = useMemo(
     () =>
@@ -153,7 +153,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         <Strip spaces={nearby} />
       </Section>
 
-      <Section title="Trabajos remotos" subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
+      <Section title="Trabajos remotos" badge={`${counts.opportunities}`} subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
         {opportunities.length === 0 ? (
           <p className="px-4 text-sm text-gray-400 md:px-0">No hay oportunidades nuevas por ahora.</p>
         ) : (
@@ -165,7 +165,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         )}
       </Section>
 
-      <Section title="Aprende" subtitle="Cursos destacados para trabajar con IA" href="/aprende">
+      <Section title="Aprende" badge={`${counts.courses}`} subtitle={`${counts.certificates} con certificado · cursos destacados para trabajar con IA`} href="/aprende">
         {courses.length === 0 ? (
           <p className="px-4 text-sm text-gray-400 md:px-0">Pronto habrá cursos destacados aquí.</p>
         ) : (
@@ -189,12 +189,6 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
           </div>
         </div>
       </section>
-
-      {recommended.length > 0 && (
-        <Section title="Recomendados para ti" subtitle="Los mejores Workcofy Score" href="/spots?sort=workcofy_score">
-          <Strip spaces={recommended} />
-        </Section>
-      )}
 
       {workFriendly.length > 0 && (
         <Section title="Work-friendly ahora" subtitle="Cafés abiertos en este momento" href="/spots?category=cafe,work_cafe">

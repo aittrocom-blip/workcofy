@@ -2,8 +2,9 @@ import { requireUser } from '@/lib/supabase/serverAuth'
 import { listSpaces } from '@/lib/data/spaces'
 import { listAllSpaceBenefits } from '@/lib/data/benefits'
 import { listRewardEvents, rewardsBalanceFrom } from '@/lib/data/rewards'
-import { listRecentOpportunities } from '@/lib/data/opportunities'
-import { listFeaturedCourses } from '@/lib/data/courses'
+import { countPublishedOpportunities, listRecentOpportunities } from '@/lib/data/opportunities'
+import { countPublishedCourses, listFeaturedCourses } from '@/lib/data/courses'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { passHolderFrom } from '@/lib/pass'
 import { ExplorarHome } from '@/components/app/ExplorarHome'
 
@@ -19,7 +20,7 @@ export default async function ExplorarPage() {
   // Streak and check-ins are queried on their own (not folded into the
   // profile select) so a not-yet-applied 0020/0021 migration degrades to a
   // 0 instead of taking the whole profile row down with it.
-  const [{ data: profile }, spaces, benefits, events, { count: favoritesCount }, { count: checkinsCount }, { data: streakRow }, opportunities, courses] =
+  const [{ data: profile }, spaces, benefits, events, { count: favoritesCount }, { count: checkinsCount }, { data: streakRow }, opportunities, courses, opportunityCount, courseCount, { count: certificateCount }] =
     await Promise.all([
       supabase.from('profiles').select('name, avatar_id, created_at, city').eq('id', user.id).single(),
       listSpaces(),
@@ -30,6 +31,9 @@ export default async function ExplorarPage() {
       supabase.from('profiles').select('streak_count').eq('id', user.id).maybeSingle(),
       listRecentOpportunities(6),
       listFeaturedCourses(6),
+      countPublishedOpportunities(),
+      countPublishedCourses(),
+      createServerSupabaseClient().from('courses').select('id', { count: 'exact', head: true }).eq('status', 'published').eq('has_certificate', true),
     ])
 
   return (
@@ -39,6 +43,7 @@ export default async function ExplorarPage() {
       benefits={benefits.slice(0, 8)}
       opportunities={opportunities}
       courses={courses}
+      counts={{ opportunities: opportunityCount, courses: courseCount, certificates: certificateCount ?? 0 }}
       stats={{
         coins: rewardsBalanceFrom(events),
         streak: streakRow?.streak_count ?? 0,
