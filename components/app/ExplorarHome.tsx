@@ -49,7 +49,6 @@ function Section({ title, subtitle, href, children }: { title: string; subtitle?
 }
 
 function Strip({ spaces }: { spaces: SpaceWithDistance[] }) {
-  if (spaces.length === 0) return <p className="px-4 text-sm text-gray-400 md:px-0">Nada por aquí todavía.</p>
   return (
     <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
       {spaces.map((space) => (
@@ -86,10 +85,6 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
 
   const nearby = useMemo(
     () => (located ? [...withDistance].sort(byDistance) : [...withDistance].sort(byScore)).slice(0, 10),
-    [withDistance, located]
-  )
-  const spots = useMemo(
-    () => withDistance.filter((s) => s.verified).sort(located ? byDistance : byScore).slice(0, 10),
     [withDistance, located]
   )
   const recommended = useMemo(
@@ -158,10 +153,6 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         <Strip spaces={nearby} />
       </Section>
 
-      <Section title="Workcofy Spots" subtitle="Establecimientos verificados de la red" href="/spots?verified=1">
-        <Strip spaces={spots} />
-      </Section>
-
       <Section title="Trabajos remotos" subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
         {opportunities.length === 0 ? (
           <p className="px-4 text-sm text-gray-400 md:px-0">No hay oportunidades nuevas por ahora.</p>
@@ -199,13 +190,17 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         </div>
       </section>
 
-      <Section title="Recomendados para ti" subtitle="Los mejores Workcofy Score" href="/spots?sort=workcofy_score">
-        <Strip spaces={recommended} />
-      </Section>
+      {recommended.length > 0 && (
+        <Section title="Recomendados para ti" subtitle="Los mejores Workcofy Score" href="/spots?sort=workcofy_score">
+          <Strip spaces={recommended} />
+        </Section>
+      )}
 
-      <Section title="Work-friendly ahora" subtitle="Cafés abiertos en este momento" href="/spots?category=cafe,work_cafe">
-        <Strip spaces={workFriendly} />
-      </Section>
+      {workFriendly.length > 0 && (
+        <Section title="Work-friendly ahora" subtitle="Cafés abiertos en este momento" href="/spots?category=cafe,work_cafe">
+          <Strip spaces={workFriendly} />
+        </Section>
+      )}
 
       <Section title="Beneficios" subtitle="Se activan mostrando tu Pass" href="/beneficios">
         {benefits.length === 0 ? (
