@@ -14,7 +14,6 @@ import { OpportunityTile, CourseTile } from '@/components/app/DiscoverTiles'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
-import { isOpenNow } from '@/lib/hours/openingHours'
 import { getLimaNow } from '@/lib/geo/limaTime'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 import { SpotCard } from '@/components/app/SpotCard'
@@ -94,16 +93,6 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
     () => (located ? [...withDistance].sort(byDistance) : [...withDistance].sort(byScore)).slice(0, 10),
     [withDistance, located]
   )
-  const workFriendly = useMemo(
-    () =>
-      withDistance
-        .filter((s) => (s.category === 'cafe' || s.category === 'work_cafe') && isOpenNow(s.opening_hours, now))
-        .sort(located ? byDistance : byScore)
-        .slice(0, 10),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [withDistance, located]
-  )
-
   function submitSearch(event: FormEvent) {
     event.preventDefault()
     const q = query.trim()
@@ -194,12 +183,6 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
           </div>
         </div>
       </section>
-
-      {workFriendly.length > 0 && (
-        <Section title="Work-friendly ahora" subtitle="Cafés abiertos en este momento" href="/spots?category=cafe,work_cafe">
-          <Strip spaces={workFriendly} />
-        </Section>
-      )}
 
       <Section title="Beneficios" subtitle="Se activan mostrando tu Pass" href="/beneficios">
         {benefits.length === 0 ? (
