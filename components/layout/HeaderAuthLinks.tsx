@@ -9,6 +9,7 @@ import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
 import { useUserName } from '@/lib/hooks/useUserName'
 import { avatarFor } from '@/lib/avatars'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
+import { StreakBadge } from '@/components/layout/StreakBadge'
 import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
 interface HeaderAuthLinksProps {
@@ -155,8 +156,9 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
       <div className="flex flex-col gap-1">
         {user ? (
           <>
-            <div className="px-2 py-1">
+            <div className="flex items-center gap-3 px-2 py-1">
               <RewardsBadge />
+              <StreakBadge />
             </div>
             <Link
               href="/favoritos"
@@ -218,6 +220,7 @@ export function HeaderAuthLinks({ variant = 'desktop', onNavigate }: HeaderAuthL
   return (
     <div ref={rootRef} className="relative hidden items-center gap-3 sm:flex">
       {user && <RewardsBadge />}
+      {user && <StreakBadge />}
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

@@ -40,7 +40,7 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('name, country, city, marketing_consent, avatar_id, created_at')
+    .select('name, country, city, marketing_consent, avatar_id, created_at, streak_count, streak_longest')
     .eq('id', user.id)
     .single()
 
@@ -72,7 +72,8 @@ export default async function PerfilPage() {
         initialAvatarId={profile?.avatar_id ?? null}
         joinedAt={profile?.created_at ?? null}
       />
-      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"><p className="text-2xl font-bold">🔥 {profile?.streak_count ?? 0}</p><p className="mt-1 text-xs font-semibold text-gray-500">Racha (récord: {profile?.streak_longest ?? 0})</p></div>
         <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"><p className="text-2xl font-bold">{balance}</p><p className="mt-1 text-xs font-semibold text-gray-500">W Coins</p></div>
         <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"><p className="text-2xl font-bold">{favoritesCount ?? 0}</p><p className="mt-1 text-xs font-semibold text-gray-500">Favoritos</p></div>
         <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"><p className="text-2xl font-bold">{reviewsCount ?? 0}</p><p className="mt-1 text-xs font-semibold text-gray-500">Reseñas</p></div>

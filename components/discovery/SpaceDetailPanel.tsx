@@ -11,6 +11,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 import { VerifiedBadge } from '@/components/space/VerifiedBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import { LikeButton } from '@/components/space/LikeButton'
+import { CheckInButton } from '@/components/space/CheckInButton'
 import { ShareButton } from '@/components/ui/ShareButton'
 import { SocialLinks } from '@/components/space/SocialLinks'
 import { EventsSection } from '@/components/space/EventsSection'
@@ -238,6 +239,10 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
             path={`/spaces/${space.slug}`}
             kind="espacio"
             className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-gray-200 p-2 text-gray-600 hover:border-black"
+          />
+          <CheckInButton
+            spaceId={space.id}
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-200 px-4 py-2.5 text-sm font-semibold transition-colors hover:border-black"
           />
         </div>
 
