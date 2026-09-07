@@ -11,7 +11,7 @@ export interface NavLink {
 }
 
 export const NAV_LINKS: NavLink[] = [
-  { href: '/espacios', label: 'Espacios', icon: '/icons/nav-explorar.png' },
+  { href: '/espacios', label: 'Spots', icon: '/icons/nav-explorar.png' },
   { href: '/oportunidades', label: 'Trabajos remotos', icon: '/icons/nav-equipos.png' },
   { href: '/aprende', label: 'Aprende', icon: '/icons/event-laptop.png' },
   { href: '/eventos', label: 'Eventos', icon: '/icons/nav-eventos.png', disabled: true },

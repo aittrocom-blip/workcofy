@@ -5,7 +5,7 @@ import { DiscoveryView } from '@/components/discovery/DiscoveryView'
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Espacios para trabajar: cafeterías, coworkings y más | Workcofy',
+  title: 'Spots para trabajar: cafeterías, coworkings y más | Workcofy',
   description:
     'Encuentra cafés, work cafés, coworkings, hoteles y bibliotecas donde trabajar cerca de ti, con WiFi, enchufes y ambiente verificados.',
 }

@@ -130,7 +130,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar espacios…"
+            placeholder="Buscar Spots…"
             enterKeyHint="search"
             className="h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-gray-400"
           />
