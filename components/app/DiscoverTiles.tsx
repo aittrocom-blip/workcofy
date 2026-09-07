@@ -7,6 +7,7 @@ import { optionLabel } from '@/lib/optionLabel'
 import { professionLabel } from '@/lib/professions'
 import { formatRelativeDays } from '@/lib/text/relativeDays'
 import { CompanyLogo } from '@/components/opportunities/OpportunityCard'
+import { ProviderLogo } from '@/components/courses/ProviderLogo'
 
 // Compact, strip-sized versions of OpportunityCard / CourseCard for the
 // Explorar home — enough to recognise and tap, the full card lives on the
@@ -43,9 +44,7 @@ export function CourseTile({ course }: { course: CourseRecord }) {
       className="flex w-[220px] flex-none flex-col rounded-[20px] border border-gray-100 bg-white p-3.5 transition-colors active:bg-gray-50"
     >
       <div className="flex items-center gap-2.5">
-        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-gray-100 text-sm font-bold text-gray-600">
-          {course.provider.charAt(0).toUpperCase()}
-        </span>
+        <ProviderLogo provider={course.provider} courseUrl={course.url} />
         <span className="min-w-0 flex-1 truncate text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">{course.provider}</span>
       </div>
       <p className="mt-2.5 line-clamp-2 text-[15px] font-bold leading-snug tracking-tight">{course.title}</p>

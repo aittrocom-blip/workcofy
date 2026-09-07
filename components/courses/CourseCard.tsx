@@ -4,17 +4,7 @@ import { optionLabel } from '@/lib/optionLabel'
 import { professionLabel } from '@/lib/professions'
 import { ShareButton } from '@/components/ui/ShareButton'
 import { CourseFavoriteButton } from '@/components/courses/CourseFavoriteButton'
-
-function ProviderMark({ provider }: { provider: string }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-gray-100 text-sm font-bold text-gray-600"
-    >
-      {provider.charAt(0).toUpperCase()}
-    </span>
-  )
-}
+import { ProviderLogo } from '@/components/courses/ProviderLogo'
 
 const NEW_WINDOW_MS = 48 * 60 * 60 * 1000
 
@@ -34,7 +24,7 @@ export function CourseCard({ course, now = new Date() }: { course: CourseRecord;
   return (
     <article className="group flex h-full flex-col rounded-[28px] border border-gray-200 bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.08)]">
       <div className="flex items-center gap-3">
-        <ProviderMark provider={course.provider} />
+        <ProviderLogo provider={course.provider} courseUrl={course.url} />
         <span className="min-w-0 flex-1 truncate text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{course.provider}</span>
         {isNew && <span className="flex-none rounded-full bg-black px-2 py-0.5 text-[11px] font-bold text-white">Nuevo</span>}
         {course.official && (
