@@ -28,11 +28,11 @@ export function Hero() {
             title="Próximamente"
             className="inline-flex cursor-not-allowed items-center rounded-full bg-gray-200 px-8 py-3.5 text-base font-semibold text-gray-400"
           >
-            Encontrar un Spot
+            Encontrar un espacio
           </span>
         ) : (
           <Link href="/espacios" className={SECONDARY}>
-            Encontrar un Spot
+            Encontrar un espacio
           </Link>
         )}
       </div>

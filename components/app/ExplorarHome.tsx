@@ -8,6 +8,8 @@ import type { SpaceBenefitWithSpace } from '@/lib/data/benefits'
 import type { OpportunityRecord } from '@/lib/data/opportunityTypes'
 import type { CourseRecord } from '@/lib/data/courseTypes'
 import type { PassHolder } from '@/lib/pass'
+import type { Tip } from '@/lib/data/tips'
+import { TipOfTheDay } from '@/components/app/TipOfTheDay'
 import { OpportunityTile, CourseTile } from '@/components/app/DiscoverTiles'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
@@ -26,6 +28,7 @@ interface ExplorarHomeProps {
   benefits: SpaceBenefitWithSpace[]
   opportunities: OpportunityRecord[]
   courses: CourseRecord[]
+  tip: Tip | null
   counts: { opportunities: number; courses: number; certificates: number }
   stats: { coins: number; streak: number; favorites: number; checkins: number }
 }
@@ -73,7 +76,7 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // The signed-in home. Location is requested once on mount (same hook the
 // map uses); until it's granted "Cerca de ti" falls back to the best-scored
 // spaces rather than pretending a fallback centre is the user's position.
-export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, counts, stats }: ExplorarHomeProps) {
+export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tip, counts, stats }: ExplorarHomeProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [passOpen, setPassOpen] = useState(false)
@@ -125,7 +128,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar Spots…"
+            placeholder="Buscar espacios…"
             enterKeyHint="search"
             className="h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-gray-400"
           />
@@ -152,6 +155,8 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
       <Section title="Cerca de ti" subtitle={located ? 'Ordenado por distancia' : 'Activa tu ubicación para ordenar por cercanía'} href="/spots">
         <Strip spaces={nearby} />
       </Section>
+
+      {tip && <TipOfTheDay tip={tip} />}
 
       <Section title="Trabajos remotos" badge={`${counts.opportunities}`} subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
         {opportunities.length === 0 ? (

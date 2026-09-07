@@ -5,7 +5,7 @@ import { DiscoveryView } from '@/components/discovery/DiscoveryView'
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Spots | Workcofy',
+  title: 'Espacios | Workcofy',
 }
 
 interface SpotsPageProps {

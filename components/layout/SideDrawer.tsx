@@ -138,6 +138,9 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
               <Row href="/favoritos" onClick={onClose} active={isNavLinkActive('/favoritos', pathname)}>
                 Favoritos
               </Row>
+              <Row href="/tips" onClick={onClose} active={isNavLinkActive('/tips', pathname)}>
+                Tips
+              </Row>
               {NAV_LINKS.filter((link) => link.href !== '/espacios').map((link) => (
                 <Row key={link.href} href={link.href} onClick={onClose} active={isNavLinkActive(link.href, pathname)} disabled={link.disabled}>
                   {link.label}

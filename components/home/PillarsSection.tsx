@@ -12,9 +12,9 @@ interface Pillar {
 const PILLARS: Pillar[] = [
   {
     icon: '/icons/nav-explorar.png',
-    title: 'Spots',
+    title: 'Espacios',
     text: 'Descubre cafeterías, coworkings, hoteles, bibliotecas y otros lugares donde puedes trabajar.',
-    cta: 'Encontrar un Spot',
+    cta: 'Encontrar un espacio',
     href: '/espacios',
   },
   {
