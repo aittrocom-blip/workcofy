@@ -18,7 +18,7 @@ export async function CoursesHomeSection() {
     <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
       <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Aprende</span>
       <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-4xl">Aprende algo nuevo hoy</h2>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => (
           <CourseCard key={course.id} course={course} />
         ))}

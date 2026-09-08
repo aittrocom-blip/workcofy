@@ -116,7 +116,7 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 pt-2">
+        <nav className="flex-1 overflow-y-auto overscroll-y-none px-3 pt-2">
           {user ? (
             <>
               <Link href="/perfil" onClick={onClose} className="mb-2 flex items-center gap-3 rounded-2xl bg-gray-50 p-3">

@@ -168,7 +168,7 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
       {/* Visible scrollbar on purpose — this panel has a lot of content
           below the fold (horario, reseñas, etc.) and hiding the scrollbar
           left no visual cue that there was more to scroll to. */}
-      <div className="flex-1 overflow-y-auto px-4 pb-10 pt-4 md:px-6">
+      <div className="flex-1 overflow-y-auto overscroll-y-none px-4 pb-10 pt-4 md:px-6">
         {renderablePhotos.length > 0 ? (
           <HorizontalScroller className="gap-2">
             {renderablePhotos.map((photo, index) => (

@@ -66,7 +66,7 @@ export async function CoursesListing({ basePath, fixed, searchParams, compactSea
             </span>
           )}
         </p>
-        <form action={basePath} method="get" className="flex items-center gap-2">
+        <form action={basePath} method="get" className="flex min-w-0 flex-wrap items-center gap-2">
           {sortHidden.map(([key, value]) => (
             <input key={key} type="hidden" name={key} value={value} />
           ))}
@@ -100,7 +100,7 @@ export async function CoursesListing({ basePath, fixed, searchParams, compactSea
           <p className="mt-1 text-sm text-gray-500">Prueba con otra palabra o con menos filtros.</p>
         </div>
       ) : (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}

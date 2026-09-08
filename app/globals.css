@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Stop scrolling at the document edges without bouncing the fixed navigation. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 :root {
   /* Header.tsx's inner bar is h-16, plus its border-b (1px) that the bar
      height itself doesn't include — omitting that 1px here was leaving

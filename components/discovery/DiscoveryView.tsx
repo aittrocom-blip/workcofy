@@ -360,7 +360,7 @@ export function DiscoveryView({
             </div>
           )}
         </div>
-        <div className="order-2 border-t border-gray-100 md:order-1 md:w-2/5 md:overflow-y-auto md:border-r md:border-t-0">
+        <div className="order-2 border-t border-gray-100 md:order-1 md:w-2/5 md:overflow-y-auto md:overscroll-y-none md:border-r md:border-t-0">
           <SpaceList
             spaces={filtered}
             selectedId={selectedId}

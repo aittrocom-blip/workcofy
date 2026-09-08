@@ -22,7 +22,7 @@ export function CourseCard({ course, now = new Date() }: { course: CourseRecord;
   const isNew = now.getTime() - new Date(course.created_at).getTime() < NEW_WINDOW_MS
 
   return (
-    <article className="group flex h-full flex-col rounded-[28px] border border-gray-200 bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.08)]">
+    <article className="group flex h-full min-w-0 max-w-full flex-col break-words rounded-[28px] border border-gray-200 bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.08)]">
       <div className="flex items-center gap-3">
         <ProviderLogo provider={course.provider} courseUrl={course.url} />
         <span className="min-w-0 flex-1 truncate text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{course.provider}</span>
@@ -86,7 +86,7 @@ export function CourseCard({ course, now = new Date() }: { course: CourseRecord;
             </a>
           </span>
         </div>
-        {price.detail && <p className="mt-1.5 truncate text-[11px] text-gray-400">{price.detail}</p>}
+        {price.detail && <p className="mt-1.5 text-[11px] text-gray-400">{price.detail}</p>}
       </div>
     </article>
   )
