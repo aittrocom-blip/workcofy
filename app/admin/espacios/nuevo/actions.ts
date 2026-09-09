@@ -21,58 +21,79 @@ export interface NewSpaceInput {
   googlePlaceDetails?: GooglePlaceFields | null
 }
 
-export async function createSpaceAction(input: NewSpaceInput) {
-  await requireAdmin()
+export interface CreateSpaceResult {
+  ok: boolean
+  message?: string
+}
 
-  const name = input.name.trim()
-  const district = input.district.trim()
-  if (!name) throw new Error('El nombre es obligatorio.')
-  if (!district) throw new Error('La zona/distrito es obligatoria.')
+// Next.js redacts any error thrown across a Server Action boundary in
+// production ("An error occurred in the Server Components render... digest"),
+// which is right for genuinely unexpected failures but useless for an
+// entirely normal one — e.g. picking a Google Place that's already in
+// Workcofy (createSpace()'s own "ya existe un espacio activo..." error).
+// Everything expected is caught here and returned as data instead of
+// thrown, so the real message always reaches the admin. redirect() still
+// has to run outside the try/catch — it works by throwing internally, and
+// catching that here would swallow the redirect as if it were an error.
+export async function createSpaceAction(input: NewSpaceInput): Promise<CreateSpaceResult> {
+  let redirectSlug: string
+  try {
+    await requireAdmin()
 
-  let googleFields: GooglePlaceFields | null = input.googlePlaceDetails ?? null
-  if (!googleFields && input.googlePlaceId) {
-    googleFields = await getGooglePlaceDetails(input.googlePlaceId)
-  }
+    const name = input.name.trim()
+    const district = input.district.trim()
+    if (!name) return { ok: false, message: 'El nombre es obligatorio.' }
+    if (!district) return { ok: false, message: 'La zona/distrito es obligatoria.' }
 
-  const space = await createSpace({
-    name,
-    category: input.category,
-    district,
-    country: input.country,
-    address: input.address.trim() || googleFields?.address || null,
-    latitude: googleFields?.latitude,
-    longitude: googleFields?.longitude,
-    googlePlaceId: input.googlePlaceId,
-    googleMapsUrl: googleFields?.googleMapsUrl,
-    phone: googleFields?.phone,
-    website: googleFields?.website,
-    rating: googleFields?.rating,
-    reviewCount: googleFields?.reviewCount,
-    priceLevel: googleFields?.priceLevel,
-    openingHours: googleFields?.openingHours,
-    dataSource: googleFields ? 'google' : 'mock',
-  })
+    let googleFields: GooglePlaceFields | null = input.googlePlaceDetails ?? null
+    if (!googleFields && input.googlePlaceId) {
+      googleFields = await getGooglePlaceDetails(input.googlePlaceId)
+    }
 
-  // Photos need the space's final slug (for the storage path), so this can
-  // only happen after createSpace() — a failure here shouldn't undo an
-  // otherwise-successful creation, just leave it with no photos for now.
-  if (googleFields?.photoRefs?.length) {
-    const apiKey = process.env.GOOGLE_MAPS_SERVER_API_KEY
-    if (apiKey) {
-      try {
-        const admin = createAdminSupabaseClient()
-        const photos = await downloadAndUploadPlacePhotos(admin, googleFields.photoRefs, apiKey, space.slug)
-        if (photos.length > 0) {
-          await admin.from('spaces').update({ photos }).eq('id', space.id)
+    const space = await createSpace({
+      name,
+      category: input.category,
+      district,
+      country: input.country,
+      address: input.address.trim() || googleFields?.address || null,
+      latitude: googleFields?.latitude,
+      longitude: googleFields?.longitude,
+      googlePlaceId: input.googlePlaceId,
+      googleMapsUrl: googleFields?.googleMapsUrl,
+      phone: googleFields?.phone,
+      website: googleFields?.website,
+      rating: googleFields?.rating,
+      reviewCount: googleFields?.reviewCount,
+      priceLevel: googleFields?.priceLevel,
+      openingHours: googleFields?.openingHours,
+      dataSource: googleFields ? 'google' : 'mock',
+    })
+
+    // Photos need the space's final slug (for the storage path), so this can
+    // only happen after createSpace() — a failure here shouldn't undo an
+    // otherwise-successful creation, just leave it with no photos for now.
+    if (googleFields?.photoRefs?.length) {
+      const apiKey = process.env.GOOGLE_MAPS_SERVER_API_KEY
+      if (apiKey) {
+        try {
+          const admin = createAdminSupabaseClient()
+          const photos = await downloadAndUploadPlacePhotos(admin, googleFields.photoRefs, apiKey, space.slug)
+          if (photos.length > 0) {
+            await admin.from('spaces').update({ photos }).eq('id', space.id)
+          }
+        } catch (error) {
+          console.warn(`No se pudieron descargar las fotos para "${space.slug}":`, error)
         }
-      } catch (error) {
-        console.warn(`No se pudieron descargar las fotos para "${space.slug}":`, error)
       }
     }
+
+    revalidatePath('/admin/espacios')
+    redirectSlug = space.slug
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : 'No se pudo crear el espacio.' }
   }
 
-  revalidatePath('/admin/espacios')
-  redirect(`/admin/espacios/${space.slug}`)
+  redirect(`/admin/espacios/${redirectSlug}`)
 }
 
 export interface GooglePlaceCandidate {

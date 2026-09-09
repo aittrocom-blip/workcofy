@@ -95,7 +95,9 @@ export function NewSpaceForm() {
     setSaving(true)
     setError(null)
     try {
-      await createSpaceAction({
+      // On success createSpaceAction redirects itself — this promise only
+      // ever resolves (rather than navigating away) when it failed.
+      const result = await createSpaceAction({
         name,
         category,
         country,
@@ -104,6 +106,8 @@ export function NewSpaceForm() {
         googlePlaceId: selectedPlaceId,
         googlePlaceDetails: placeDetails,
       })
+      setError(result.message ?? 'No se pudo crear el espacio.')
+      setSaving(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo crear el espacio.')
       setSaving(false)
