@@ -32,22 +32,24 @@ export function CourseCard({ course, now = new Date() }: { course: CourseRecord;
         )}
       </div>
 
-      <h3 className="mt-4 line-clamp-2 text-lg font-bold leading-tight tracking-tight text-black">{course.title}</h3>
-      {course.summary && <p className="mt-2 line-clamp-2 text-sm text-gray-600">{course.summary}</p>}
+      <h3 className="mt-4 text-lg font-bold leading-snug tracking-tight text-black">
+        <a href={`/ir/curso/${course.id}`} target="_blank" rel="noopener" className="rounded-sm hover:underline hover:underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">{course.title}</a>
+      </h3>
+      {course.summary && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600">{course.summary}</p>}
 
       <p className="mt-3 text-xs font-medium text-gray-500">
         {category?.label}
         {topic && <span> · {topic}</span>}
         {!topic && <span> · IA</span>}
       </p>
-      {meta.length > 0 && <p className="mt-1 text-xs text-gray-500">{meta.join(' · ')}</p>}
+      {meta.length > 0 && <p className="mb-5 mt-1 text-xs leading-relaxed text-gray-500">{meta.join(' · ')}</p>}
 
       <div className="mt-auto border-t border-gray-100 pt-4">
-        <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-3">
+        <div className="flex flex-col gap-4">
           <span className="flex min-w-0 items-center gap-2 text-sm">
             <span
               className={`flex-none rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                course.price === 'gratis' ? 'bg-workcofy-green/10 text-workcofy-green' : 'bg-gray-100 text-gray-700'
+                course.price === 'gratis' ? 'bg-workcofy-green/10 text-green-800' : 'bg-gray-100 text-gray-700'
               }`}
             >
               {price.label}
@@ -58,35 +60,29 @@ export function CourseCard({ course, now = new Date() }: { course: CourseRecord;
               </span>
             )}
           </span>
-          {/* ml-auto (on top of justify-between) keeps this group pinned to
-              the right edge even when it wraps to its own line on narrow
-              screens — without it, a wrapped flex item falls back to the
-              start edge instead of staying right-aligned. */}
-          <span className="ml-auto flex flex-none items-center gap-2">
+          <span className="flex min-w-0 items-center gap-2">
             <CourseFavoriteButton
               courseId={course.id}
-              className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-gray-200 p-2 transition-colors hover:border-black"
+              className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-gray-200 p-3 transition-colors hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
             />
-            {/* No standalone Workcofy page exists per course yet, so sharing
-                points at our own tracked redirect — the recipient still lands
-                on the real course, and the share counts as a click. */}
+            {/* Keep the tracked redirect for shares and provider visits. */}
             <ShareButton
               title={course.title}
               path={`/ir/curso/${course.id}`}
               kind="curso"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 p-2 text-gray-500 transition-colors hover:border-black hover:text-black"
+              className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-gray-200 p-3 text-gray-500 transition-colors hover:border-black hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
             />
             <a
               href={`/ir/curso/${course.id}`}
               target="_blank"
               rel="noopener"
-              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-black px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-white hover:text-black hover:ring-1 hover:ring-black active:scale-[0.97]"
+              className="inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full bg-black px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.97]"
             >
               Ver curso <span aria-hidden="true">→</span>
             </a>
           </span>
         </div>
-        {price.detail && <p className="mt-1.5 text-[11px] text-gray-400">{price.detail}</p>}
+        {price.detail && <p className="mt-3 text-xs leading-relaxed text-gray-500">{price.detail}</p>}
       </div>
     </article>
   )

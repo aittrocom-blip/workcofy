@@ -40,7 +40,9 @@ export function CourseTile({ course }: { course: CourseRecord }) {
   const category = courseCategoryFromValue(course.category)
   return (
     <Link
-      href={`/aprende/${course.slug}`}
+      href={`/ir/curso/${course.id}`}
+      target="_blank"
+      rel="noopener"
       className="flex w-[220px] flex-none flex-col rounded-[20px] border border-gray-100 bg-white p-3.5 transition-colors active:bg-gray-50"
     >
       <div className="flex items-center gap-2.5">

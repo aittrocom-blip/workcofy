@@ -35,16 +35,16 @@ interface ExplorarHomeProps {
 function Section({ title, subtitle, href, badge, children }: { title: string; subtitle?: string; href?: string; badge?: string; children: React.ReactNode }) {
   return (
     <section className="mt-8">
-      <div className="mb-3 flex items-end justify-between px-4 md:px-0">
-        <div>
-          <h2 className="flex items-center gap-2 text-lg font-extrabold tracking-tight">
+      <div className="mb-3 flex items-end justify-between gap-3 px-4 md:px-0">
+        <div className="min-w-0">
+          <h2 className="flex flex-wrap items-center gap-2 text-lg font-extrabold tracking-tight">
             {title}
             {badge && <span className="rounded-full bg-workcofy-yellow/20 px-2 py-0.5 text-[11px] font-bold tabular-nums text-black">{badge}</span>}
           </h2>
           {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
         </div>
         {href && (
-          <Link href={href} className="text-xs font-semibold text-black underline underline-offset-2">
+          <Link href={href} aria-label={`Ver todo: ${title}`} className="inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-xs font-semibold text-black underline underline-offset-4 transition-colors hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
             Ver todo
           </Link>
         )}
@@ -115,13 +115,14 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
             <path strokeLinecap="round" d="m20 20-3.5-3.5" />
           </svg>
           <input
+            aria-label="Buscar espacios para trabajar"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar espacios…"
             enterKeyHint="search"
-            className="h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-gray-400"
+            className="h-11 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-gray-400"
           />
-          <button type="submit" className="rounded-full bg-black px-4 py-2 text-xs font-semibold text-white active:scale-95">
+          <button type="submit" className="min-h-11 rounded-full bg-black px-4 py-2 text-sm font-semibold text-white active:scale-95">
             Buscar
           </button>
         </form>
@@ -140,6 +141,22 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
           )}
         </div>
       </header>
+
+      <nav aria-label="Descubre Workcofy" className="mt-6 grid grid-cols-1 gap-2 px-4 min-[360px]:grid-cols-3 md:gap-3 md:px-0">
+        {[
+          { href: '/spots', title: 'Encuentra tu spot', description: 'Un lugar para trabajar', number: '01' },
+          { href: '/oportunidades', title: 'Trabaja en remoto', description: 'Explora oportunidades', number: '02' },
+          { href: '/aprende', title: 'Aprende algo nuevo', description: 'Habilidades para tu día', number: '03' },
+        ].map((item) => (
+          <Link key={item.href} href={item.href} className="group min-w-0 rounded-2xl border border-gray-200 bg-[#FFFCF5] p-3 transition-colors hover:border-workcofy-yellow hover:bg-workcofy-yellow/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black md:p-5">
+            <span aria-hidden="true" className="flex items-center justify-between text-xs font-semibold text-gray-500">
+              {item.number}<span className="text-base text-black">↗</span>
+            </span>
+            <span className="mt-3 block text-sm font-bold leading-snug tracking-tight md:text-base">{item.title}</span>
+            <span className="mt-1 block text-xs leading-relaxed text-gray-600">{item.description}</span>
+          </Link>
+        ))}
+      </nav>
 
       <Section title="Cerca de ti" subtitle={located ? 'Ordenado por distancia' : 'Activa tu ubicación para ordenar por cercanía'} href="/spots">
         <Strip spaces={nearby} />

@@ -22,6 +22,14 @@ export interface GooglePlacePhotoRef {
   height: number
 }
 
+// Downloaded in parallel, not one at a time — sequentially, 10 photos (each
+// a Google fetch + a Supabase Storage upload) routinely took 20-30s+ and blew
+// past the caller's serverless function time limit (see maxDuration on
+// app/admin/espacios/nuevo/actions.ts), which killed the whole request mid-
+// flight with a generic 500 even though the space row itself had already
+// been created. Promise.allSettled keeps the "one bad photo doesn't lose the
+// others" guarantee while running them concurrently; order is restored from
+// photoRefs afterward so photo indexes (and their storage paths) stay stable.
 export async function downloadAndUploadPlacePhotos(
   supabase: SupabaseClient,
   photoRefs: GooglePlacePhotoRef[],
@@ -29,11 +37,9 @@ export async function downloadAndUploadPlacePhotos(
   slug: string
 ): Promise<SpacePhoto[]> {
   const picked = photoRefs.slice(0, MAX_PHOTOS_PER_SPACE)
-  const uploaded: SpacePhoto[] = []
 
-  for (let i = 0; i < picked.length; i++) {
-    const photo = picked[i]
-    try {
+  const results = await Promise.allSettled(
+    picked.map(async (photo, i): Promise<SpacePhoto> => {
       const photoUrl = `${PLACE_PHOTO_URL}?maxwidth=1200&photoreference=${photo.photo_reference}&key=${apiKey}`
       const response = await fetch(photoUrl)
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
@@ -46,13 +52,20 @@ export async function downloadAndUploadPlacePhotos(
       if (error) throw error
 
       const { data } = supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path)
-      uploaded.push({ url: data.publicUrl, width: photo.width, height: photo.height })
-    } catch (error) {
+      return { url: data.publicUrl, width: photo.width, height: photo.height }
+    })
+  )
+
+  const uploaded: SpacePhoto[] = []
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      uploaded.push(result.value)
+    } else {
       // One failed photo (rate limit, transient network error) shouldn't
       // discard every other photo already downloaded for this space.
-      const message = error instanceof Error ? error.message : String(error)
+      const message = result.reason instanceof Error ? result.reason.message : String(result.reason)
       console.warn(`Photo ${i} failed for "${slug}": ${message}`)
     }
-  }
+  })
   return uploaded
 }
