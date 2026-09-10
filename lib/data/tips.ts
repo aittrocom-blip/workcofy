@@ -37,7 +37,7 @@ export async function listPublishedTips(): Promise<Tip[]> {
 // blocks rather than picking randomly, so as the pool grows (see
 // lib/tips/generateTips.ts) every tip eventually gets its turn instead of a
 // few lucky ones dominating.
-export function tipsOfTheDay(tips: Tip[], date: Date = new Date(), count = 3): Tip[] {
+export function tipsOfTheDay(tips: Tip[], date: Date = new Date(), count = 6): Tip[] {
   if (tips.length === 0) return []
   const lima = new Date(date.toLocaleString('en-US', { timeZone: 'America/Lima' }))
   const start = new Date(lima.getFullYear(), 0, 0)

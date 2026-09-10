@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { TIP_CATEGORY_LABELS, type Tip } from '@/lib/data/tips'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
 
@@ -12,22 +11,19 @@ function TipTile({ tip }: { tip: Tip }) {
   )
 }
 
-// Three tips, rotating daily (see tipsOfTheDay) — a strip like the other
-// Explorar sections instead of one big block, since there are now several
-// per day and the pool keeps growing (lib/tips/generateTips.ts).
+// Six tips, rotating daily (see tipsOfTheDay — deterministic per Lima day,
+// not random per page load: reloading mid-day shouldn't show a different
+// set, that reads as a glitch rather than "fresh content"). No "Ver todos"
+// here on purpose — the point is a rotating glimpse of a growing pool
+// (lib/tips/generateTips.ts keeps adding to it), not a static list to browse.
 export function DailyTips({ tips }: { tips: Tip[] }) {
   if (tips.length === 0) return null
 
   return (
     <section className="mt-8">
-      <div className="mb-3 flex items-end justify-between px-4 md:px-0">
-        <div>
-          <h2 className="text-lg font-extrabold tracking-tight">Tips de hoy</h2>
-          <p className="text-xs text-gray-500">Nuevos cada día — trabajo remoto, foco, IA y más</p>
-        </div>
-        <Link href="/tips" className="text-xs font-semibold text-black underline underline-offset-2">
-          Ver todos
-        </Link>
+      <div className="mb-3 px-4 md:px-0">
+        <h2 className="text-lg font-extrabold tracking-tight">Tips de hoy</h2>
+        <p className="text-xs text-gray-500">Nuevos cada día — trabajo remoto, foco, IA y más</p>
       </div>
       <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
         {tips.map((tip) => (

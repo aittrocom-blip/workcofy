@@ -23,6 +23,7 @@ const HIGHLIGHT_PRIORITY: { group: 'para_trabajar' | 'para_llamadas' | 'servicio
   { group: 'servicios', key: 'impresiones' },
   { group: 'servicios', key: 'pizarra' },
   { group: 'servicios', key: 'estacionamiento' },
+  { group: 'servicios', key: 'estacionamiento_bicicletas' },
   { group: 'servicios', key: 'accesibilidad' },
   { group: 'servicios', key: 'comida' },
 ]

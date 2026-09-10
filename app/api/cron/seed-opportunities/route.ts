@@ -6,6 +6,7 @@ import { runWeRemotoIngestion } from '@/lib/opportunities/sources/runWeRemotoIng
 import { sendDailySignupDigest } from '@/lib/reports/signupDigest'
 import { sendWeeklyContentDigest } from '@/lib/reports/weeklyContentDigest'
 import { runOpportunityAlerts } from '@/lib/reports/opportunityAlerts'
+import { generateDailyTips } from '@/lib/tips/generateTips'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -56,6 +57,12 @@ export async function GET(request: Request) {
     results.weeklyDigest = new Date().getUTCDay() === 1 ? await sendWeeklyContentDigest(supabase) : { skipped: 'not Monday' }
   } catch (error) {
     results.weeklyDigest = { error: error instanceof Error ? error.message : String(error) }
+  }
+
+  try {
+    results.tipsGenerated = await generateDailyTips(supabase)
+  } catch (error) {
+    results.tipsGenerated = { error: error instanceof Error ? error.message : String(error) }
   }
 
   return NextResponse.json(results)

@@ -27,6 +27,7 @@ export interface ServiciosAmenities {
   pantalla_tv: boolean | null
   proyector: boolean | null
   estacionamiento: boolean | null
+  estacionamiento_bicicletas: boolean | null
   terraza: boolean | null
   pet_friendly: boolean | null
   accesibilidad: boolean | null
@@ -70,8 +71,8 @@ export const DEFAULT_AMENITIES: AmenitiesData = {
   // true the same way wifi is, unless a space's own data says otherwise.
   servicios: {
     cafe: true, agua: true, banos: true, comida: null, impresiones: null, pizarra: null,
-    pantalla_tv: null, proyector: null, estacionamiento: null, terraza: null, pet_friendly: null,
-    accesibilidad: null,
+    pantalla_tv: null, proyector: null, estacionamiento: null, estacionamiento_bicicletas: null, terraza: null,
+    pet_friendly: null, accesibilidad: null,
   },
   ambiente: null,
   tipo_espacio: [],
@@ -97,7 +98,8 @@ export const AMENITY_LABELS: Record<string, string> = {
   pizarra: 'Pizarra',
   pantalla_tv: 'Pantalla / TV',
   proyector: 'Proyector',
-  estacionamiento: 'Estacionamiento',
+  estacionamiento: 'Estacionamiento de autos',
+  estacionamiento_bicicletas: 'Estacionamiento de bicicletas',
   terraza: 'Terraza / aire libre',
   pet_friendly: 'Pet friendly',
   accesibilidad: 'Accesibilidad',

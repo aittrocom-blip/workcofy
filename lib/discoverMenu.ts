@@ -39,7 +39,7 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
   { label: 'Eventos', Icon: CalendarIcon, href: null, enabled: false, comingSoon: false },
   { label: 'Favoritos', Icon: HeartLineIcon, href: '/favoritos', enabled: true, comingSoon: false },
   { label: 'Tank Shark', Icon: SharkIcon, href: null, enabled: false, comingSoon: true },
-  { label: 'Red', Icon: NetworkIcon, href: null, enabled: false, comingSoon: true },
+  { label: 'El Muro', Icon: NetworkIcon, href: null, enabled: false, comingSoon: true },
   { label: 'Billetera', Icon: WalletIcon, href: null, enabled: false, comingSoon: true },
   // TODO: point at a dedicated Retos flow once it exists — distinct from
   // the Misiones already shown in /perfil's RewardsPanel.

@@ -12,8 +12,8 @@ describe('DEFAULT_AMENITIES', () => {
     })
     expect(DEFAULT_AMENITIES.servicios).toEqual({
       cafe: true, agua: true, banos: true, comida: null, impresiones: null, pizarra: null,
-      pantalla_tv: null, proyector: null, estacionamiento: null, terraza: null, pet_friendly: null,
-      accesibilidad: null,
+      pantalla_tv: null, proyector: null, estacionamiento: null, estacionamiento_bicicletas: null,
+      terraza: null, pet_friendly: null, accesibilidad: null,
     })
   })
 
