@@ -6,7 +6,7 @@ import { countPublishedOpportunities, listRecentOpportunities } from '@/lib/data
 import { countPublishedCourses, listPublishedCourses } from '@/lib/data/courses'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { passHolderFrom } from '@/lib/pass'
-import { listPublishedTips, tipOfTheDay } from '@/lib/data/tips'
+import { listPublishedTips, tipsOfTheDay } from '@/lib/data/tips'
 import { ExplorarHome } from '@/components/app/ExplorarHome'
 
 export const dynamic = 'force-dynamic'
@@ -47,7 +47,7 @@ export default async function ExplorarPage() {
       benefits={benefits.slice(0, 8)}
       opportunities={opportunities}
       courses={courses}
-      tip={tipOfTheDay(tips)}
+      tips={tipsOfTheDay(tips)}
       counts={{ opportunities: opportunityCount, courses: courseCount, certificates: certificateCount ?? 0 }}
       stats={{
         coins: rewardsBalanceFrom(events),

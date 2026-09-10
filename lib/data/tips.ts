@@ -32,12 +32,20 @@ export async function listPublishedTips(): Promise<Tip[]> {
   return (data ?? []) as Tip[]
 }
 
-// Deterministic per Lima calendar day, so everyone sees the same tip that
-// day and it doesn't change between navigations.
-export function tipOfTheDay(tips: Tip[], date: Date = new Date()): Tip | null {
-  if (tips.length === 0) return null
+// Deterministic per Lima calendar day (same picks for everyone, no change
+// between navigations that day) — rotates through the pool in `count`-sized
+// blocks rather than picking randomly, so as the pool grows (see
+// lib/tips/generateTips.ts) every tip eventually gets its turn instead of a
+// few lucky ones dominating.
+export function tipsOfTheDay(tips: Tip[], date: Date = new Date(), count = 3): Tip[] {
+  if (tips.length === 0) return []
   const lima = new Date(date.toLocaleString('en-US', { timeZone: 'America/Lima' }))
   const start = new Date(lima.getFullYear(), 0, 0)
   const dayOfYear = Math.floor((lima.getTime() - start.getTime()) / 86_400_000)
-  return tips[dayOfYear % tips.length]
+  const blockStart = (dayOfYear * count) % tips.length
+  const picked: Tip[] = []
+  for (let i = 0; i < Math.min(count, tips.length); i++) {
+    picked.push(tips[(blockStart + i) % tips.length])
+  }
+  return picked
 }

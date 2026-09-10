@@ -14,7 +14,7 @@ import { avatarFor } from '@/lib/avatars'
 import { passIdFor } from '@/lib/pass'
 import { DISCOVER_MENU_ITEMS } from '@/lib/discoverMenu'
 import { DiscoverGrid } from '@/components/layout/DiscoverGrid'
-import { PersonIcon, GearIcon, ShieldIcon, StoreIcon, InfoIcon, LogoutIcon, ChevronRightIcon } from '@/components/layout/DiscoverIcons'
+import { GearIcon, ShieldIcon, StoreIcon, InfoIcon, LogoutIcon, ChevronRightIcon } from '@/components/layout/DiscoverIcons'
 
 interface SideDrawerProps {
   open: boolean
@@ -176,9 +176,9 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
                 <ChevronRightIcon className="h-4 w-4 flex-none text-gray-300" />
               </Link>
 
-              <IconRow href="/perfil" onClick={onClose} icon={<PersonIcon className="h-5 w-5" />} active={isNavLinkActive('/perfil', pathname)}>
-                Mi perfil
-              </IconRow>
+              {/* The avatar card above already links to /perfil — a second
+                  "Mi perfil" row here was just duplicating it. Configuración
+                  (editing) stays as its own destination. */}
               <IconRow href="/configuracion" onClick={onClose} icon={<GearIcon className="h-5 w-5" />} active={isNavLinkActive('/configuracion', pathname)}>
                 Configuración
               </IconRow>
@@ -190,11 +190,7 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
 
               <Divider />
 
-              <Row href="/tips" onClick={onClose} active={isNavLinkActive('/tips', pathname)}>
-                Tips
-              </Row>
-
-              <p className={`mt-2 ${SECTION_LABEL}`}>Descubrir</p>
+              <p className={SECTION_LABEL}>Descubrir</p>
               <DiscoverGrid items={DISCOVER_MENU_ITEMS} onNavigate={onClose} />
 
               <Divider />

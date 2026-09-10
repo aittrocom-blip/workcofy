@@ -9,7 +9,7 @@ import type { OpportunityRecord } from '@/lib/data/opportunityTypes'
 import type { CourseRecord } from '@/lib/data/courseTypes'
 import type { PassHolder } from '@/lib/pass'
 import type { Tip } from '@/lib/data/tips'
-import { TipOfTheDay } from '@/components/app/TipOfTheDay'
+import { DailyTips } from '@/components/app/DailyTips'
 import { OpportunityTile, CourseTile } from '@/components/app/DiscoverTiles'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
 import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
@@ -27,7 +27,7 @@ interface ExplorarHomeProps {
   benefits: SpaceBenefitWithSpace[]
   opportunities: OpportunityRecord[]
   courses: CourseRecord[]
-  tip: Tip | null
+  tips: Tip[]
   counts: { opportunities: number; courses: number; certificates: number }
   stats: { coins: number; streak: number; favorites: number; checkins: number }
 }
@@ -75,7 +75,7 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // The signed-in home. Location is requested once on mount (same hook the
 // map uses); until it's granted "Cerca de ti" falls back to the best-scored
 // spaces rather than pretending a fallback centre is the user's position.
-export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tip, counts, stats }: ExplorarHomeProps) {
+export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tips, counts, stats }: ExplorarHomeProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [passOpen, setPassOpen] = useState(false)
@@ -162,7 +162,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         <Strip spaces={nearby} />
       </Section>
 
-      {tip && <TipOfTheDay tip={tip} />}
+      <DailyTips tips={tips} />
 
       <Section title="Trabajos remotos" badge={`${counts.opportunities}`} subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
         {opportunities.length === 0 ? (
