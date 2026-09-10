@@ -8,6 +8,7 @@ import { FavoritesProvider } from '@/components/providers/FavoritesProvider'
 import { CourseFavoritesProvider } from '@/components/providers/CourseFavoritesProvider'
 import { LikesProvider } from '@/components/providers/LikesProvider'
 import { USER_ID_HEADER } from '@/lib/supabase/middleware'
+import { ActionToast } from '@/components/layout/ActionToast'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://workcofy.com'),
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </FavoritesProvider>
         <Analytics />
         <BodyScrollLock />
+        <ActionToast />
       </body>
     </html>
   )

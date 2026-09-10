@@ -78,6 +78,35 @@ export function NetworkIcon({ className }: IconProps) {
   )
 }
 
+export function NotesWallIcon({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <rect x="2" y="3" width="20" height="18" rx="2" />
+      <rect x="5.5" y="6.5" width="5" height="7" rx="0.7" />
+      <path d="M7 9h2M7 11h1M14 9h5v6l-2 2h-3V9ZM17 17v-2h2M5.5 17H10" />
+    </Base>
+  )
+}
+
+export function TriviaIcon({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M5 3h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6l-5 3v-3H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+      <path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 4" />
+      <circle cx="12" cy="15" r="0.8" fill="currentColor" stroke="none" />
+    </Base>
+  )
+}
+
+export function BellIcon({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M18 10a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
+      <path d="M10 21h4" />
+    </Base>
+  )
+}
+
 export function WalletIcon({ className }: IconProps) {
   return (
     <Base className={className}>

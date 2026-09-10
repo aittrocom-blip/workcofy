@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import type { SpaceRecord, SpaceWithDistance } from '@/lib/data/spaceTypes'
 import type { SpaceBenefitWithSpace } from '@/lib/data/benefits'
 import type { OpportunityRecord } from '@/lib/data/opportunityTypes'
 import type { CourseRecord } from '@/lib/data/courseTypes'
 import type { PassHolder } from '@/lib/pass'
 import type { Tip } from '@/lib/data/tips'
+import { DiscoverGrid } from '@/components/layout/DiscoverGrid'
+import { HOME_QUICK_ACTIONS } from '@/lib/discoverMenu'
 import { DailyTips } from '@/components/app/DailyTips'
 import { OpportunityTile, CourseTile } from '@/components/app/DiscoverTiles'
 import { useUserLocation } from '@/lib/geo/useUserLocation'
@@ -34,7 +35,7 @@ interface ExplorarHomeProps {
 
 function Section({ title, subtitle, href, badge, children }: { title: string; subtitle?: string; href?: string; badge?: string; children: React.ReactNode }) {
   return (
-    <section className="mt-8">
+    <section className="mt-10">
       <div className="mb-3 flex items-end justify-between gap-3 px-4 md:px-0">
         <div className="min-w-0">
           <h2 className="flex flex-wrap items-center gap-2 text-lg font-extrabold tracking-tight">
@@ -64,6 +65,15 @@ function Strip({ spaces }: { spaces: SpaceWithDistance[] }) {
   )
 }
 
+function EmptyShelf({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
+  return (
+    <div className="mx-4 flex min-h-24 items-center gap-3 rounded-2xl border border-dashed border-gray-200 bg-[#FFFCF5] px-4 py-3 md:mx-0">
+      <span aria-hidden="true" className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-workcofy-yellow/20 text-lg">{icon}</span>
+      <p className="text-sm leading-relaxed text-gray-600"><span className="font-semibold text-black">{title}</span> {children}</p>
+    </div>
+  )
+}
+
 function byScore(a: SpaceWithDistance, b: SpaceWithDistance): number {
   return (computeWorkcofyScore(b) ?? 0) - (computeWorkcofyScore(a) ?? 0)
 }
@@ -76,8 +86,6 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // map uses); until it's granted "Cerca de ti" falls back to the best-scored
 // spaces rather than pretending a fallback centre is the user's position.
 export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tips, counts, stats }: ExplorarHomeProps) {
-  const router = useRouter()
-  const [query, setQuery] = useState('')
   const [passOpen, setPassOpen] = useState(false)
   const { coordinate, status, requestLocation } = useUserLocation()
 
@@ -93,72 +101,48 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
     () => (located ? [...withDistance].sort(byDistance) : [...withDistance].sort(byScore)).slice(0, 10),
     [withDistance, located]
   )
-  function submitSearch(event: FormEvent) {
-    event.preventDefault()
-    const q = query.trim()
-    router.push(q ? `/spots?q=${encodeURIComponent(q)}` : '/spots')
-  }
-
   const firstName = holder.name.split(' ')[0]
 
   return (
-    <div className="mx-auto max-w-6xl pb-6 pt-6 md:px-8 md:pt-10">
+    <main className="mx-auto max-w-6xl pb-8 pt-6 md:px-8 md:pt-10">
       <header className="px-4 md:px-0">
         <h1 className="text-[28px] font-extrabold leading-tight tracking-tight md:text-4xl">
           Hola, {firstName} <span aria-hidden="true">👋</span>
         </h1>
-        <p className="mt-1 text-base text-gray-600 md:text-lg">¿Dónde quieres trabajar hoy?</p>
-
-        <form onSubmit={submitSearch} role="search" className="mt-4 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1 shadow-[0_8px_24px_rgba(0,0,0,0.05)] focus-within:border-black">
-          <svg viewBox="0 0 24 24" className="h-5 w-5 flex-none text-gray-400" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="7" />
-            <path strokeLinecap="round" d="m20 20-3.5-3.5" />
-          </svg>
-          <input
-            aria-label="Buscar espacios para trabajar"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar espacios…"
-            enterKeyHint="search"
-            className="h-11 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-gray-400"
-          />
-          <button type="submit" className="min-h-11 rounded-full bg-black px-4 py-2 text-sm font-semibold text-white active:scale-95">
-            Buscar
-          </button>
-        </form>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/spots" className="rounded-full border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold hover:border-black">
-            🗺️ Ver mapa
-          </Link>
-          <Link href="/spots?verified=1" className="rounded-full border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold hover:border-black">
-            Solo Workcofy Spots
-          </Link>
-          {!located && status !== 'requesting' && (
-            <button type="button" onClick={requestLocation} className="rounded-full bg-workcofy-yellow/20 px-3.5 py-2 text-xs font-semibold hover:bg-workcofy-yellow/30">
-              📍 Usar mi ubicación
-            </button>
-          )}
-        </div>
+        <p className="mt-1 text-base text-gray-600 md:text-lg">¿Qué quieres hacer hoy?</p>
       </header>
 
-      <nav aria-label="Descubre Workcofy" className="mt-6 grid grid-cols-1 gap-2 px-4 min-[360px]:grid-cols-3 md:gap-3 md:px-0">
-        {[
-          { href: '/spots', title: 'Encuentra tu spot', description: 'Un lugar para trabajar', number: '01' },
-          { href: '/oportunidades', title: 'Trabaja en remoto', description: 'Explora oportunidades', number: '02' },
-          { href: '/aprende', title: 'Aprende algo nuevo', description: 'Habilidades para tu día', number: '03' },
-        ].map((item) => (
-          <Link key={item.href} href={item.href} className="group min-w-0 rounded-2xl border border-gray-200 bg-[#FFFCF5] p-3 transition-colors hover:border-workcofy-yellow hover:bg-workcofy-yellow/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black md:p-5">
-            <span aria-hidden="true" className="flex items-center justify-between text-xs font-semibold text-gray-500">
-              {item.number}<span className="text-base text-black">↗</span>
-            </span>
-            <span className="mt-3 block text-sm font-bold leading-snug tracking-tight md:text-base">{item.title}</span>
-            <span className="mt-1 block text-xs leading-relaxed text-gray-600">{item.description}</span>
-          </Link>
-        ))}
-      </nav>
+      <section className="mt-6" aria-labelledby="home-primary-actions">
+        <p id="home-primary-actions" className="px-4 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400 md:px-0">Empieza por aquí</p>
+        <nav aria-label="Acciones principales de Workcofy" className="mt-2 grid grid-cols-1 gap-2 px-4 md:grid-cols-3 md:gap-3 md:px-0">
+          {[
+            { href: '/spots', title: 'Encuentra tu espacio', description: 'Un lugar para trabajar', image: '/banners/encuentra-tu-espacio.png' },
+            { href: '/oportunidades', title: 'Trabaja en remoto', description: 'Explora oportunidades', image: '/banners/trabaja-en-remoto.png' },
+            { href: '/aprende', title: 'Aprende algo nuevo', description: 'Habilidades para tu día', image: '/banners/aprende-algo-nuevo.png' },
+          ].map((item) => (
+            <Link key={item.href} href={item.href} className="group relative isolate flex min-h-[96px] min-w-0 flex-col justify-center overflow-hidden rounded-2xl border border-gray-200 bg-white py-3 pl-4 pr-[38%] transition-all hover:border-workcofy-yellow hover:shadow-[0_8px_20px_rgba(0,0,0,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black md:min-h-[110px] md:pl-4">
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-1 right-1 -z-20 w-[43%] bg-contain bg-right bg-no-repeat transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ backgroundImage: `url(${item.image})` }} />
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[52%] -z-10 w-[16%] bg-gradient-to-r from-white to-transparent" />
+              <span className="block text-sm font-bold leading-snug tracking-tight md:text-base">{item.title}</span>
+              <span className="mt-1 block text-xs leading-relaxed text-gray-600">{item.description}</span>
+            </Link>
+          ))}
+        </nav>
+      </section>
+
+      <section className="mt-5 border-y border-gray-100 px-4 py-1 md:px-0" aria-labelledby="home-quick-actions">
+        <p id="home-quick-actions" className="pt-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">Más para ti</p>
+        <DiscoverGrid items={HOME_QUICK_ACTIONS} home />
+      </section>
 
       <Section title="Cerca de ti" subtitle={located ? 'Ordenado por distancia' : 'Activa tu ubicación para ordenar por cercanía'} href="/spots">
+        {!located && status !== 'requesting' && (
+          <div className="mb-3 px-4 md:px-0">
+            <button type="button" onClick={requestLocation} className="min-h-11 rounded-full bg-workcofy-yellow/20 px-3.5 py-2 text-xs font-semibold hover:bg-workcofy-yellow/30">
+              Usar mi ubicación
+            </button>
+          </div>
+        )}
         <Strip spaces={nearby} />
       </Section>
 
@@ -166,7 +150,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
 
       <Section title="Trabajos remotos" badge={`${counts.opportunities}`} subtitle="Lo más reciente, 100% remoto" href="/oportunidades">
         {opportunities.length === 0 ? (
-          <p className="px-4 text-sm text-gray-400 md:px-0">No hay oportunidades nuevas por ahora.</p>
+          <EmptyShelf icon="↗" title="Aún no hay oportunidades nuevas.">Vuelve pronto: aquí aparecerán empleos remotos seleccionados para la comunidad.</EmptyShelf>
         ) : (
           <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
             {opportunities.map((opportunity) => (
@@ -178,7 +162,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
 
       <Section title="Aprende" badge={`${counts.courses}`} subtitle={`${counts.certificates} con certificado · cursos destacados para trabajar con IA`} href="/aprende">
         {courses.length === 0 ? (
-          <p className="px-4 text-sm text-gray-400 md:px-0">Pronto habrá cursos destacados aquí.</p>
+          <EmptyShelf icon="✦" title="Estamos preparando nuevos cursos.">Pronto tendrás más recursos para aprender y trabajar mejor con IA.</EmptyShelf>
         ) : (
           <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
             {courses.map((course) => (
@@ -203,7 +187,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
 
       <Section title="Beneficios" subtitle="Se activan mostrando tu Pass" href="/beneficios">
         {benefits.length === 0 ? (
-          <p className="px-4 text-sm text-gray-400 md:px-0">Pronto verás aquí los beneficios de los Workcofy Spots.</p>
+          <EmptyShelf icon="✦" title="Los beneficios están en camino.">Aparecerán aquí cuando haya ventajas activas para tu Workcofy Pass.</EmptyShelf>
         ) : (
           <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
             {benefits.map((benefit) => (
@@ -214,7 +198,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
       </Section>
 
       {passOpen && <PassExpanded holder={holder} onClose={() => setPassOpen(false)} />}
-    </div>
+    </main>
   )
 }
 

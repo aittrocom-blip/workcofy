@@ -15,6 +15,13 @@ export const metadata = {
   title: 'Explorar | Workcofy',
 }
 
+// Most Home shelves are optional. A missing table, an RLS change or a brief
+// network problem in one of them should hide only that shelf, never leave the
+// member staring at an empty Explorar screen.
+function optional<T>(promise: Promise<T>, fallback: T): Promise<T> {
+  return promise.catch(() => fallback)
+}
+
 export default async function ExplorarPage() {
   const { user, supabase } = await requireUser('/app')
 
@@ -24,18 +31,18 @@ export default async function ExplorarPage() {
   const [{ data: profile }, spaces, benefits, events, { count: favoritesCount }, { count: checkinsCount }, { data: streakRow }, opportunities, courses, opportunityCount, courseCount, { count: certificateCount }, tips] =
     await Promise.all([
       supabase.from('profiles').select('name, avatar_id, created_at, city').eq('id', user.id).single(),
-      listSpaces(),
-      listAllSpaceBenefits(),
-      listRewardEvents(supabase, user.id),
+      optional(listSpaces(), []),
+      optional(listAllSpaceBenefits(), []),
+      optional(listRewardEvents(supabase, user.id), []),
       supabase.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
       supabase.from('space_checkins').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
       supabase.from('profiles').select('streak_count').eq('id', user.id).maybeSingle(),
-      listRecentOpportunities(6),
+      optional(listRecentOpportunities(6), []),
       // Default sort = featured first, then most clicked — so the strip fills
       // to 8 even when fewer than 8 courses are flagged featured.
-      listPublishedCourses().then((all) => all.slice(0, 8)),
-      countPublishedOpportunities(),
-      countPublishedCourses(),
+      optional(listPublishedCourses().then((all) => all.slice(0, 8)), []),
+      optional(countPublishedOpportunities(), 0),
+      optional(countPublishedCourses(), 0),
       createServerSupabaseClient().from('courses').select('id', { count: 'exact', head: true }).eq('status', 'published').eq('has_certificate', true),
       listPublishedTips(),
     ])

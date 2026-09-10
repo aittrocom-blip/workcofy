@@ -54,7 +54,7 @@ export function LikesProvider({ children }: { children: ReactNode }) {
   // next real fetch regardless).
   const toggleLike = useCallback(
     async (spaceId: string) => {
-      if (!userId) return false
+      if (!userId) throw new Error('No hay sesión activa.')
       const supabase = createBrowserSupabaseClient()
       const alreadyLiked = likedIds.has(spaceId)
 
@@ -65,10 +65,17 @@ export function LikesProvider({ children }: { children: ReactNode }) {
         return next
       })
 
-      if (alreadyLiked) {
-        await supabase.from('space_likes').delete().eq('user_id', userId).eq('space_id', spaceId)
-      } else {
-        await supabase.from('space_likes').insert({ user_id: userId, space_id: spaceId })
+      const { error } = alreadyLiked
+        ? await supabase.from('space_likes').delete().eq('user_id', userId).eq('space_id', spaceId)
+        : await supabase.from('space_likes').insert({ user_id: userId, space_id: spaceId })
+      if (error) {
+        setLikedIds((current) => {
+          const next = new Set(current)
+          if (alreadyLiked) next.add(spaceId)
+          else next.delete(spaceId)
+          return next
+        })
+        throw error
       }
       return !alreadyLiked
     },

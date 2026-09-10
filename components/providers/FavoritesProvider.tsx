@@ -6,7 +6,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 interface FavoritesContextValue {
   loggedIn: boolean
   isFavorited: (spaceId: string) => boolean
-  toggleFavorite: (spaceId: string) => Promise<void>
+  toggleFavorite: (spaceId: string) => Promise<boolean>
 }
 
 const FavoritesContext = createContext<FavoritesContextValue | null>(null)
@@ -49,7 +49,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const toggleFavorite = useCallback(
     async (spaceId: string) => {
-      if (!userId) return
+      if (!userId) throw new Error('No hay sesión activa.')
       const supabase = createBrowserSupabaseClient()
       const alreadyFavorited = favoriteIds.has(spaceId)
 
@@ -62,12 +62,22 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         return next
       })
 
-      if (alreadyFavorited) {
-        await supabase.from('favorites').delete().eq('user_id', userId).eq('space_id', spaceId)
-      } else {
-        await supabase.from('favorites').insert({ user_id: userId, space_id: spaceId })
+      const { error } = alreadyFavorited
+        ? await supabase.from('favorites').delete().eq('user_id', userId).eq('space_id', spaceId)
+        : await supabase.from('favorites').insert({ user_id: userId, space_id: spaceId })
+      if (error) {
+        setFavoriteIds((current) => {
+          const next = new Set(current)
+          if (alreadyFavorited) next.add(spaceId)
+          else next.delete(spaceId)
+          return next
+        })
+        throw error
+      }
+      if (!alreadyFavorited) {
         window.dispatchEvent(new Event('workcofy:reward-earned'))
       }
+      return !alreadyFavorited
     },
     [userId, favoriteIds]
   )

@@ -16,7 +16,8 @@
     "seed:getonboard": "tsx --env-file-if-exists=.env.local scripts/seed-getonboard.ts",
     "seed:weremoto": "tsx --env-file-if-exists=.env.local scripts/seed-weremoto.ts",
     "seed:courses": "tsx --env-file-if-exists=.env.local scripts/seed-courses.ts",
-    "refresh:espacios": "tsx --env-file-if-exists=.env.local scripts/refresh-espacios.ts"
+    "refresh:espacios": "tsx --env-file-if-exists=.env.local scripts/refresh-espacios.ts",
+    "seed:trivia": "tsx --env-file-if-exists=.env.local scripts/seed-trivia-month.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

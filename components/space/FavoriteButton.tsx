@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useFavorites } from '@/components/providers/FavoritesProvider'
+import { showActionToast } from '@/components/layout/ActionToast'
 
 interface FavoriteButtonProps {
   spaceId: string
@@ -35,9 +36,14 @@ export function FavoriteButton({ spaceId, className = '' }: FavoriteButtonProps)
   return (
     <button
       type="button"
-      onClick={(event) => {
+      onClick={async (event) => {
         event.stopPropagation()
-        toggleFavorite(spaceId)
+        try {
+          const saved = await toggleFavorite(spaceId)
+          showActionToast(saved ? 'Guardado en favoritos' : 'Quitado de favoritos')
+        } catch {
+          showActionToast('No se pudo guardar. Inténtalo otra vez.')
+        }
       }}
       aria-label={favorited ? 'Quitar de favoritos' : 'Guardar en favoritos'}
       aria-pressed={favorited}

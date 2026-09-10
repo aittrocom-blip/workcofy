@@ -10,7 +10,7 @@ const LOCKED_PATHS = ['/espacios', '/login', '/registro', '/recuperar', '/restab
 
 // The authenticated app's own screens (see lib/navLinks.ts APP_NAV_LINKS).
 // /perfil and /favoritos guard themselves server-side already.
-const APP_ONLY_PATHS = ['/app', '/spots', '/mi-pass', '/beneficios', '/configuracion']
+const APP_ONLY_PATHS = ['/app', '/spots', '/mi-pass', '/beneficios', '/configuracion', '/trivia']
 
 function isAppOnlyPath(pathname: string): boolean {
   return APP_ONLY_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))

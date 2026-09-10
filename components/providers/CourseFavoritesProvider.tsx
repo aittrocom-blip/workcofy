@@ -6,7 +6,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 interface CourseFavoritesContextValue {
   loggedIn: boolean
   isFavorited: (courseId: string) => boolean
-  toggleFavorite: (courseId: string) => Promise<void>
+  toggleFavorite: (courseId: string) => Promise<boolean>
 }
 
 const CourseFavoritesContext = createContext<CourseFavoritesContextValue | null>(null)
@@ -49,7 +49,7 @@ export function CourseFavoritesProvider({ children }: { children: ReactNode }) {
 
   const toggleFavorite = useCallback(
     async (courseId: string) => {
-      if (!userId) return
+      if (!userId) throw new Error('No hay sesión activa.')
       const supabase = createBrowserSupabaseClient()
       const alreadyFavorited = favoriteIds.has(courseId)
 
@@ -62,11 +62,19 @@ export function CourseFavoritesProvider({ children }: { children: ReactNode }) {
         return next
       })
 
-      if (alreadyFavorited) {
-        await supabase.from('course_favorites').delete().eq('user_id', userId).eq('course_id', courseId)
-      } else {
-        await supabase.from('course_favorites').insert({ user_id: userId, course_id: courseId })
+      const { error } = alreadyFavorited
+        ? await supabase.from('course_favorites').delete().eq('user_id', userId).eq('course_id', courseId)
+        : await supabase.from('course_favorites').insert({ user_id: userId, course_id: courseId })
+      if (error) {
+        setFavoriteIds((current) => {
+          const next = new Set(current)
+          if (alreadyFavorited) next.add(courseId)
+          else next.delete(courseId)
+          return next
+        })
+        throw error
       }
+      return !alreadyFavorited
     },
     [userId, favoriteIds]
   )

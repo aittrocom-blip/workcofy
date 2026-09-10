@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { APP_NAV_LINKS, isNavLinkActive } from '@/lib/navLinks'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
+import { FavoritesShortcut, NotificationsShortcut } from '@/components/layout/FavoritesShortcut'
 import { StreakBadge } from '@/components/layout/StreakBadge'
 import { SideDrawer } from '@/components/layout/SideDrawer'
 import { AppNavIconGlyph } from '@/components/layout/BottomNavigation'
@@ -45,10 +46,14 @@ export function MobileHeader() {
             })}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1 md:gap-3">
+            <div className="flex items-center gap-1 md:gap-2.5">
               <RewardsBadge />
               <StreakBadge />
+              <div className="flex items-center gap-0">
+                <FavoritesShortcut />
+                <NotificationsShortcut />
+              </div>
             </div>
             <button
               type="button"

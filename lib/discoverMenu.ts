@@ -2,9 +2,9 @@ import {
   TagIcon,
   RefreshIcon,
   CalendarIcon,
-  HeartLineIcon,
+  TriviaIcon,
   SharkIcon,
-  NetworkIcon,
+  NotesWallIcon,
   WalletIcon,
   FlameIcon,
   CalendarCheckIcon,
@@ -37,9 +37,9 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
   // TODO: point at /eventos once that section actually ships — today it's
   // still the disabled placeholder in lib/navLinks.ts's NAV_LINKS.
   { label: 'Eventos', Icon: CalendarIcon, href: null, enabled: false, comingSoon: false },
-  { label: 'Favoritos', Icon: HeartLineIcon, href: '/favoritos', enabled: true, comingSoon: false },
+  { label: 'Trivia', Icon: TriviaIcon, href: '/trivia', enabled: true, comingSoon: false },
   { label: 'Tank Shark', Icon: SharkIcon, href: null, enabled: false, comingSoon: true },
-  { label: 'El Muro', Icon: NetworkIcon, href: null, enabled: false, comingSoon: true },
+  { label: 'El Muro', Icon: NotesWallIcon, href: null, enabled: false, comingSoon: true },
   { label: 'Billetera', Icon: WalletIcon, href: null, enabled: false, comingSoon: true },
   // TODO: point at a dedicated Retos flow once it exists — distinct from
   // the Misiones already shown in /perfil's RewardsPanel.
@@ -47,3 +47,15 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
   // TODO: point at a reservations flow once it exists.
   { label: 'Reservas', Icon: CalendarCheckIcon, href: null, enabled: false, comingSoon: false },
 ]
+
+// Reuse real destinations when these sections ship. Missing routes stay inert.
+export const HOME_QUICK_ACTIONS: DiscoverMenuItem[] = [
+  'Descuentos', 'Suscripciones', 'Eventos', 'Trivia', 'Tank Shark', 'El Muro', 'Billetera', 'Retos', 'Reservas',
+].map((label) => {
+  const item = DISCOVER_MENU_ITEMS.find((entry) => entry.label === label)!
+  return {
+    ...item,
+    label: label === 'El Muro' ? 'Muro' : label,
+    comingSoon: item.comingSoon,
+  }
+})

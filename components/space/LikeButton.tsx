@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLikes } from '@/components/providers/LikesProvider'
+import { showActionToast } from '@/components/layout/ActionToast'
 
 interface LikeButtonProps {
   spaceId: string
@@ -39,8 +40,15 @@ export function LikeButton({ spaceId, likeCount, className = '' }: LikeButtonPro
 
   async function handleClick(event: React.MouseEvent) {
     event.stopPropagation()
+    const previous = optimisticCount
     setOptimisticCount((count) => count + (liked ? -1 : 1))
-    await toggleLike(spaceId)
+    try {
+      const nowLiked = await toggleLike(spaceId)
+      showActionToast(nowLiked ? 'Gracias por tu me gusta' : 'Me gusta retirado')
+    } catch {
+      setOptimisticCount(previous)
+      showActionToast('No se pudo guardar. Inténtalo otra vez.')
+    }
   }
 
   return (

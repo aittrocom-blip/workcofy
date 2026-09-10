@@ -61,7 +61,7 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
         </div>
         <FavoriteButton
           spaceId={space.id}
-          className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm transition-colors"
+          className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm transition-colors"
         />
       </div>
       <h3 title={space.name} className="mt-3 line-clamp-2 min-h-[2.75rem] font-semibold leading-snug tracking-tight">

@@ -1,5 +1,6 @@
 import { TIP_CATEGORY_LABELS, type Tip } from '@/lib/data/tips'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
+import { TipLikeButton } from '@/components/app/TipLikeButton'
 
 function TipTile({ tip }: { tip: Tip }) {
   return (
@@ -7,6 +8,7 @@ function TipTile({ tip }: { tip: Tip }) {
       <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-workcofy-yellow">{TIP_CATEGORY_LABELS[tip.category]}</span>
       <p className="mt-2 text-sm font-bold leading-snug">{tip.title}</p>
       <p className="mt-1.5 line-clamp-4 text-xs leading-relaxed text-white/70">{tip.body}</p>
+      <TipLikeButton tipId={tip.id} title={tip.title} />
     </div>
   )
 }
@@ -20,7 +22,7 @@ export function DailyTips({ tips }: { tips: Tip[] }) {
   if (tips.length === 0) return null
 
   return (
-    <section className="mt-8">
+    <section className="mt-10">
       <div className="mb-3 px-4 md:px-0">
         <h2 className="text-lg font-extrabold tracking-tight">Tips de hoy</h2>
         <p className="text-xs text-gray-500">Nuevos cada día — trabajo remoto, foco, IA y más</p>

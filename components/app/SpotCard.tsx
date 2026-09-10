@@ -8,6 +8,7 @@ import { districtLabel } from '@/lib/districts'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
+import { topAmenityHighlights } from '@/lib/amenities/highlights'
 
 interface SpotCardProps {
   space: SpaceWithDistance
@@ -41,6 +42,7 @@ export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
   const coverPhoto = space.photos?.find((photo) => photo.url)
   const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label ?? space.category
   const href = `/spaces/${space.slug}`
+  const highlights = topAmenityHighlights(space.amenities, 2)
 
   if (variant === 'row') {
     return (
@@ -93,6 +95,11 @@ export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
           {districtLabel(space.district)}
           {space.distanceKm != null && ` · ${formatDistanceKm(space.distanceKm)}`}
         </p>
+        {highlights.length > 0 && (
+          <p className="mt-1 flex gap-1 overflow-hidden whitespace-nowrap text-[10px] font-semibold text-gray-600">
+            {highlights.map((highlight) => <span key={highlight} className="rounded-full bg-gray-100 px-1.5 py-0.5">{highlight}</span>)}
+          </p>
+        )}
         <p className="mt-1 flex items-center gap-2 text-xs">
           <span className={`h-1.5 w-1.5 rounded-full ${openNow ? 'bg-green-500' : 'bg-gray-300'}`} />
           <span className={openNow ? 'text-green-600' : 'text-gray-400'}>{openNow ? 'Abierto' : 'Cerrado'}</span>
@@ -107,7 +114,7 @@ export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
       </Link>
       <FavoriteButton
         spaceId={space.id}
-        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm backdrop-blur"
+        className="absolute left-2 top-[5.5rem] flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm backdrop-blur"
       />
     </div>
   )
