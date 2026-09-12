@@ -63,7 +63,7 @@ export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
           window.dispatchEvent(new Event('workcofy:reward-earned'))
           return
         }
-        setStatus(result.message === 'too_far' ? 'too_far' : result.message === 'already_checked_in_today' ? 'already' : 'error')
+        setStatus(result.message === 'too_far' ? 'too_far' : result.message === 'already_checked_in_today' ? 'already' : result.message === 'daily_checkin_limit' ? 'already' : 'error')
       },
       () => setStatus('error'),
       { enableHighAccuracy: true, timeout: 10_000 }
