@@ -71,11 +71,11 @@ export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
   }
 
   if (status === 'done') {
-    return <span className={`${className} pointer-events-none`}>✓ Check-in registrado{coins > 0 ? ` +${coins}` : ''}</span>
+    return <span className={`${className} pointer-events-none`}>✓ Beneficio desbloqueado{coins > 0 ? ` · +${coins} W Coins` : ''}</span>
   }
 
   if (status === 'already') {
-    return <span className={`${className} pointer-events-none`}>✓ Ya hiciste check-in hoy</span>
+    return <span className={`${className} pointer-events-none`}>✓ Beneficio ya desbloqueado hoy</span>
   }
 
   return (
@@ -93,7 +93,7 @@ export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
             ? 'Estás lejos — reintentar'
             : status === 'error'
               ? 'No se pudo — reintentar'
-              : '📍 Estuve aquí'}
+              : 'Desbloquear beneficio'}
     </button>
   )
 }
