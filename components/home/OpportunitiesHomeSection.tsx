@@ -15,8 +15,8 @@ export async function OpportunitiesHomeSection() {
   ])
   if (opportunities.length === 0) return null
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-      <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Trabajos remotos</span>
+    <section className="wc-section">
+      <span className="wc-eyebrow">Trabajos remotos</span>
       <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-4xl">Nuevas oportunidades</h2>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {opportunities.map((opportunity) => (
@@ -25,7 +25,7 @@ export async function OpportunitiesHomeSection() {
       </div>
       <Link
         href="/oportunidades"
-        className="mt-8 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+        className="wc-button-primary mt-8 w-fit"
       >
         Ver todas las oportunidades{total > 0 && ` (${total})`}
       </Link>

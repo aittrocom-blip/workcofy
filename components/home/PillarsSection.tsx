@@ -42,13 +42,13 @@ const PILLARS: Pillar[] = [
 
 export function PillarsSection() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+    <section className="wc-section">
       <h2 className="text-center text-2xl font-bold tracking-tight md:text-4xl">
         Encuentra lo que necesitas para trabajar mejor
       </h2>
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PILLARS.map((pillar) => (
-          <div key={pillar.title} className="flex flex-col rounded-3xl border border-gray-100 bg-gray-50 p-6">
+          <div key={pillar.title} className="wc-card flex flex-col bg-[var(--wc-surface)] p-6 shadow-none">
             <div className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={pillar.icon} alt="" className="h-6 w-6" />
@@ -63,7 +63,7 @@ export function PillarsSection() {
             {pillar.href ? (
               <Link
                 href={pillar.href}
-                className="mt-5 inline-block w-fit rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+                className="wc-button-primary mt-5 w-fit"
               >
                 {pillar.cta}
               </Link>

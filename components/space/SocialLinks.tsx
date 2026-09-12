@@ -26,11 +26,22 @@ function TikTokIcon() {
 
 export function SocialLinks({ instagramUrl, tiktokUrl }: SocialLinksProps) {
   if (!instagramUrl && !tiktokUrl) {
-    return <p className="text-sm text-gray-500">Este espacio todavía no tiene redes sociales registradas.</p>
+    return (
+      <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3">
+        <p className="text-sm font-medium text-gray-700">Próximamente: videos de este espacio</p>
+        <p className="mt-1 text-xs leading-5 text-gray-500">
+          Estamos verificando sus cuentas para mostrar contenido útil para trabajar, reunirse y organizar eventos.
+        </p>
+      </div>
+    )
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+      <p className="text-sm leading-5 text-gray-600">
+        Mira cómo se vive este espacio antes de visitarlo: trabajo, reuniones y eventos.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
       {instagramUrl && (
         <a
           href={instagramUrl}
@@ -39,7 +50,7 @@ export function SocialLinks({ instagramUrl, tiktokUrl }: SocialLinksProps) {
           className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-black"
         >
           <InstagramIcon />
-          Instagram
+          Instagram del local
         </a>
       )}
       {tiktokUrl && (
@@ -50,9 +61,10 @@ export function SocialLinks({ instagramUrl, tiktokUrl }: SocialLinksProps) {
           className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-black"
         >
           <TikTokIcon />
-          TikTok
+          TikTok del local
         </a>
       )}
+      </div>
     </div>
   )
 }

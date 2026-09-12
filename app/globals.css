@@ -9,11 +9,73 @@ body {
 }
 
 :root {
+  --wc-ink: #111111;
+  --wc-muted: #667085;
+  --wc-line: #e7e9ee;
+  --wc-surface: #f7f8fa;
+  --wc-accent: #f2d84b;
+  --wc-radius-card: 1.25rem;
+  --wc-radius-panel: 1.75rem;
+  --wc-shadow-soft: 0 10px 30px rgba(17, 17, 17, 0.06);
   /* Header.tsx's inner bar is h-16, plus its border-b (1px) that the bar
      height itself doesn't include — omitting that 1px here was leaving
      the full-screen map exactly 1px taller than the real remaining
      viewport, which is enough to trigger a page-level scrollbar. */
   --app-header-height: calc(4rem + 1px);
+}
+
+@layer components {
+  .wc-section {
+    margin-inline: auto;
+    max-width: 80rem;
+    padding: 4rem 1rem;
+  }
+
+  .wc-eyebrow {
+    color: var(--wc-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    line-height: 1rem;
+    text-transform: uppercase;
+  }
+
+  .wc-button-primary,
+  .wc-button-secondary {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 700;
+    gap: 0.5rem;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.5rem;
+    transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  .wc-button-primary {
+    background: var(--wc-ink);
+    box-shadow: 0 5px 14px rgba(17, 17, 17, 0.12);
+    color: white;
+  }
+
+  .wc-button-primary:hover { box-shadow: 0 8px 20px rgba(17, 17, 17, 0.18); }
+  .wc-button-secondary { border: 1px solid var(--wc-ink); color: var(--wc-ink); }
+  .wc-button-secondary:hover { background: var(--wc-ink); color: white; }
+  .wc-button-primary:active,
+  .wc-button-secondary:active { transform: scale(0.97); }
+
+  .wc-card {
+    background: white;
+    border: 1px solid var(--wc-line);
+    border-radius: var(--wc-radius-card);
+    box-shadow: var(--wc-shadow-soft);
+  }
+}
+
+@media (min-width: 768px) {
+  .wc-section { padding-inline: 2rem; }
 }
 
 @media (min-width: 768px) {

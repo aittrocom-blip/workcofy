@@ -13,10 +13,10 @@ const SCENARIOS = [
 
 export function ExplorarSection() {
   return (
-    <section id="explorar" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-8">
+    <section id="explorar" className="wc-section scroll-mt-20">
       <div className="flex flex-col items-center gap-10 md:flex-row">
         <div className="flex-1">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Espacios</span>
+          <span className="wc-eyebrow">Espacios</span>
           <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight md:text-4xl">
             Encuentra tu próximo lugar para trabajar.
           </h2>
@@ -29,7 +29,7 @@ export function ExplorarSection() {
             {SCENARIOS.map((scenario) => (
               <div
                 key={scenario.category}
-                className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3.5"
+                className="wc-card flex items-center gap-3 bg-[var(--wc-surface)] px-4 py-3.5 shadow-none"
               >
                 <CategoryIcon name={scenario.category} className="h-5 w-5 flex-none" />
                 <span className="text-sm font-medium">{scenario.text}</span>
@@ -48,7 +48,7 @@ export function ExplorarSection() {
           ) : (
             <Link
               href="/espacios"
-              className="mt-4 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+              className="wc-button-primary mt-4 w-fit"
             >
               Explorar espacios
             </Link>

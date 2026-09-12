@@ -293,7 +293,7 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
           ))}
         </ul>
 
-        <h3 className="mt-8 text-lg font-bold tracking-tight">Redes sociales</h3>
+        <h3 className="mt-8 text-lg font-bold tracking-tight">Contenido del local</h3>
         <div className="mt-3">
           <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
         </div>

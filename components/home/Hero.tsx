@@ -2,15 +2,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
-const PRIMARY =
-  'inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]'
-const SECONDARY =
-  'inline-flex items-center gap-2 rounded-full border border-black bg-white px-8 py-3.5 text-base font-semibold text-black transition-colors hover:bg-black hover:text-white active:scale-[0.97]'
-
 // The illustration stays: it shows the product without repeating the headline.
 export function Hero() {
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-8 pt-10 text-center md:px-8 md:pt-14">
+    <div className="mx-auto max-w-7xl px-4 pb-8 pt-12 text-center md:px-8 md:pt-16">
       <h1 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-6xl">
         Trabaja. Aprende. Conecta.
       </h1>
@@ -20,7 +15,7 @@ export function Hero() {
       </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link href="/oportunidades" className={PRIMARY}>
+        <Link href="/oportunidades" className="wc-button-primary px-7 py-3.5 text-base">
           Explorar oportunidades
         </Link>
         {LAUNCH_LOCKED ? (
@@ -31,7 +26,7 @@ export function Hero() {
             Encontrar un espacio
           </span>
         ) : (
-          <Link href="/espacios" className={SECONDARY}>
+          <Link href="/espacios" className="wc-button-secondary px-7 py-3.5 text-base">
             Encontrar un espacio
           </Link>
         )}

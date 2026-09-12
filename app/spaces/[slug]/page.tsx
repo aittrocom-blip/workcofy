@@ -206,7 +206,7 @@ export default async function SpacePage({ params }: SpacePageProps) {
         ))}
       </ul>
 
-      <h2 className="mt-10 text-xl font-bold tracking-tight">Redes sociales</h2>
+      <h2 className="mt-10 text-xl font-bold tracking-tight">Contenido del local</h2>
       <div className="mt-3">
         <SocialLinks instagramUrl={space.instagram_url} tiktokUrl={space.tiktok_url} />
       </div>

@@ -15,8 +15,8 @@ export async function CoursesHomeSection() {
   ])
   if (courses.length === 0) return null
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-      <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Aprende</span>
+    <section className="wc-section">
+      <span className="wc-eyebrow">Aprende</span>
       <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-4xl">Aprende algo nuevo hoy</h2>
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => (
@@ -25,7 +25,7 @@ export async function CoursesHomeSection() {
       </div>
       <Link
         href="/aprende"
-        className="mt-8 inline-block rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
+        className="wc-button-primary mt-8 w-fit"
       >
         Explorar cursos{total > 0 && ` (${total})`}
       </Link>
