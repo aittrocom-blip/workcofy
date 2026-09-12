@@ -80,7 +80,17 @@ export default function TerminosPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">5. Contenido y recomendaciones</h2>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">5. Beneficios, check-ins y fidelidad</h2>
+          <div className="mt-3 flex flex-col gap-3">
+            <p>Algunos establecimientos pueden ofrecer descuentos, promociones, productos, puntos o recompensas mediante check-ins, códigos QR o tarjetas de fidelidad digitales. La disponibilidad, vigencia, condiciones y cumplimiento de cada beneficio dependen exclusivamente del establecimiento que lo publica.</p>
+            <p>El establecimiento es responsable de configurar información veraz, respetar las condiciones anunciadas y atender la entrega o aplicación del beneficio. Workcofy no es el proveedor del producto, descuento o recompensa y no puede garantizar la disponibilidad, calidad ni aceptación de una promoción de un tercero.</p>
+            <p>El usuario debe revisar las condiciones antes de canjear un beneficio. Workcofy puede suspender un beneficio, QR, tarjeta o cuenta cuando detecte fraude, abuso, información incorrecta o cuando el establecimiento deje de participar.</p>
+            <p>Los puntos y W Coins no son dinero, no pueden transferirse ni canjearse por efectivo y pueden estar sujetos a límites, vencimiento y reglas específicas comunicadas en la plataforma.</p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">6. Contenido y recomendaciones</h2>
           <div className="mt-3 flex flex-col gap-3">
             <p>
               Cuando publicas una reseña, calificación o fotografía, conservas su propiedad y
@@ -99,7 +109,7 @@ export default function TerminosPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">6. Publicidad</h2>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">7. Publicidad</h2>
           <p className="mt-3">
             Cuando exista contenido patrocinado o listados destacados por acuerdo comercial, se
             identificarán visiblemente como tales — nunca se presentarán como la recomendación
@@ -108,7 +118,7 @@ export default function TerminosPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">7. Propiedad intelectual</h2>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">8. Propiedad intelectual</h2>
           <div className="mt-3 flex flex-col gap-3">
             <p>La marca Workcofy, el personaje Worky, el logotipo, el diseño, el código, los algoritmos y la estructura de la plataforma son propiedad de Workcofy o sus licenciantes.</p>
             <p>La compilación y estructura de nuestra información de espacios está protegida como base de datos. Queda prohibida la extracción masiva, copia, indexación no autorizada o creación de bases de datos derivadas sin autorización escrita.</p>
@@ -116,7 +126,7 @@ export default function TerminosPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">8. Responsabilidad</h2>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">9. Responsabilidad</h2>
           <div className="mt-3 flex flex-col gap-3">
             <p>
               Hacemos esfuerzos razonables por mantener la plataforma disponible y segura, pero
@@ -133,7 +143,7 @@ export default function TerminosPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">9. Ley aplicable</h2>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">10. Ley aplicable</h2>
           <div className="mt-3 flex flex-col gap-3">
             <p>
               Estos Términos se rigen por las leyes de la República del Perú. Para cualquier
@@ -147,7 +157,7 @@ export default function TerminosPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold tracking-tight text-gray-900">10. Cambios y contacto</h2>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">11. Cambios y contacto</h2>
           <p className="mt-3">
             Podemos modificar estos Términos; los cambios materiales se comunican con
             anticipación razonable. Puedes cerrar tu cuenta cuando quieras — ver nuestra{' '}
