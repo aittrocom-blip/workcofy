@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import { getSpaceBySlugForAdmin } from '@/lib/data/spaces'
-import { VerificationForm } from './VerificationForm'
 import { AmenitiesEditorForm } from './AmenitiesEditorForm'
 import { DeleteSpaceForm } from './DeleteSpaceForm'
 import { TrustProfileForm } from './TrustProfileForm'
@@ -22,7 +21,6 @@ export default async function AdminSpacePage({ params }: AdminSpacePageProps) {
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <h1 className="text-2xl font-bold tracking-tight">{space.name}</h1>
-      <VerificationForm spaceId={space.id} slug={space.slug} initialVerified={space.verified} />
       <TrustProfileForm spaceId={space.id} slug={space.slug} initialLevel={trustLevel} initialUses={space.recommended_for ?? []} initialMethod={space.verification_method ?? null} />
       <SpaceQrCode slug={space.slug} />
       <AmenitiesEditorForm
