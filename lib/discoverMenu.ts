@@ -5,7 +5,7 @@ import {
   TriviaIcon,
   SharkIcon,
   NotesWallIcon,
-  WalletIcon,
+  VideoIcon,
   FlameIcon,
   CalendarCheckIcon,
   type LineIcon,
@@ -40,7 +40,7 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
   { label: 'Trivia', Icon: TriviaIcon, href: '/trivia', enabled: true, comingSoon: false },
   { label: 'Tank Shark', Icon: SharkIcon, href: null, enabled: false, comingSoon: true },
   { label: 'El Muro', Icon: NotesWallIcon, href: null, enabled: false, comingSoon: true },
-  { label: 'Billetera', Icon: WalletIcon, href: null, enabled: false, comingSoon: true },
+  { label: 'Virals', Icon: VideoIcon, href: '/virals', enabled: true, comingSoon: false },
   // TODO: point at a dedicated Retos flow once it exists — distinct from
   // the Misiones already shown in /perfil's RewardsPanel.
   { label: 'Retos', Icon: FlameIcon, href: null, enabled: false, comingSoon: false },
@@ -51,7 +51,7 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
 // Put the two engagement loops the team wants to emphasize first. Keep the
 // remaining ecosystem items in their existing order so the drawer remains
 // familiar for current users.
-const DISCOVER_MENU_ORDER = ['Retos', 'Trivia', 'Descuentos', 'Suscripciones', 'Eventos', 'Tank Shark', 'El Muro', 'Billetera', 'Reservas']
+const DISCOVER_MENU_ORDER = ['Retos', 'Trivia', 'Virals', 'Descuentos', 'Suscripciones', 'Eventos', 'Tank Shark', 'El Muro', 'Reservas']
 
 export const DISCOVER_MENU_ITEMS_ORDERED = DISCOVER_MENU_ORDER.map((label) =>
   DISCOVER_MENU_ITEMS.find((item) => item.label === label)!
@@ -59,7 +59,7 @@ export const DISCOVER_MENU_ITEMS_ORDERED = DISCOVER_MENU_ORDER.map((label) =>
 
 // Reuse real destinations when these sections ship. Missing routes stay inert.
 export const HOME_QUICK_ACTIONS: DiscoverMenuItem[] = [
-  'Descuentos', 'Suscripciones', 'Eventos', 'Trivia', 'Tank Shark', 'El Muro', 'Billetera', 'Retos', 'Reservas',
+  'Descuentos', 'Suscripciones', 'Eventos', 'Trivia', 'Tank Shark', 'El Muro', 'Virals', 'Retos', 'Reservas',
 ].map((label) => {
   const item = DISCOVER_MENU_ITEMS.find((entry) => entry.label === label)!
   return {

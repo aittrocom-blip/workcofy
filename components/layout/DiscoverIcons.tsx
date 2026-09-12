@@ -117,6 +117,15 @@ export function WalletIcon({ className }: IconProps) {
   )
 }
 
+export function VideoIcon({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
+    </Base>
+  )
+}
+
 export function FlameIcon({ className }: IconProps) {
   return (
     <Base className={className}>
