@@ -36,7 +36,7 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
   { label: 'Suscripciones', Icon: RefreshIcon, href: null, enabled: false, comingSoon: true },
   // TODO: point at /eventos once that section actually ships — today it's
   // still the disabled placeholder in lib/navLinks.ts's NAV_LINKS.
-  { label: 'Eventos', Icon: CalendarIcon, href: null, enabled: false, comingSoon: false },
+  { label: 'Eventos', Icon: CalendarIcon, href: null, enabled: false, comingSoon: true },
   { label: 'Trivia', Icon: TriviaIcon, href: '/trivia', enabled: true, comingSoon: false },
   { label: 'Tank Shark', Icon: SharkIcon, href: null, enabled: false, comingSoon: true },
   { label: 'El Muro', Icon: NotesWallIcon, href: null, enabled: false, comingSoon: true },
@@ -45,8 +45,17 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
   // the Misiones already shown in /perfil's RewardsPanel.
   { label: 'Retos', Icon: FlameIcon, href: null, enabled: false, comingSoon: false },
   // TODO: point at a reservations flow once it exists.
-  { label: 'Reservas', Icon: CalendarCheckIcon, href: null, enabled: false, comingSoon: false },
+  { label: 'Reservas', Icon: CalendarCheckIcon, href: null, enabled: false, comingSoon: true },
 ]
+
+// Put the two engagement loops the team wants to emphasize first. Keep the
+// remaining ecosystem items in their existing order so the drawer remains
+// familiar for current users.
+const DISCOVER_MENU_ORDER = ['Retos', 'Trivia', 'Descuentos', 'Suscripciones', 'Eventos', 'Tank Shark', 'El Muro', 'Billetera', 'Reservas']
+
+export const DISCOVER_MENU_ITEMS_ORDERED = DISCOVER_MENU_ORDER.map((label) =>
+  DISCOVER_MENU_ITEMS.find((item) => item.label === label)!
+)
 
 // Reuse real destinations when these sections ship. Missing routes stay inert.
 export const HOME_QUICK_ACTIONS: DiscoverMenuItem[] = [

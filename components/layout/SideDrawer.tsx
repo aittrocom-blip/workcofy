@@ -12,7 +12,7 @@ import { useUserAvatar } from '@/lib/hooks/useUserAvatar'
 import { useUserName } from '@/lib/hooks/useUserName'
 import { avatarFor } from '@/lib/avatars'
 import { passIdFor } from '@/lib/pass'
-import { DISCOVER_MENU_ITEMS } from '@/lib/discoverMenu'
+import { DISCOVER_MENU_ITEMS_ORDERED } from '@/lib/discoverMenu'
 import { DiscoverGrid } from '@/components/layout/DiscoverGrid'
 import { GearIcon, ShieldIcon, StoreIcon, InfoIcon, LogoutIcon, ChevronRightIcon } from '@/components/layout/DiscoverIcons'
 
@@ -191,7 +191,7 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
               <Divider />
 
               <p className={SECTION_LABEL}>Descubrir</p>
-              <DiscoverGrid items={DISCOVER_MENU_ITEMS} onNavigate={onClose} />
+              <DiscoverGrid items={DISCOVER_MENU_ITEMS_ORDERED} onNavigate={onClose} />
 
               <Divider />
 
