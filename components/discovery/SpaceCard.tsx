@@ -10,7 +10,7 @@ import { formatPriceLevel } from '@/lib/priceLevel'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { CATEGORY_OPTIONS } from '@/lib/categories'
 import { CategoryIcon } from '@/components/discovery/CategoryIcon'
-import { VerifiedBadge } from '@/components/space/VerifiedBadge'
+import { TrustBadge } from '@/components/space/TrustBadge'
 import { FavoriteButton } from '@/components/space/FavoriteButton'
 import type { SpaceWithDistance } from '@/lib/data/spaceTypes'
 
@@ -34,6 +34,8 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
   const viewSpaceButtonClass =
     'whitespace-nowrap rounded-full border border-black bg-white px-3.5 py-2.5 text-xs font-semibold text-black transition-colors hover:bg-black hover:text-white active:scale-[0.97]'
   const score = computeWorkcofyScore(space)
+  const trustLevel = space.trust_level ?? (space.verified ? 'workcofy_verified' : 'listed')
+  const recommendedFor = space.recommended_for ?? []
   const priceLevel = formatPriceLevel(space.price_level)
   const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label ?? space.category
   const coverPhoto = space.photos?.find((photo) => photo.url)
@@ -50,9 +52,9 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
           // eslint-disable-next-line @next/next/no-img-element
           <img src={coverPhoto.url} alt={space.name} className="h-full w-full object-cover" />
         )}
-        {space.verified && (
+        {trustLevel !== 'listed' && (
           <div className="absolute left-2 top-2">
-            <VerifiedBadge />
+            <TrustBadge level={trustLevel} />
           </div>
         )}
         <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] font-semibold shadow-sm">
@@ -88,6 +90,9 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
         <p className="mt-1 text-xs font-semibold">
           Workcofy Score <span className="text-workcofy-yellow">{score}</span>
         </p>
+      )}
+      {recommendedFor.length > 0 && (
+        <p className="mt-1 line-clamp-1 text-xs text-gray-500">Bueno para: {recommendedFor.slice(0, 2).join(' · ')}</p>
       )}
       <p className="mt-1 text-xs text-gray-500">{openNow ? `Abierto · ${todayHours}` : 'Cerrado'}</p>
       <div className="mt-3.5 flex flex-wrap gap-1.5">

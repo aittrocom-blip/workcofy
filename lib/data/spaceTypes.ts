@@ -43,6 +43,11 @@ export interface SpaceRecord {
   verified: boolean
   verified_at: string | null
   verified_amenities: string[]
+  /** Optional while older fixtures/rows are migrated to 0026. */
+  trust_level?: 'listed' | 'community_recommended' | 'workcofy_verified' | 'workcofy_point'
+  last_verified_at?: string | null
+  verification_method?: string | null
+  recommended_for?: string[]
   partner_status: string
   /** Provenance of this row: fabricated dev fixtures vs. real Google Places data. */
   data_source: 'mock' | 'google'

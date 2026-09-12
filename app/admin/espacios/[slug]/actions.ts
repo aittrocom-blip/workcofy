@@ -14,6 +14,9 @@ export async function updateVerification(spaceId: string, slug: string, verified
     .update({
       verified,
       verified_at: verified ? new Date().toISOString() : null,
+      trust_level: verified ? 'workcofy_verified' : 'listed',
+      last_verified_at: verified ? new Date().toISOString() : null,
+      verification_method: verified ? 'manual' : null,
     })
     .eq('id', spaceId)
 
@@ -21,6 +24,31 @@ export async function updateVerification(spaceId: string, slug: string, verified
 
   revalidatePath(`/admin/espacios/${slug}`)
   revalidatePath(`/spaces/${slug}`)
+}
+
+export async function updateTrustProfile(
+  spaceId: string,
+  slug: string,
+  trustLevel: 'listed' | 'community_recommended' | 'workcofy_verified' | 'workcofy_point',
+  recommendedFor: string[],
+  verificationMethod: string | null,
+) {
+  await requireAdmin()
+  const admin = createAdminSupabaseClient()
+  const isVerified = trustLevel === 'workcofy_verified' || trustLevel === 'workcofy_point'
+  const now = new Date().toISOString()
+  const { error } = await admin.from('spaces').update({
+    trust_level: trustLevel,
+    recommended_for: recommendedFor,
+    verification_method: verificationMethod || null,
+    verified: isVerified,
+    verified_at: isVerified ? now : null,
+    last_verified_at: isVerified ? now : null,
+  }).eq('id', spaceId)
+  if (error) throw new Error(`No se pudo guardar: ${error.message}`)
+  revalidatePath(`/admin/espacios/${slug}`)
+  revalidatePath(`/spaces/${slug}`)
+  revalidatePath('/espacios')
 }
 
 // The "Workcofy comprobó este espacio" badge on the public ficha lists

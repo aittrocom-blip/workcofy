@@ -3,6 +3,7 @@ import { getSpaceBySlugForAdmin } from '@/lib/data/spaces'
 import { VerificationForm } from './VerificationForm'
 import { AmenitiesEditorForm } from './AmenitiesEditorForm'
 import { DeleteSpaceForm } from './DeleteSpaceForm'
+import { TrustProfileForm } from './TrustProfileForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,11 +16,13 @@ export default async function AdminSpacePage({ params }: AdminSpacePageProps) {
   // must still open here, otherwise "Reactivar" would be unreachable.
   const space = await getSpaceBySlugForAdmin(params.slug)
   if (!space) notFound()
+  const trustLevel = space.trust_level ?? (space.verified ? 'workcofy_verified' : 'listed')
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <h1 className="text-2xl font-bold tracking-tight">{space.name}</h1>
       <VerificationForm spaceId={space.id} slug={space.slug} initialVerified={space.verified} />
+      <TrustProfileForm spaceId={space.id} slug={space.slug} initialLevel={trustLevel} initialUses={space.recommended_for ?? []} initialMethod={space.verification_method ?? null} />
       <AmenitiesEditorForm
         spaceId={space.id}
         slug={space.slug}
