@@ -6,11 +6,13 @@ import { districtLabel } from '@/lib/districts'
 
 export const dynamic = 'force-dynamic'
 
-export default async function CheckInPage({ params }: { params: { slug: string } }) {
+export default async function CheckInPage({ params, searchParams }: { params: { slug: string }; searchParams: { demo?: string } }) {
   const space = await getSpaceBySlug(params.slug)
   if (!space) notFound()
   const benefits = await listSpaceBenefits(space.id)
+  const demoMode = params.slug === 'workcofy-store' && searchParams.demo === '1'
   return <main className="mx-auto min-h-screen max-w-md bg-white px-5 pb-10 pt-7">
+    {demoMode && <p className="mt-4 rounded-xl border border-dashed border-workcofy-yellow bg-workcofy-yellow/10 px-3 py-2 text-xs font-semibold text-gray-700">Modo demo: simulando que estás en el local.</p>}
     <section className="mt-4">
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-gray-400">Acceso Workcofy</p>
       <h1 className="mt-2 text-[32px] font-extrabold leading-tight tracking-tight">{space.name}</h1>
@@ -18,7 +20,7 @@ export default async function CheckInPage({ params }: { params: { slug: string }
     </section>
     <section className="mt-8 overflow-hidden rounded-[28px] bg-black p-6 text-white shadow-xl shadow-black/10">
       <div className="flex items-start gap-3"><span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-workcofy-yellow text-xl">🎁</span><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-workcofy-yellow">Beneficio del local</p><h2 className="mt-1 text-xl font-extrabold">Desbloquea tu beneficio</h2><p className="mt-1 text-sm leading-relaxed text-white/65">Confirma que estás aquí para acceder a tus ventajas Workcofy.</p></div></div>
-      <CheckInButton spaceId={space.id} className="mt-6 flex w-full items-center justify-center rounded-full bg-workcofy-yellow px-5 py-3.5 text-sm font-bold text-black transition-transform active:scale-[0.98]" />
+      <CheckInButton spaceId={space.id} demoCoordinates={demoMode && space.latitude && space.longitude ? { lat: space.latitude, lng: space.longitude } : undefined} className="mt-6 flex w-full items-center justify-center rounded-full bg-workcofy-yellow px-5 py-3.5 text-sm font-bold text-black transition-transform active:scale-[0.98]" />
       <p className="mt-3 text-center text-[11px] text-white/40">Tu acceso es válido una vez al día en este local</p>
     </section>
     <section className="mt-9">

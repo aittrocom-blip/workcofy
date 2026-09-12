@@ -9,6 +9,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/browserClient'
 interface CheckInButtonProps {
   spaceId: string
   className?: string
+  demoCoordinates?: { lat: number; lng: number }
 }
 
 type Status = 'idle' | 'locating' | 'saving' | 'done' | 'already' | 'too_far' | 'error'
@@ -23,7 +24,7 @@ interface CheckInRpcResult {
 // (0020_space_checkins.sql) rejects it server-side if the browser's reported
 // coordinates aren't within ~150m of the space, so this can't be farmed by
 // just clicking the button from home.
-export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
+export function CheckInButton({ spaceId, className = '', demoCoordinates }: CheckInButtonProps) {
   const pathname = usePathname()
   const { user } = useAuthUser()
   const [status, setStatus] = useState<Status>('idle')
@@ -38,6 +39,10 @@ export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
   }
 
   function handleClick() {
+    if (demoCoordinates) {
+      void saveCheckIn(demoCoordinates.lat, demoCoordinates.lng)
+      return
+    }
     if (!('geolocation' in navigator)) {
       setStatus('error')
       return
@@ -45,13 +50,21 @@ export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
     setStatus('locating')
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        setStatus('saving')
-        const supabase = createBrowserSupabaseClient()
-        const { data, error } = await supabase.rpc('checkin_at_space', {
-          p_space_id: spaceId,
-          p_lat: position.coords.latitude,
-          p_lng: position.coords.longitude,
-        })
+        await saveCheckIn(position.coords.latitude, position.coords.longitude)
+      },
+      () => setStatus('error'),
+      { enableHighAccuracy: true, timeout: 10_000 }
+    )
+  }
+
+  async function saveCheckIn(lat: number, lng: number) {
+    setStatus('saving')
+    const supabase = createBrowserSupabaseClient()
+    const { data, error } = await supabase.rpc('checkin_at_space', {
+      p_space_id: spaceId,
+      p_lat: lat,
+      p_lng: lng,
+    })
         const result = (data as CheckInRpcResult[] | null)?.[0]
         if (error || !result) {
           setStatus('error')
@@ -64,10 +77,7 @@ export function CheckInButton({ spaceId, className = '' }: CheckInButtonProps) {
           return
         }
         setStatus(result.message === 'too_far' ? 'too_far' : result.message === 'already_checked_in_today' ? 'already' : result.message === 'daily_checkin_limit' ? 'already' : 'error')
-      },
-      () => setStatus('error'),
-      { enableHighAccuracy: true, timeout: 10_000 }
-    )
+  }
   }
 
   if (status === 'done') {
