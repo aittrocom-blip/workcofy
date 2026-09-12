@@ -78,7 +78,6 @@ export function CheckInButton({ spaceId, className = '', demoCoordinates }: Chec
         }
         setStatus(result.message === 'too_far' ? 'too_far' : result.message === 'already_checked_in_today' ? 'already' : result.message === 'daily_checkin_limit' ? 'already' : 'error')
   }
-  }
 
   if (status === 'done') {
     return <span className={`${className} pointer-events-none`}>✓ Beneficio desbloqueado{coins > 0 ? ` · +${coins} W Coins` : ''}</span>
