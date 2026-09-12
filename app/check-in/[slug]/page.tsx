@@ -20,7 +20,7 @@ export default async function CheckInPage({ params, searchParams }: { params: { 
     </section>
     <section className="mt-8 overflow-hidden rounded-[28px] bg-black p-6 text-white shadow-xl shadow-black/10">
       <div className="flex items-start gap-3"><span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-workcofy-yellow text-xl">🎁</span><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-workcofy-yellow">Beneficio del local</p><h2 className="mt-1 text-xl font-extrabold">Desbloquea tu beneficio</h2><p className="mt-1 text-sm leading-relaxed text-white/65">Confirma que estás aquí para acceder a tus ventajas Workcofy.</p></div></div>
-      <CheckInButton spaceId={space.id} demoCoordinates={demoMode && space.latitude && space.longitude ? { lat: space.latitude, lng: space.longitude } : undefined} className="mt-6 flex w-full items-center justify-center rounded-full bg-workcofy-yellow px-5 py-3.5 text-sm font-bold text-black transition-transform active:scale-[0.98]" />
+      <CheckInButton spaceId={space.id} spaceName={space.name} benefitLabel={benefits[0]?.label} demoCoordinates={demoMode && space.latitude && space.longitude ? { lat: space.latitude, lng: space.longitude } : undefined} className="mt-6 flex w-full items-center justify-center rounded-full bg-workcofy-yellow px-5 py-3.5 text-sm font-bold text-black transition-transform active:scale-[0.98]" />
       <p className="mt-3 text-center text-[11px] text-white/40">Tu acceso es válido una vez al día en este local</p>
     </section>
     <section className="mt-9">

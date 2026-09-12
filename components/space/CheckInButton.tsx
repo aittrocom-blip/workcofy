@@ -10,6 +10,8 @@ interface CheckInButtonProps {
   spaceId: string
   className?: string
   demoCoordinates?: { lat: number; lng: number }
+  spaceName?: string
+  benefitLabel?: string
 }
 
 type Status = 'idle' | 'locating' | 'saving' | 'done' | 'already' | 'too_far' | 'error'
@@ -24,11 +26,13 @@ interface CheckInRpcResult {
 // (0020_space_checkins.sql) rejects it server-side if the browser's reported
 // coordinates aren't within ~150m of the space, so this can't be farmed by
 // just clicking the button from home.
-export function CheckInButton({ spaceId, className = '', demoCoordinates }: CheckInButtonProps) {
+export function CheckInButton({ spaceId, className = '', demoCoordinates, spaceName = 'Este local', benefitLabel = 'Beneficio del local' }: CheckInButtonProps) {
   const pathname = usePathname()
   const { user } = useAuthUser()
   const [status, setStatus] = useState<Status>('idle')
   const [coins, setCoins] = useState(0)
+  const [activationCode, setActivationCode] = useState('')
+  const [activatedAt, setActivatedAt] = useState<Date | null>(null)
 
   if (!user) {
     return (
@@ -72,6 +76,8 @@ export function CheckInButton({ spaceId, className = '', demoCoordinates }: Chec
         }
         if (result.success) {
           setCoins(result.coins_awarded)
+          setActivationCode(String(Math.floor(100000 + Math.random() * 900000)))
+          setActivatedAt(new Date())
           setStatus('done')
           window.dispatchEvent(new Event('workcofy:reward-earned'))
           return
@@ -80,7 +86,16 @@ export function CheckInButton({ spaceId, className = '', demoCoordinates }: Chec
   }
 
   if (status === 'done') {
-    return <span className={`${className} pointer-events-none`}>✓ Beneficio desbloqueado{coins > 0 ? ` · +${coins} W Coins` : ''}</span>
+    const expiresAt = activatedAt ? new Date(activatedAt.getTime() + 60 * 60 * 1000) : null
+    const formatTime = (date: Date | null) => date?.toLocaleTimeString('es-PE', { hour: 'numeric', minute: '2-digit' }) ?? '--'
+    return <div className="w-full rounded-3xl bg-workcofy-yellow p-5 text-black shadow-lg shadow-workcofy-yellow/20">
+      <div className="flex items-center justify-between"><p className="text-[10px] font-extrabold uppercase tracking-[0.2em]">Beneficio activo</p><span className="rounded-full bg-black px-2.5 py-1 text-[10px] font-bold text-white">ACTIVO</span></div>
+      <h3 className="mt-3 text-xl font-extrabold tracking-tight">{benefitLabel}</h3>
+      <p className="mt-1 text-sm font-semibold text-black/65">{spaceName}</p>
+      <div className="mt-4 grid grid-cols-2 gap-3 border-t border-black/10 pt-3 text-xs"><div><p className="text-black/50">Usuario</p><p className="font-bold">@{user.user_metadata?.user_name ?? user.email?.split('@')[0] ?? 'miembro'}</p></div><div><p className="text-black/50">ID</p><p className="font-bold">WK-{user.id.slice(0, 6).toUpperCase()}</p></div><div><p className="text-black/50">Activado</p><p className="font-bold">{formatTime(activatedAt)}</p></div><div><p className="text-black/50">Válido hasta</p><p className="font-bold">{formatTime(expiresAt)}</p></div></div>
+      <div className="mt-4 rounded-2xl bg-white/75 px-4 py-3 text-center"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Código para validar en caja</p><p className="mt-1 text-2xl font-black tracking-[0.25em]">{activationCode}</p></div>
+      {coins > 0 && <p className="mt-3 text-center text-xs font-bold">También ganaste +{coins} W Coins</p>}
+    </div>
   }
 
   if (status === 'already') {
