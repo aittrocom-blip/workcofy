@@ -21,52 +21,6 @@ function Base({ children, className = 'h-6 w-6' }: { children: React.ReactNode; 
 
 // --- DESCUBRIR grid icons ---
 
-export function TagIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <path d="M11.6 3H5a2 2 0 0 0-2 2v6.6c0 .53.21 1.04.59 1.41l9 9a2 2 0 0 0 2.82 0l6.6-6.6a2 2 0 0 0 0-2.82l-9-9A2 2 0 0 0 11.6 3Z" />
-      <circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none" />
-    </Base>
-  )
-}
-
-export function RefreshIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <path d="M3 11a9 9 0 0 1 15.5-6.2M21 4v5h-5" />
-      <path d="M21 13a9 9 0 0 1-15.5 6.2M3 20v-5h5" />
-    </Base>
-  )
-}
-
-export function CalendarIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <rect x="3.5" y="5" width="17" height="16" rx="2.5" />
-      <path d="M8 3v4M16 3v4M3.5 10h17" />
-    </Base>
-  )
-}
-
-// Same path FavoriteButton/CourseFavoriteButton already use, so the
-// "Favoritos" tile reads as the exact same heart everywhere in the app.
-export function HeartLineIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <path d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z" />
-    </Base>
-  )
-}
-
-export function SharkIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <path d="M12 4c1.5 3 2.2 6 2.2 6s3.3-.7 5.8.6c-1.6 1-3.6 1.4-4.9 1.4h-6.2c-1.8 0-3.6-.5-4.9-1.5 1.7-1 3.4-1.3 4.7-1.1 0 0 .7-2.6 2.2-5.4Z" />
-      <path d="M4 15.5c1.2-.8 2.4-.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2-.8 2.4-.8 3.6 0 1.2.8 2.4.8 3.6 0" />
-    </Base>
-  )
-}
-
 export function NetworkIcon({ className }: IconProps) {
   return (
     <Base className={className}>
@@ -78,22 +32,11 @@ export function NetworkIcon({ className }: IconProps) {
   )
 }
 
-export function NotesWallIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <rect x="2" y="3" width="20" height="18" rx="2" />
-      <rect x="5.5" y="6.5" width="5" height="7" rx="0.7" />
-      <path d="M7 9h2M7 11h1M14 9h5v6l-2 2h-3V9ZM17 17v-2h2M5.5 17H10" />
-    </Base>
-  )
-}
-
 export function TriviaIcon({ className }: IconProps) {
   return (
     <Base className={className}>
-      <path d="M5 3h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6l-5 3v-3H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
-      <path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 4" />
-      <circle cx="12" cy="15" r="0.8" fill="currentColor" stroke="none" />
+      <path d="M9.2 9a2.9 2.9 0 1 1 5.3 1.7c-.8 1-2.5 1.5-2.5 3.3" />
+      <circle cx="12" cy="18" r="0.9" fill="currentColor" stroke="none" />
     </Base>
   )
 }
@@ -122,25 +65,6 @@ export function VideoIcon({ className }: IconProps) {
     <Base className={className}>
       <rect x="3" y="5" width="18" height="14" rx="3" />
       <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
-    </Base>
-  )
-}
-
-export function FlameIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <path d="M12 3s-4.5 4-4.5 8.5a4.5 4.5 0 0 0 9 0c0-1.4-.6-2.5-1.3-3.4.2 1.6-.6 2.6-1.4 2.1-.7-.4-.4-1.4-.4-2.2C13.4 6.2 12 3 12 3Z" />
-      <path d="M9.2 14.3c0 1.8 1.3 3.1 2.8 3.1s2.8-1.3 2.8-3.1" />
-    </Base>
-  )
-}
-
-export function CalendarCheckIcon({ className }: IconProps) {
-  return (
-    <Base className={className}>
-      <rect x="3.5" y="5" width="17" height="16" rx="2.5" />
-      <path d="M8 3v4M16 3v4M3.5 10h17" />
-      <path d="m8.5 14.5 2.2 2.2 4.3-4.3" />
     </Base>
   )
 }

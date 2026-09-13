@@ -182,6 +182,9 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
               <IconRow href="/configuracion" onClick={onClose} icon={<GearIcon className="h-5 w-5" />} active={isNavLinkActive('/configuracion', pathname)}>
                 Configuración
               </IconRow>
+              <IconRow href="/mi-pass" onClick={onClose} icon={<span className="flex h-5 w-5 items-center justify-center"><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="5" width="18" height="14" rx="3" /><circle cx="9" cy="11" r="2" /><path d="M6.3 16c.5-1.5 1.5-2.2 2.7-2.2s2.2.7 2.7 2.2M14.5 10h3.5M14.5 13.5h3.5" /></svg></span>} active={isNavLinkActive('/mi-pass', pathname)}>
+                Mi Pass
+              </IconRow>
               {isAdmin && (
                 <IconRow href="/admin/espacios" onClick={onClose} icon={<ShieldIcon className="h-5 w-5" />} active={pathname.startsWith('/admin')}>
                   Admin
@@ -196,10 +199,7 @@ export function SideDrawer({ open, onClose }: SideDrawerProps) {
               <Divider />
 
               <p className={SECTION_LABEL}>Workcofy</p>
-              {/* TODO: wire real routes once /partners and an "about" page
-                  exist — rendered without href/onClick for now so they read
-                  as part of the ecosystem without pretending to work. */}
-              <IconRow icon={<StoreIcon className="h-5 w-5" />}>Partners</IconRow>
+              <IconRow href="/partners" onClick={onClose} icon={<StoreIcon className="h-5 w-5" />} active={pathname === '/partners'}>Partners</IconRow>
               <IconRow icon={<InfoIcon className="h-5 w-5" />}>Acerca de Workcofy</IconRow>
 
               <Divider />

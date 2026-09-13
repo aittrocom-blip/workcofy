@@ -80,7 +80,8 @@ export default async function SpacePage({ params }: SpacePageProps) {
       <div className="mt-5">
         <VisitorAvatarsStrip spaceId={space.id} />
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+      <div className="mt-2 flex flex-wrap items-start gap-2">
+        {space.partner_status === 'partner' && <img src="/partner-logo.png" alt="Workcofy Partner" className="h-8 w-8 object-contain" />}
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{space.name}</h1>
         {space.verified && <VerifiedBadge />}
       </div>

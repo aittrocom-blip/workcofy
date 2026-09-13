@@ -14,7 +14,7 @@ import { AppNavIconGlyph } from '@/components/layout/BottomNavigation'
 // The app shell's header: [LOGO] ………… [coins 🔥] [☰]. Pads for the Dynamic
 // Island via env(safe-area-inset-top). On md+ the four app destinations
 // appear as top tabs between the logo and the controls, so desktop keeps
-// the same Explorar / Spots / Mi Pass / Beneficios logic without a tab bar.
+// the same Explorar / Spots / Trabajo / Aprende logic without a tab bar.
 export function MobileHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()

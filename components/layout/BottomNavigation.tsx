@@ -21,19 +21,18 @@ export function AppNavIconGlyph({ icon, className = 'h-6 w-6' }: { icon: AppNavI
           <circle cx="12" cy="10" r="2.4" />
         </svg>
       )
-    case 'pass':
+    case 'aprende':
       return (
         <svg {...common}>
-          <rect x="3" y="5" width="18" height="14" rx="3" />
-          <circle cx="9" cy="11" r="2" />
-          <path d="M6.3 16c.5-1.5 1.5-2.2 2.7-2.2s2.2.7 2.7 2.2M14.5 10h3.5M14.5 13.5h3.5" />
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
+          <path d="M4 5.5v16M8 7h8M8 11h8M8 15h5" />
         </svg>
       )
-    case 'beneficios':
+    case 'trabajo':
       return (
         <svg {...common}>
-          <path d="M4 10.5h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
-          <path d="M5 15.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5M12 10.5V20M12 10.5c-2.5 0-4.5-1.3-4.5-3S9 5 10.2 5.6 12 8 12 10.5zm0 0c2.5 0 4.5-1.3 4.5-3S15 5 13.8 5.6 12 8 12 10.5z" />
+          <rect x="3" y="7" width="18" height="13" rx="2" />
+          <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M3 12h18M10 12v2h4v-2" />
         </svg>
       )
   }
@@ -41,8 +40,7 @@ export function AppNavIconGlyph({ icon, className = 'h-6 w-6' }: { icon: AppNavI
 
 // Fixed tab bar for the authenticated app. Sits over the home indicator
 // (safe-area padding) and hides on md+, where MobileHeader shows the same
-// four destinations as top tabs. Mi Pass gets the one accent in the bar —
-// a solid black tile when active — since it's the app's centrepiece.
+// four destinations as top tabs. Mi Pass remains in the side menu.
 export function BottomNavigation() {
   const pathname = usePathname()
 
@@ -54,7 +52,6 @@ export function BottomNavigation() {
       <ul className="mx-auto grid h-16 max-w-md grid-cols-4">
         {APP_NAV_LINKS.map((link) => {
           const active = isNavLinkActive(link.href, pathname)
-          const isPass = link.icon === 'pass'
           return (
             <li key={link.href} className="flex">
               <Link
@@ -66,7 +63,7 @@ export function BottomNavigation() {
               >
                 <span
                   className={`flex h-8 w-11 items-center justify-center rounded-2xl transition-all ${
-                    active && isPass ? 'bg-black text-workcofy-yellow' : active ? 'bg-workcofy-yellow/20' : ''
+                    active ? 'bg-workcofy-yellow/20' : ''
                   }`}
                 >
                   <AppNavIconGlyph icon={link.icon} className={`h-[22px] w-[22px] ${active ? 'stroke-[2.2]' : ''}`} />

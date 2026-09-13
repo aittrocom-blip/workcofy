@@ -10,6 +10,7 @@ import { useUserName } from '@/lib/hooks/useUserName'
 import { avatarFor } from '@/lib/avatars'
 import { RewardsBadge } from '@/components/layout/RewardsBadge'
 import { FavoritesShortcut, NotificationsShortcut } from '@/components/layout/FavoritesShortcut'
+import { FavoriteIcon } from '@/components/ui/FavoriteIcon'
 import { StreakBadge } from '@/components/layout/StreakBadge'
 import { LAUNCH_LOCKED } from '@/lib/launchLock'
 
@@ -28,18 +29,6 @@ function UserPlusIcon({ className = 'h-[18px] w-[18px]' }: { className?: string 
       <circle cx="10" cy="8" r="3.5" />
       <path strokeLinecap="round" d="M2.5 20c1.3-3.6 4.1-5.5 7.5-5.5s6.2 1.9 7.5 5.5" />
       <path strokeLinecap="round" d="M18 4.5v6M15 7.5h6" />
-    </svg>
-  )
-}
-
-function HeartIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z"
-      />
     </svg>
   )
 }
@@ -185,7 +174,7 @@ export function HeaderAuthLinks() {
               <MenuItem href="/perfil" onClick={() => setOpen(false)} icon={<UserIcon />}>
                 Perfil
               </MenuItem>
-              <MenuItem href="/favoritos" onClick={() => setOpen(false)} icon={<HeartIcon />}>
+              <MenuItem href="/favoritos" onClick={() => setOpen(false)} icon={<FavoriteIcon filled={false} className="h-[18px] w-[18px]" />}>
                 Favoritos
               </MenuItem>
               {isAdmin && (

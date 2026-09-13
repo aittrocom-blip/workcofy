@@ -5,8 +5,8 @@ type TrustLevel = NonNullable<SpaceRecord['trust_level']>
 const TRUST_LABELS: Record<TrustLevel, string> = {
   listed: 'Listado',
   community_recommended: 'Recomendado por la comunidad',
-  workcofy_verified: 'Verificado por Workcofy',
-  workcofy_point: 'Workcofy Point',
+  workcofy_verified: 'Verificado',
+  workcofy_point: 'Workcofy Partner',
 }
 
 const TRUST_STYLES: Record<TrustLevel, string> = {

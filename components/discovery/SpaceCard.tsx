@@ -65,8 +65,9 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
           spaceId={space.id}
           className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm transition-colors"
         />
+        {space.partner_status === 'partner' && <span className="absolute bottom-2 left-12 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 p-1.5 shadow-sm backdrop-blur" title="Workcofy Partner"><img src="/partner-logo.png" alt="Partner" className="h-full w-full object-contain" /></span>}
       </div>
-      <h3 title={space.name} className="mt-3 line-clamp-2 min-h-[2.75rem] font-semibold leading-snug tracking-tight">
+      <h3 title={space.name} className="mt-1 line-clamp-2 min-h-[2.75rem] font-semibold leading-snug tracking-tight">
         {space.name}
       </h3>
       <p className="text-sm text-gray-500">{districtLabel(space.district)}</p>

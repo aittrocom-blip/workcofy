@@ -13,7 +13,7 @@ export function AuthenticatedShell({ children }: { children: React.ReactNode }) 
       <main className="flex-1 pb-[var(--app-bottom-nav-height)]">{children}</main>
       <footer className="hidden border-t border-gray-100 px-8 py-5 text-xs text-gray-400 md:block">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1">
-          <span>© {new Date().getFullYear()} Workcofy · Work anywhere. Work better.</span>
+          <span suppressHydrationWarning>© {new Date().getFullYear()} Workcofy · Work anywhere. Work better.</span>
           <Link href="/terminos" className="hover:text-black">
             Términos
           </Link>

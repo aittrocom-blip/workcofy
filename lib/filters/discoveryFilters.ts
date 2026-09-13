@@ -1,4 +1,5 @@
 import { parseCategoryListParam } from '@/lib/categories'
+import type { SpaceUseCase } from '@/lib/spaceUseCases'
 
 export type SortOption = 'distance' | 'rating' | 'workcofy_score' | 'popular' | 'open_now'
 
@@ -22,6 +23,7 @@ export interface DiscoveryFilterState {
   // apertura" option in the same dropdown.
   openBetween: { start: string; end: string } | null
   verifiedOnly: boolean
+  purpose: SpaceUseCase | null
 }
 
 export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilterState = {
@@ -41,6 +43,7 @@ export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilterState = {
   open24h: false,
   openBetween: null,
   verifiedOnly: false,
+  purpose: null,
 }
 
 export function parseDiscoveryFilters(params: URLSearchParams): DiscoveryFilterState {
@@ -61,6 +64,9 @@ export function parseDiscoveryFilters(params: URLSearchParams): DiscoveryFilterS
       return from && to ? { start: from, end: to } : null
     })(),
     verifiedOnly: params.get('verified') === '1',
+    purpose: (['focus', 'meetings', 'social'] as const).includes(params.get('para') as SpaceUseCase)
+      ? (params.get('para') as SpaceUseCase)
+      : null,
   }
 }
 
@@ -80,6 +86,7 @@ export function serializeDiscoveryFilters(state: Partial<DiscoveryFilterState>):
     params.set('openTo', state.openBetween.end)
   }
   if (state.verifiedOnly) params.set('verified', '1')
+  if (state.purpose) params.set('para', state.purpose)
   return params.toString()
 }
 
@@ -96,5 +103,6 @@ export function countActiveFilters(state: DiscoveryFilterState): number {
   if (state.open24h) count += 1
   if (state.openBetween) count += 1
   if (state.verifiedOnly) count += 1
+  if (state.purpose) count += 1
   return count
 }

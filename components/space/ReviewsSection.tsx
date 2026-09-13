@@ -135,8 +135,18 @@ function ReviewForm({ spaceId, userId, existing, onSaved }: ReviewFormProps) {
         reviewerName: 'Tú',
       })
       window.dispatchEvent(new Event('workcofy:reward-earned'))
-    } catch {
-      setError(NETWORK_ERROR_MESSAGE)
+    } catch (caughtError) {
+      console.error('Review save failed', caughtError)
+      const code = caughtError && typeof caughtError === 'object' && 'code' in caughtError
+        ? String((caughtError as { code?: string }).code)
+        : ''
+      if (code === '23503') {
+        setError('Tu perfil todavía no está listo. Cierra sesión, vuelve a ingresar e inténtalo otra vez.')
+      } else if (code === '42501' || code === 'PGRST301') {
+        setError('Tu sesión no tiene permiso para publicar todavía. Vuelve a iniciar sesión.')
+      } else {
+        setError(NETWORK_ERROR_MESSAGE)
+      }
     } finally {
       setSaving(false)
     }

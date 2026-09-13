@@ -7,8 +7,8 @@ import type { SpaceRecord } from '@/lib/data/spaceTypes'
 const LEVELS: { value: NonNullable<SpaceRecord['trust_level']>; label: string }[] = [
   { value: 'listed', label: 'Listado' },
   { value: 'community_recommended', label: 'Recomendado por la comunidad' },
-  { value: 'workcofy_verified', label: 'Verificado por Workcofy' },
-  { value: 'workcofy_point', label: 'Workcofy Point' },
+  { value: 'workcofy_verified', label: 'Verificado' },
+  { value: 'workcofy_point', label: 'Workcofy Partner' },
 ]
 const USES = ['Trabajo rápido', 'Concentración', 'Videollamadas', 'Reunión informal', 'Trabajo social', 'Lectura / estudio']
 

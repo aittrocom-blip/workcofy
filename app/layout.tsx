@@ -7,6 +7,8 @@ import { BodyScrollLock } from '@/components/layout/BodyScrollLock'
 import { FavoritesProvider } from '@/components/providers/FavoritesProvider'
 import { CourseFavoritesProvider } from '@/components/providers/CourseFavoritesProvider'
 import { LikesProvider } from '@/components/providers/LikesProvider'
+import { PlaylistLikesProvider } from '@/components/providers/PlaylistLikesProvider'
+import { PlaylistFavoritesProvider } from '@/components/providers/PlaylistFavoritesProvider'
 import { USER_ID_HEADER } from '@/lib/supabase/middleware'
 import { ActionToast } from '@/components/layout/ActionToast'
 
@@ -43,7 +45,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <FavoritesProvider>
           <CourseFavoritesProvider>
             <LikesProvider>
-              <AppShell initialUserId={initialUserId}>{children}</AppShell>
+              <PlaylistLikesProvider>
+                <PlaylistFavoritesProvider>
+                  <AppShell initialUserId={initialUserId}>{children}</AppShell>
+                </PlaylistFavoritesProvider>
+              </PlaylistLikesProvider>
             </LikesProvider>
           </CourseFavoritesProvider>
         </FavoritesProvider>

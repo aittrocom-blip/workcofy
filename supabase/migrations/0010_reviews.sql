@@ -20,6 +20,12 @@ create index if not exists reviews_space_id_idx on reviews (space_id);
 
 alter table reviews enable row level security;
 
+-- Keep table privileges explicit. RLS decides which rows a user can touch;
+-- these grants allow PostgREST to perform the corresponding operations.
+grant select on reviews to anon, authenticated;
+grant insert on reviews to authenticated;
+grant delete on reviews to authenticated;
+
 -- Reviews are public content, same as the spaces they're attached to —
 -- anyone (including anon visitors) can read them.
 drop policy if exists "Anyone can read reviews" on reviews;

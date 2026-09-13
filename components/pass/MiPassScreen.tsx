@@ -1,25 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import type { PassHolder } from '@/lib/pass'
 import { WorkcofyPass } from '@/components/pass/WorkcofyPass'
 import { PassExpanded } from '@/components/pass/PassExpanded'
 
 interface MiPassScreenProps {
   holder: PassHolder
-  spotsCount: number
-  benefitsCount: number
 }
 
-export function MiPassScreen({ holder, spotsCount, benefitsCount }: MiPassScreenProps) {
+export function MiPassScreen({ holder }: MiPassScreenProps) {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-10 pt-6 md:px-8 md:pt-10">
-      <div className="md:grid md:grid-cols-[minmax(0,400px)_1fr] md:items-start md:gap-12">
-        <div className="flex flex-col items-center">
-          <p className="mb-4 self-start text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400 md:hidden">Tu Workcofy Pass</p>
+    <div className="mx-auto flex min-h-[calc(100vh-var(--app-header-height,4rem))] max-w-5xl flex-col items-center px-4 pb-12 pt-8 md:px-8 md:pt-12">
+      <p className="text-center text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">Tu Workcofy Pass</p>
+      <div className="mt-5 flex w-full flex-col items-center">
           <WorkcofyPass holder={holder} variant="full" />
           <button
             type="button"
@@ -31,48 +27,6 @@ export function MiPassScreen({ holder, spotsCount, benefitsCount }: MiPassScreen
             </svg>
             Mostrar mi Pass
           </button>
-        </div>
-
-        <section className="mt-10 md:mt-0">
-          <p className="hidden text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400 md:block">Tu Workcofy Pass</p>
-          <h1 className="mt-1 text-2xl font-extrabold tracking-tight md:text-3xl">Tu identidad en la red Workcofy</h1>
-          <p className="mt-2 max-w-md text-sm text-gray-600">
-            Muéstralo al llegar a un Workcofy Spot para identificarte como miembro y acceder a los beneficios de la comunidad.
-          </p>
-
-          <ul className="mt-6 flex flex-col gap-3">
-            <li className="flex items-start gap-3 rounded-2xl border border-gray-100 p-4">
-              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-workcofy-yellow/20 text-base">📍</span>
-              <span>
-                <span className="block text-sm font-bold">{spotsCount} Workcofy Spots en la red</span>
-                <span className="block text-xs text-gray-500">Establecimientos verificados donde tu Pass te identifica.</span>
-                <Link href="/spots?verified=1" className="mt-1 inline-block text-xs font-semibold text-black underline">
-                  Ver Spots
-                </Link>
-              </span>
-            </li>
-            <li className="flex items-start gap-3 rounded-2xl border border-gray-100 p-4">
-              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-workcofy-yellow/20 text-base">🎁</span>
-              <span>
-                <span className="block text-sm font-bold">{benefitsCount} beneficios disponibles</span>
-                <span className="block text-xs text-gray-500">Descuentos y accesos que se activan mostrando tu Pass.</span>
-                <Link href="/beneficios" className="mt-1 inline-block text-xs font-semibold text-black underline">
-                  Ver beneficios
-                </Link>
-              </span>
-            </li>
-            <li className="flex items-start gap-3 rounded-2xl border border-gray-100 p-4">
-              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-workcofy-yellow/20 text-base">🪪</span>
-              <span>
-                <span className="block text-sm font-bold">Tu foto y nombre salen de tu perfil</span>
-                <span className="block text-xs text-gray-500">Cámbialos cuando quieras desde Configuración.</span>
-                <Link href="/configuracion" className="mt-1 inline-block text-xs font-semibold text-black underline">
-                  Editar perfil
-                </Link>
-              </span>
-            </li>
-          </ul>
-        </section>
       </div>
 
       {expanded && <PassExpanded holder={holder} onClose={() => setExpanded(false)} />}

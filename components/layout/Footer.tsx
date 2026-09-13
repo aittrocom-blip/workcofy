@@ -50,7 +50,7 @@ function FooterContent() {
       </div>
 
       <div className="mx-auto mt-10 flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-6 text-xs text-gray-400">
-        <span>© {year} Workcofy. Todos los derechos reservados.</span>
+        <span suppressHydrationWarning>© {year} Workcofy. Todos los derechos reservados.</span>
         <Link href="/terminos" className="hover:text-black">
           Términos
         </Link>

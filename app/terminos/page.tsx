@@ -75,7 +75,7 @@ export default function TerminosPage() {
               su disponibilidad, horarios, precios, Wi-Fi, enchufes o seguridad. Verifica
               información crítica directamente con el establecimiento antes de ir.
             </p>
-            <p>Clasificamos cada espacio en cuatro niveles: <strong>Public Place</strong> (espacio público), <strong>Listed Place</strong> (listado usando fuentes abiertas, sin verificación directa), <strong>Community Recommended</strong> (evaluado principalmente por reseñas de la comunidad) y <strong>Workcofy Point</strong> (afiliado bajo estándares Workcofy — el único con relación comercial directa). El indicador &ldquo;Workcofy Verified&rdquo; solo significa que confirmamos puntualmente ciertos datos — no equivale a ser Workcofy Point.</p>
+            <p>Clasificamos cada espacio en cuatro niveles: <strong>Public Place</strong> (espacio público), <strong>Listed Place</strong> (listado usando fuentes abiertas, sin verificación directa), <strong>Community Recommended</strong> (evaluado principalmente por reseñas de la comunidad) y <strong>Workcofy Partner</strong> (afiliado bajo estándares Workcofy — el único con relación comercial directa). El indicador &ldquo;Workcofy Verified&rdquo; solo significa que confirmamos puntualmente ciertos datos — no equivale a ser Workcofy Partner.</p>
           </div>
         </section>
 

@@ -50,6 +50,14 @@ export async function countPublishedCourses(): Promise<number> {
   return count ?? 0
 }
 
+// Mirrors getSpacesByIds — used by /favoritos to resolve saved course ids.
+export async function getCoursesByIds(ids: string[]): Promise<CourseRecord[]> {
+  if (ids.length === 0) return []
+  const { data, error } = await publishedQuery().in('id', ids)
+  if (error) throw new Error(`Failed to load courses by id: ${error.message}`)
+  return (data ?? []) as CourseRecord[]
+}
+
 export async function getCourseById(id: string): Promise<CourseRecord | null> {
   if (!UUID_RE.test(id)) return null
   const { data, error } = await publishedQuery().eq('id', id).maybeSingle()

@@ -16,20 +16,9 @@ interface SpotCardProps {
   variant?: 'tile' | 'row'
 }
 
-// "Workcofy Spot" (spaces.verified — an affiliated, verified venue in the
-// network) vs. a regular place, which shows its real category (Café
-// Workfriendly / Cowork Café / Coworking / Lobby Café — the same
-// CATEGORY_OPTIONS label the map uses) so the chip always matches the
-// space's data. Card taps go to the space's full page.
-export function SpotBadge({ verified, label, className = '' }: { verified: boolean; label: string; className?: string }) {
-  if (verified) {
-    return (
-      <span className={`inline-flex items-center gap-1.5 rounded-full bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white ${className}`}>
-        <span className="h-1.5 w-1.5 rounded-full bg-workcofy-yellow" />
-        Workcofy Spot
-      </span>
-    )
-  }
+// Every space keeps its real category. Partner status is represented only by
+// the small Partner mark rendered next to the name.
+export function SpotBadge({ label, className = '' }: { label: string; className?: string }) {
   return (
     <span className={`inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-700 backdrop-blur ${className}`}>
       {label}
@@ -55,8 +44,8 @@ export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <SpotBadge verified={space.verified} label={categoryLabel} className={space.verified ? '' : 'bg-gray-100'} />
-          <h3 className="mt-1 truncate text-[15px] font-bold tracking-tight">{space.name}</h3>
+          <SpotBadge label={categoryLabel} className="bg-gray-100" />
+          <div className="mt-1 flex items-center gap-1.5"><h3 className="truncate text-[15px] font-bold tracking-tight">{space.name}</h3>{space.partner_status === 'partner' && <img src="/icons/logo-partner.png" alt="Partner" className="h-4 w-4 flex-none object-contain" />}</div>
           <p className="truncate text-xs text-gray-500">
             {districtLabel(space.district)}
             {space.distanceKm != null && ` · ${formatDistanceKm(space.distanceKm)}`}
@@ -88,9 +77,10 @@ export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={coverPhoto.url} alt="" className="h-full w-full object-cover" />
           )}
-          <SpotBadge verified={space.verified} label={categoryLabel} className="absolute left-2 top-2" />
+          <SpotBadge label={categoryLabel} className="absolute left-2 top-2" />
         </div>
-        <h3 className="mt-2.5 truncate text-[15px] font-bold leading-tight tracking-tight">{space.name}</h3>
+        {space.partner_status === 'partner' && <span className="absolute left-12 top-[5.5rem] flex h-8 w-8 items-center justify-center rounded-full bg-white/95 p-1.5 shadow-sm backdrop-blur" title="Workcofy Partner"><img src="/icons/logo-partner.png" alt="Partner" className="h-full w-full object-contain" /></span>}
+        <h3 className="mt-1 truncate text-[15px] font-bold leading-tight tracking-tight">{space.name}</h3>
         <p className="mt-0.5 truncate text-xs text-gray-500">
           {districtLabel(space.district)}
           {space.distanceKm != null && ` · ${formatDistanceKm(space.distanceKm)}`}

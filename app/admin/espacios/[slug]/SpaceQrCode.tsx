@@ -4,7 +4,7 @@ import { QRCodeSVG } from 'qrcode.react'
 
 export function SpaceQrCode({ slug }: { slug: string }) {
   const origin = typeof window === 'undefined' ? '' : window.location.origin
-  const value = `${origin}/check-in/${slug}`
+  const value = `${origin}/qr/${slug}`
   function downloadJpg() {
     const svg = document.querySelector('[data-workcofy-qr]') as SVGSVGElement | null
     if (!svg) return

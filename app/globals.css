@@ -72,6 +72,11 @@ body {
     border-radius: var(--wc-radius-card);
     box-shadow: var(--wc-shadow-soft);
   }
+
+  .wc-social-embed {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
 }
 
 @media (min-width: 768px) {

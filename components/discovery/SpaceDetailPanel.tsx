@@ -140,7 +140,7 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
 
   return (
     <div className="flex h-full flex-col">
-      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-gray-100 bg-white/95 px-3 py-2 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-1 border-b border-gray-100 bg-white/95 px-3 py-2 backdrop-blur-sm">
         <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-gray-700">
           {topBarItems.map((item, index) => (
             <Fragment key={item.key}>
@@ -152,6 +152,10 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
               {item.node}
             </Fragment>
           ))}
+        </div>
+        <div className="ml-auto flex flex-none items-center gap-1">
+          {space.partner_status === 'partner' && <img src="/partner-logo.png" alt="Partner" className="h-6 w-[4.5rem] object-contain" />}
+          {space.verified && <VerifiedBadge />}
         </div>
         <button
           type="button"
@@ -189,7 +193,6 @@ export function SpaceDetailPanel({ space, onClose, origin = null }: SpaceDetailP
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <h2 className="text-xl font-extrabold tracking-tight">{space.name}</h2>
-          {space.verified && <VerifiedBadge />}
         </div>
         <p className="mt-1 text-sm text-gray-500">{districtLabel(space.district)}</p>
 

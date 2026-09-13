@@ -1,6 +1,7 @@
 'use client'
 
 import { useDailyStreak } from '@/lib/hooks/useDailyStreak'
+import { RetosIcon } from '@/components/layout/DiscoverIconImages'
 
 interface StreakBadgeProps {
   size?: 'sm' | 'lg'
@@ -16,7 +17,7 @@ export function StreakBadge({ size = 'sm' }: StreakBadgeProps) {
   if (size === 'lg') {
     return (
       <span className="flex items-center gap-1.5 text-lg font-bold text-workcofy-black" title={`${streak.longest} días seguidos (récord)`}>
-        🔥 {streak.streak}
+        <RetosIcon className="h-5 w-5" /> {streak.streak}
       </span>
     )
   }
@@ -26,7 +27,7 @@ export function StreakBadge({ size = 'sm' }: StreakBadgeProps) {
       className="inline-flex items-center gap-1 text-[15px] font-semibold text-[#252A32]"
       title={`${streak.longest} días seguidos (récord)`}
     >
-      🔥 {streak.streak}
+      <RetosIcon className="h-4 w-4" /> {streak.streak}
     </span>
   )
 }

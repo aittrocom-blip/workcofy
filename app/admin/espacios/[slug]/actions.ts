@@ -5,6 +5,74 @@ import { requireAdmin } from '@/lib/admin/requireAdmin'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { parseAmenities, type AmenitiesData } from '@/lib/amenities/types'
 
+function makePartnerUsername(slug: string) {
+  return `partner-${slug.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 35)}`
+}
+
+function makeTemporaryPassword() {
+  return `Wc-${Math.random().toString(36).slice(2, 8)}-${Math.random().toString(36).slice(2, 6)}`
+}
+
+export async function createPartnerAccess(spaceId: string, slug: string) {
+  await requireAdmin()
+  const admin = createAdminSupabaseClient()
+  const username = makePartnerUsername(slug)
+  const email = `${username}@partners.workcofy.local`
+  const { data: existing } = await admin.from('partner_accounts').select('id, user_id, active, username').eq('space_id', spaceId).maybeSingle()
+  if (existing?.active) throw new Error('Este espacio ya tiene un acceso Partner activo.')
+  if (existing && !existing.active) {
+    const password = makeTemporaryPassword()
+    const { error: restoreError } = await admin.auth.admin.updateUserById(existing.user_id, { password, ban_duration: 'none', user_metadata: { role: 'partner', space_id: spaceId, force_password_change: true } })
+    if (restoreError) throw new Error(`No se pudo reactivar el usuario: ${restoreError.message}`)
+    const { error: reactivateError } = await admin.from('partner_accounts').update({ active: true, force_password_change: true }).eq('id', existing.id)
+    if (reactivateError) throw new Error(`No se pudo reactivar el acceso: ${reactivateError.message}`)
+    await admin.from('spaces').update({ partner_status: 'partner' }).eq('id', spaceId)
+    return { username: existing.username, password }
+  }
+  const password = makeTemporaryPassword()
+  const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { role: 'partner', space_id: spaceId } })
+  if (error || !data.user) throw new Error(error?.message ?? 'No se pudo crear el usuario Partner')
+  const { error: insertError } = await admin.from('partner_accounts').insert({ user_id: data.user.id, space_id: spaceId, username })
+  if (insertError) {
+    await admin.auth.admin.deleteUser(data.user.id)
+    throw new Error(`No se pudo guardar el acceso: ${insertError.message}`)
+  }
+  await admin.from('spaces').update({ partner_status: 'partner' }).eq('id', spaceId)
+  return { username, password }
+}
+
+export async function disablePartnerAccess(spaceId: string, slug: string) {
+  await requireAdmin()
+  const admin = createAdminSupabaseClient()
+  const { data: account, error: findError } = await admin
+    .from('partner_accounts')
+    .select('id, user_id')
+    .eq('space_id', spaceId)
+    .maybeSingle()
+  if (findError) throw new Error(`No se pudo consultar el acceso: ${findError.message}`)
+  if (!account) throw new Error('Este espacio no tiene un acceso Partner creado.')
+  const { error } = await admin.from('partner_accounts').update({ active: false }).eq('id', account.id)
+  if (error) throw new Error(`No se pudo deshabilitar: ${error.message}`)
+  await admin.auth.admin.updateUserById(account.user_id, { ban_duration: '876000h' })
+  await admin.from('spaces').update({ partner_status: 'none' }).eq('id', spaceId)
+  revalidatePath(`/admin/espacios/${slug}`)
+}
+
+export async function resetPartnerPassword(spaceId: string, slug: string) {
+  await requireAdmin()
+  const admin = createAdminSupabaseClient()
+  const { data: account } = await admin.from('partner_accounts').select('user_id, active').eq('space_id', spaceId).maybeSingle()
+  if (!account) throw new Error('Este espacio no tiene un acceso Partner creado.')
+  if (!account.active) throw new Error('Primero debes habilitar el acceso Partner.')
+  const password = makeTemporaryPassword()
+  const { error } = await admin.auth.admin.updateUserById(account.user_id, { password, user_metadata: { force_password_change: true } })
+  if (error) throw new Error(`No se pudo generar la nueva clave: ${error.message}`)
+  await admin.from('partner_accounts').update({ force_password_change: true }).eq('space_id', spaceId)
+  // Do not revalidate here: the client needs to keep the one-time password
+  // visible so the administrator can copy or share it.
+  return { password }
+}
+
 export async function updateVerification(spaceId: string, slug: string, verified: boolean) {
   await requireAdmin()
 

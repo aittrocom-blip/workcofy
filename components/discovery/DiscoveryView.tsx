@@ -28,6 +28,7 @@ import { sortSpaces } from '@/lib/filters/sortSpaces'
 import { districtLabel, districtSlugFromValue } from '@/lib/districts'
 import { isOpenNow, isOpenDuring, isOpen24HoursToday } from '@/lib/hours/openingHours'
 import { getLimaNow } from '@/lib/geo/limaTime'
+import { spaceMatchesUseCase } from '@/lib/spaceUseCases'
 
 interface DiscoveryViewProps {
   spaces: SpaceRecord[]
@@ -110,9 +111,10 @@ export function DiscoveryView({
         return false
       }
       if (filters.verifiedOnly && !space.verified) return false
+      if (filters.purpose && !spaceMatchesUseCase(space, filters.purpose)) return false
       return true
     })
-  }, [sorted, filters.open24h, filters.openBetween, filters.verifiedOnly])
+  }, [sorted, filters.open24h, filters.openBetween, filters.verifiedOnly, filters.purpose])
 
   const selectedSpace = filtered.find((space) => space.id === selectedId) ?? null
 
@@ -160,6 +162,7 @@ export function DiscoveryView({
       open24h: false,
       openBetween: null,
       verifiedOnly: false,
+      purpose: null,
     })
   }
 

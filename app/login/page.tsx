@@ -39,7 +39,8 @@ function LoginForm() {
 
     try {
       const supabase = createBrowserSupabaseClient()
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      const loginEmail = email.includes('@') ? email : `${email}@partners.workcofy.local`
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email: loginEmail, password })
 
       if (signInError) {
         setError(translateAuthError(signInError))
@@ -60,15 +61,15 @@ function LoginForm() {
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label htmlFor="email" className="text-xs font-medium text-gray-500">
-            Correo
+            Correo o usuario Partner
           </label>
           <input
             id="email"
-            type="email"
+            type="text"
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="tu@correo.com"
+            placeholder="tu@correo.com o partner-cafeteria"
             className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-black outline-none focus:border-black"
           />
         </div>

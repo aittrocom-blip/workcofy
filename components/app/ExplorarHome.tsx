@@ -8,6 +8,7 @@ import type { OpportunityRecord } from '@/lib/data/opportunityTypes'
 import type { CourseRecord } from '@/lib/data/courseTypes'
 import type { PassHolder } from '@/lib/pass'
 import type { Tip } from '@/lib/data/tips'
+import type { SpotifyPlaylist } from '@/lib/spotify'
 import { DiscoverGrid } from '@/components/layout/DiscoverGrid'
 import { HOME_QUICK_ACTIONS } from '@/lib/discoverMenu'
 import { DailyTips } from '@/components/app/DailyTips'
@@ -17,7 +18,7 @@ import { useSpacesWithDistance } from '@/lib/hooks/useSpacesWithDistance'
 import { computeWorkcofyScore } from '@/lib/score/workcofyScore'
 import { getLimaNow } from '@/lib/geo/limaTime'
 import { HorizontalScroller } from '@/components/ui/HorizontalScroller'
-import { SpotCard } from '@/components/app/SpotCard'
+import { SpotCard, SpotBadge } from '@/components/app/SpotCard'
 import { BenefitCard } from '@/components/app/BenefitCard'
 import { WorkcofyPass } from '@/components/pass/WorkcofyPass'
 import { PassExpanded } from '@/components/pass/PassExpanded'
@@ -29,8 +30,28 @@ interface ExplorarHomeProps {
   opportunities: OpportunityRecord[]
   courses: CourseRecord[]
   tips: Tip[]
+  playlists: Array<SpotifyPlaylist & { categoryKey: string; categoryTitle: string }>
   counts: { opportunities: number; courses: number; certificates: number }
   stats: { coins: number; streak: number; favorites: number; checkins: number }
+}
+
+// Same visual weight as SpotCard's tile — cover art up top, badge overlay,
+// title below — so "Música" reads as part of the same shelf system instead
+// of a bolted-on widget.
+function MusicTile({ playlist }: { playlist: SpotifyPlaylist & { categoryTitle: string } }) {
+  return (
+    <a href={playlist.url} target="_blank" rel="noreferrer" className="block w-[168px] flex-none active:scale-[0.98]">
+      <div className="relative h-32 w-full overflow-hidden rounded-[20px] bg-gray-100">
+        {playlist.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={playlist.image} alt="" className="h-full w-full object-cover" />
+        )}
+        <SpotBadge label={playlist.categoryTitle} className="absolute left-2 top-2" />
+      </div>
+      <h3 className="mt-1 truncate text-[15px] font-bold leading-tight tracking-tight">{playlist.name}</h3>
+      <p className="mt-0.5 truncate text-xs text-gray-500">Spotify{playlist.owner ? ` · ${playlist.owner}` : ''}</p>
+    </a>
+  )
 }
 
 function Section({ title, subtitle, href, badge, children }: { title: string; subtitle?: string; href?: string; badge?: string; children: React.ReactNode }) {
@@ -85,7 +106,7 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // The signed-in home. Location is requested once on mount (same hook the
 // map uses); until it's granted "Cerca de ti" falls back to the best-scored
 // spaces rather than pretending a fallback centre is the user's position.
-export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tips, counts, stats }: ExplorarHomeProps) {
+export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tips, playlists, counts, stats }: ExplorarHomeProps) {
   const [passOpen, setPassOpen] = useState(false)
   const { coordinate, status, requestLocation } = useUserLocation()
 
@@ -130,6 +151,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         </nav>
       </section>
 
+
       <section className="mt-5 border-y border-gray-100 px-4 py-1 md:px-0" aria-labelledby="home-quick-actions">
         <p id="home-quick-actions" className="pt-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">Más para ti</p>
         <DiscoverGrid items={HOME_QUICK_ACTIONS} home />
@@ -172,6 +194,16 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
         )}
       </Section>
 
+      {playlists.length > 0 && (
+        <Section title="Música para trabajar" subtitle="Playlists para poner play y concentrarte" href="/musica">
+          <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
+            {playlists.map((playlist) => (
+              <MusicTile key={playlist.id} playlist={playlist} />
+            ))}
+          </HorizontalScroller>
+        </Section>
+      )}
+
       <section className="mt-10 px-4 md:px-0">
         <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-400">Tu Workcofy Pass</p>
         <div className="mt-3 md:grid md:grid-cols-[minmax(0,440px)_1fr] md:items-center md:gap-10">
@@ -179,7 +211,7 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
           <div className="mt-5 grid grid-cols-4 gap-2 md:mt-0 md:grid-cols-2">
             <Stat label="W Coins" value={stats.coins} icon="/icons/rewards-coin.png" />
             <Stat label="Racha" value={stats.streak} emoji="🔥" />
-            <Stat label="Favoritos" value={stats.favorites} emoji="♥" />
+            <Stat label="Favoritos" value={stats.favorites} icon="/icons/fav-filled.png" />
             <Stat label="Check-ins" value={stats.checkins} emoji="📍" />
           </div>
         </div>
