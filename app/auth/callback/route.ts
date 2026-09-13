@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const nextParam = searchParams.get('next')
+  const nextPath = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/app'
 
   // Supabase itself appends error/error_code instead of code when a
   // confirmation link is expired or was already used — surface that on
@@ -40,5 +42,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/app`)
+  return NextResponse.redirect(`${origin}${nextPath}`)
 }

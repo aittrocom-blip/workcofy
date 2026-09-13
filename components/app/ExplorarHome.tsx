@@ -22,6 +22,7 @@ import { SpotCard, SpotBadge } from '@/components/app/SpotCard'
 import { BenefitCard } from '@/components/app/BenefitCard'
 import { WorkcofyPass } from '@/components/pass/WorkcofyPass'
 import { PassExpanded } from '@/components/pass/PassExpanded'
+import { SpaceDetailPanel } from '@/components/discovery/SpaceDetailPanel'
 
 interface ExplorarHomeProps {
   holder: PassHolder
@@ -76,11 +77,11 @@ function Section({ title, subtitle, href, badge, children }: { title: string; su
   )
 }
 
-function Strip({ spaces }: { spaces: SpaceWithDistance[] }) {
+function Strip({ spaces, onSelect }: { spaces: SpaceWithDistance[]; onSelect: (space: SpaceWithDistance) => void }) {
   return (
     <HorizontalScroller className="gap-3 px-4 pb-1 md:px-0">
       {spaces.map((space) => (
-        <SpotCard key={space.id} space={space} />
+        <SpotCard key={space.id} space={space} onSelect={onSelect} />
       ))}
     </HorizontalScroller>
   )
@@ -108,6 +109,7 @@ function byDistance(a: SpaceWithDistance, b: SpaceWithDistance): number {
 // spaces rather than pretending a fallback centre is the user's position.
 export function ExplorarHome({ holder, spaces, benefits, opportunities, courses, tips, playlists, counts, stats }: ExplorarHomeProps) {
   const [passOpen, setPassOpen] = useState(false)
+  const [selectedSpace, setSelectedSpace] = useState<SpaceWithDistance | null>(null)
   const { coordinate, status, requestLocation } = useUserLocation()
 
   useEffect(() => {
@@ -160,13 +162,23 @@ export function ExplorarHome({ holder, spaces, benefits, opportunities, courses,
       <Section title="Cerca de ti" subtitle={located ? 'Ordenado por distancia' : 'Activa tu ubicación para ordenar por cercanía'} href="/spots">
         {!located && status !== 'requesting' && (
           <div className="mb-3 px-4 md:px-0">
-            <button type="button" onClick={requestLocation} className="min-h-11 rounded-full bg-workcofy-yellow/20 px-3.5 py-2 text-xs font-semibold hover:bg-workcofy-yellow/30">
+            <button type="button" onClick={requestLocation} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#ff1744] px-4 py-2 text-xs font-bold text-white shadow-sm transition-transform hover:scale-[1.02] hover:bg-[#e9143e]">
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4"><path strokeLinecap="round" strokeLinejoin="round" d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
               Usar mi ubicación
             </button>
           </div>
         )}
-        <Strip spaces={nearby} />
+        <Strip spaces={nearby} onSelect={setSelectedSpace} />
       </Section>
+
+      {selectedSpace && (
+        <>
+          <button type="button" aria-label="Cerrar ficha" onClick={() => setSelectedSpace(null)} className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
+          <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-[520px] overflow-y-auto bg-white shadow-2xl">
+            <SpaceDetailPanel space={selectedSpace} onClose={() => setSelectedSpace(null)} origin={coordinate} />
+          </aside>
+        </>
+      )}
 
       <DailyTips tips={tips} />
 

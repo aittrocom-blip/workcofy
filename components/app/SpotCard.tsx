@@ -12,6 +12,7 @@ import { topAmenityHighlights } from '@/lib/amenities/highlights'
 
 interface SpotCardProps {
   space: SpaceWithDistance
+  onSelect?: (space: SpaceWithDistance) => void
   /** tile: fixed-width card for horizontal strips. row: full-width list item. */
   variant?: 'tile' | 'row'
 }
@@ -26,7 +27,7 @@ export function SpotBadge({ label, className = '' }: { label: string; className?
   )
 }
 
-export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
+export function SpotCard({ space, variant = 'tile', onSelect }: SpotCardProps) {
   const openNow = isOpenNow(space.opening_hours, getLimaNow())
   const coverPhoto = space.photos?.find((photo) => photo.url)
   const categoryLabel = CATEGORY_OPTIONS.find((option) => option.value === space.category)?.label ?? space.category
@@ -71,7 +72,7 @@ export function SpotCard({ space, variant = 'tile' }: SpotCardProps) {
 
   return (
     <div className="relative w-[168px] flex-none">
-      <Link href={href} className="block active:scale-[0.98]">
+        <Link href={href} onClick={onSelect ? (event) => { event.preventDefault(); onSelect(space) } : undefined} className="block active:scale-[0.98]">
         <div className="relative h-32 w-full overflow-hidden rounded-[20px] bg-gray-100">
           {coverPhoto && (
             // eslint-disable-next-line @next/next/no-img-element

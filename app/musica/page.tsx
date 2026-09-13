@@ -1,6 +1,6 @@
 import { requireUser } from '@/lib/supabase/serverAuth'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { FALLBACK_PLAYLISTS, getSpotifyPlaylists } from '@/lib/spotify'
+import { FALLBACK_PLAYLISTS, getSpotifyPlaylists, type MusicCategory } from '@/lib/spotify'
 import MusicGrid from './MusicGrid'
 
 export const dynamic = 'force-dynamic'
@@ -10,7 +10,19 @@ export default async function MusicaPage() {
   await requireUser('/musica')
   let categories: Awaited<ReturnType<typeof getSpotifyPlaylists>> = []
   let error = false
-  try { categories = await getSpotifyPlaylists() } catch { categories = FALLBACK_PLAYLISTS; error = false }
+  try {
+    const supabase = createServerSupabaseClient()
+    const { data: catalog } = await supabase.from('music_playlists').select('id, category_key, category_title, name, owner, image_url, spotify_url, sort_order').eq('active', true).order('sort_order', { ascending: true })
+    if (catalog?.length) {
+      const grouped = new Map<string, MusicCategory>()
+      for (const row of catalog) {
+        const current: MusicCategory = grouped.get(row.category_key) ?? { key: row.category_key, title: row.category_title, query: '', playlists: [] }
+        current.playlists.push({ id: row.id, name: row.name, owner: row.owner, image: row.image_url, url: row.spotify_url })
+        grouped.set(row.category_key, current)
+      }
+      categories = Array.from(grouped.values())
+    } else categories = await getSpotifyPlaylists()
+  } catch { categories = FALLBACK_PLAYLISTS; error = false }
 
   const playlistIds = categories.flatMap((category) => category.playlists.map((playlist) => playlist.id))
   const likeCounts: Record<string, number> = {}

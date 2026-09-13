@@ -39,6 +39,23 @@ export async function createPartnerPromotion(spaceId: string, title: string, des
   revalidatePath('/partner')
 }
 
+export async function updatePartnerPromotion(spaceId: string, promotionId: string, title: string, description: string, startsAt: string, endsAt: string) {
+  const { admin, account } = await ownPartner()
+  if (account.space_id !== spaceId) throw new Error('No autorizado')
+  if (!title.trim()) throw new Error('Escribe un título para la promoción.')
+  const { error } = await admin.from('partner_promotions').update({ title: title.trim(), description: description.trim(), starts_at: startsAt || null, ends_at: endsAt || null, updated_at: new Date().toISOString() }).eq('id', promotionId).eq('space_id', spaceId)
+  if (error) throw new Error(`No se pudo actualizar: ${error.message}`)
+  revalidatePath('/partner')
+}
+
+export async function deletePartnerPromotion(spaceId: string, promotionId: string) {
+  const { admin, account } = await ownPartner()
+  if (account.space_id !== spaceId) throw new Error('No autorizado')
+  const { error } = await admin.from('partner_promotions').delete().eq('id', promotionId).eq('space_id', spaceId)
+  if (error) throw new Error(`No se pudo eliminar: ${error.message}`)
+  revalidatePath('/partner')
+}
+
 export async function completePartnerPasswordChange() {
   const { admin, account } = await ownPartner()
   const { error } = await admin.from('partner_accounts').update({ force_password_change: false, last_login_at: new Date().toISOString() }).eq('id', account.id)
@@ -49,7 +66,7 @@ const VALIDATION_MESSAGES: Record<string, string> = {
   not_a_partner: 'Esta cuenta no tiene acceso Partner activo.',
   not_found: 'No encontramos ese código para este local.',
   already_used: 'Este código ya fue validado antes.',
-  expired: 'Este código venció (vale 1 hora desde el check-in).',
+  expired: 'Este código venció (vale 10 minutos desde el check-in).',
 }
 
 // validate_benefit_code (0035_benefit_redemptions.sql) is security definer
