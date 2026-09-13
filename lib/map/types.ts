@@ -7,6 +7,10 @@ export interface MapMarkerData {
   favorited: boolean
   /** True when the "Abierto" filter is active and this space is currently closed — rendered at reduced opacity instead of being removed from the map. */
   dimmed: boolean
+  /** Visual category used by optional map overlays such as parking. */
+  kind?: 'space' | 'parking'
+  address?: string | null
+  placeId?: string | null
 }
 
 export interface MapViewProps {

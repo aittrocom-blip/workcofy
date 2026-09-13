@@ -50,6 +50,8 @@ function createUserLocationElement(avatarSrc: string): HTMLElement {
 
 function createMarkerElement(
   isSelected: boolean,
+  kind: 'space' | 'parking' | undefined,
+  label: string,
   verified: boolean,
   photoUrl: string | null,
   favorited: boolean,
@@ -60,6 +62,20 @@ function createMarkerElement(
   wrapper.style.position = 'relative'
   wrapper.style.cursor = 'pointer'
   wrapper.style.opacity = dimmed ? '0.45' : '1'
+
+  if (kind === 'parking') {
+    const img = document.createElement('img')
+    img.src = '/icons/parking-map-marker-blue.png'
+    img.alt = `Estacionamiento cerca de ${label}`
+    img.style.width = '44px'
+    img.style.height = '44px'
+    img.style.objectFit = 'contain'
+    img.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+    img.style.transform = isSelected ? 'scale(1.1)' : 'scale(1)'
+    wrapper.appendChild(img)
+    wrapper.addEventListener('click', onSelect)
+    return wrapper
+  }
 
   const el = document.createElement('div')
   el.style.display = 'flex'
@@ -171,6 +187,8 @@ export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function M
       const isSelected = markerData.id === selectedMarkerId
       const el = createMarkerElement(
         isSelected,
+        markerData.kind,
+        markerData.label,
         markerData.verified,
         markerData.photoUrl,
         markerData.favorited,

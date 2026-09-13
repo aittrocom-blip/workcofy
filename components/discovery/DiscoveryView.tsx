@@ -69,6 +69,9 @@ export function DiscoveryView({
   const chosenAvatarId = useUserAvatar()
   const userAvatarSrc = chosenAvatarId ? avatarFor(chosenAvatarId).src : '/icons/worky-location.png'
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [showParking, setShowParking] = useState(false)
+  const [parkingMarkers, setParkingMarkers] = useState<Array<{ id: string; label: string; address: string | null; placeId: string; position: { lat: number; lng: number } }>>([])
+  const [parkingLoading, setParkingLoading] = useState(false)
   const mapRef = useRef<MapViewHandle>(null)
 
   const filters: DiscoveryFilterState = useMemo(() => {
@@ -197,7 +200,48 @@ export function DiscoveryView({
       photoUrl: space.photos?.find((photo) => photo.url)?.url ?? null,
       favorited: isFavorited(space.id),
       dimmed: filters.openNow && !isOpenNow(space.opening_hours, getLimaNow()),
+      kind: showParking && space.amenities.servicios.estacionamiento === true ? 'parking' as const : 'space' as const,
     }))
+
+  const parkingCount = spaces.filter((space) => space.amenities.servicios.estacionamiento === true).length
+
+  useEffect(() => {
+    if (!showParking || !coordinate) return
+    let cancelled = false
+    setParkingLoading(true)
+    fetch(`/api/parking?lat=${coordinate.lat}&lng=${coordinate.lng}`)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('parking')))
+      .then((data) => { if (!cancelled) setParkingMarkers(data.parking ?? []) })
+      .catch(() => { if (!cancelled) setParkingMarkers([]) })
+      .finally(() => { if (!cancelled) setParkingLoading(false) })
+    return () => { cancelled = true }
+  }, [showParking, coordinate])
+
+  const mapMarkers = showParking
+    ? [...markers, ...parkingMarkers.map((parking) => ({
+        id: parking.id, position: parking.position, label: parking.label,
+        verified: false, photoUrl: null, favorited: false, dimmed: false,
+        kind: 'parking' as const, address: parking.address, placeId: parking.placeId,
+      }))]
+    : markers
+
+  const parkingToggle = (
+    <button
+      type="button"
+      onClick={() => setShowParking((visible) => !visible)}
+      className={`pointer-events-auto flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold shadow-sm transition ${
+        showParking
+          ? 'border-blue-600 bg-blue-600 text-white'
+          : 'border-white bg-white/95 text-gray-800 hover:border-blue-200'
+      }`}
+      aria-pressed={showParking}
+      title="Mostrar locales con estacionamiento registrado"
+    >
+      <img src="/icons/parking-map-marker-blue.png" alt="" className="h-5 w-5 object-contain" />
+      Estacionamientos
+      {showParking && <span className="rounded-full bg-white/20 px-1.5 py-0.5">{parkingCount}</span>}
+    </button>
+  )
 
   if (fullScreen) {
     // --app-bottom-nav-height is only set inside the authenticated shell
@@ -209,7 +253,7 @@ export function DiscoveryView({
             ref={mapRef}
             center={coordinate}
             zoom={mapZoom}
-            markers={markers}
+            markers={mapMarkers}
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
             userLocation={status === 'granted' ? coordinate : null}
@@ -270,11 +314,18 @@ export function DiscoveryView({
 
         {/* Desktop-only floating control: zoom. */}
         <div className="pointer-events-none absolute right-4 top-20 z-20 hidden flex-col items-end gap-2 md:flex">
+          {parkingToggle}
           <MapZoomControls
             onZoomIn={() => mapRef.current?.zoomIn()}
             onZoomOut={() => mapRef.current?.zoomOut()}
           />
         </div>
+
+        {showParking && (parkingLoading || (parkingCount === 0 && parkingMarkers.length === 0)) && (
+          <div className="pointer-events-none absolute bottom-28 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white/95 px-4 py-2 text-xs text-gray-600 shadow-md">
+            {parkingLoading ? 'Buscando estacionamientos cercanos…' : 'No encontramos estacionamientos cercanos.'}
+          </div>
+        )}
 
         {/* Bottom horizontal carousel of nearby spaces, hidden once a space
             is selected — same rule Google Maps follows: the side panel takes
@@ -343,12 +394,13 @@ export function DiscoveryView({
           <MapView
             center={coordinate}
             zoom={mapZoom}
-            markers={markers}
+            markers={mapMarkers}
             selectedMarkerId={selectedId}
             onMarkerSelect={setSelectedId}
             userLocation={status === 'granted' ? coordinate : null}
             userAvatarSrc={userAvatarSrc}
           />
+          <div className="absolute right-3 top-3 z-10 md:hidden">{parkingToggle}</div>
           {selectedSpace && (
             <div className="pointer-events-none absolute inset-0 z-10 hidden items-end justify-end p-4 md:flex">
               <div className="pointer-events-auto w-80">

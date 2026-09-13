@@ -90,6 +90,14 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
               onClick={() => onMarkerSelect(marker.id)}
             >
               <div className={`relative transition-opacity duration-150 ${marker.dimmed ? 'opacity-45' : ''}`}>
+                {marker.kind === 'parking' ? (
+                  <img
+                    src="/icons/parking-map-marker-blue.png"
+                    alt={`Estacionamiento cerca de ${marker.label}`}
+                    className={`h-11 w-11 object-contain drop-shadow-md transition-transform duration-150 ${isSelected ? 'scale-110' : ''}`}
+                  />
+                ) : (
+                <>
                 {/* A circular photo of the space is the pin itself when one
                     exists. The border color keeps its one existing meaning —
                     yellow for Workcofy Verified, white otherwise — favorited
@@ -118,6 +126,8 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
                       <path d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z" />
                     </svg>
                   </span>
+                )}
+                </>
                 )}
               </div>
             </AdvancedMarker>
