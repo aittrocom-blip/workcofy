@@ -3,6 +3,26 @@ import { districtLabel } from '@/lib/districts'
 import type { SpaceBenefitWithSpace } from '@/lib/data/benefits'
 import type { CoinRedemption } from '@/lib/data/coins'
 
+// `benefit.icon`/`redemption.icon` are free-text emoji set per row in the
+// DB — this maps the ones actually in use today to the client's custom
+// artwork, and falls back to the raw emoji for anything not yet mapped so
+// new rows never render blank.
+const ICON_ARTWORK: Record<string, string> = {
+  '☕': '/icons/reward-coffee.png',
+  '💻': '/icons/reward-hours.png',
+  '🧑‍💻': '/icons/reward-experience.png',
+  '🎟️': '/icons/reward-visits.png',
+}
+
+function RewardIcon({ icon, fallback, className = '' }: { icon: string | null; fallback: string; className?: string }) {
+  const artwork = icon ? ICON_ARTWORK[icon] : undefined
+  if (artwork) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={artwork} alt="" className={`${className} object-contain`} />
+  }
+  return <span className={`${className} flex items-center justify-center text-lg`}>{icon || fallback}</span>
+}
+
 // A partner perk at a specific venue. "Muestra tu Pass" is the redemption
 // mechanic these are being prepared for — today it just deep-links to the
 // Pass; the pass-scan validation that would confirm it is the pending
@@ -11,7 +31,9 @@ export function BenefitCard({ benefit, compact = false }: { benefit: SpaceBenefi
   return (
     <div className={`flex flex-col justify-between rounded-[22px] border border-gray-100 bg-white p-4 ${compact ? 'w-[220px] flex-none' : ''}`}>
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl bg-workcofy-yellow/20 text-lg">{benefit.icon || '🎁'}</span>
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl bg-workcofy-yellow/20">
+          <RewardIcon icon={benefit.icon} fallback="🎁" className="h-6 w-6" />
+        </span>
         <div className="min-w-0">
           <p className="line-clamp-2 text-[15px] font-bold leading-snug tracking-tight">{benefit.label}</p>
           <Link href={`/spaces/${benefit.space.slug}`} className="mt-1 block truncate text-xs text-gray-500 hover:text-black">
@@ -23,7 +45,7 @@ export function BenefitCard({ benefit, compact = false }: { benefit: SpaceBenefi
         {benefit.space.verified ? (
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-black">
             <span className="h-1.5 w-1.5 rounded-full bg-workcofy-yellow" />
-            Workcofy Spot
+            Workcofy Partner
           </span>
         ) : (
           <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">Work-friendly</span>
@@ -44,7 +66,9 @@ export function RedemptionCard({ redemption, balance }: { redemption: CoinRedemp
   return (
     <div className="rounded-[22px] border border-gray-100 bg-white p-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl bg-gray-50 text-lg">{redemption.icon || '⭐'}</span>
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl bg-gray-50">
+          <RewardIcon icon={redemption.icon} fallback="⭐" className="h-6 w-6" />
+        </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-bold tracking-tight">{redemption.label}</p>
           <p className="flex items-center gap-1 text-xs text-gray-500">

@@ -51,7 +51,7 @@ export default async function BeneficiosPage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-lg font-extrabold tracking-tight">En Workcofy Spots</h2>
+        <h2 className="text-lg font-extrabold tracking-tight">En Workcofy Partners</h2>
         <p className="text-xs text-gray-500">Beneficios de los establecimientos verificados de la red</p>
         {spotBenefits.length === 0 ? (
           <p className="mt-3 rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">Aún no hay beneficios cargados en Spots. Pronto.</p>
