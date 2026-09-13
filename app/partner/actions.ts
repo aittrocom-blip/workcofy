@@ -44,3 +44,23 @@ export async function completePartnerPasswordChange() {
   const { error } = await admin.from('partner_accounts').update({ force_password_change: false, last_login_at: new Date().toISOString() }).eq('id', account.id)
   if (error) throw new Error(`No se pudo completar el cambio: ${error.message}`)
 }
+
+const VALIDATION_MESSAGES: Record<string, string> = {
+  not_a_partner: 'Esta cuenta no tiene acceso Partner activo.',
+  not_found: 'No encontramos ese código para este local.',
+  already_used: 'Este código ya fue validado antes.',
+  expired: 'Este código venció (vale 1 hora desde el check-in).',
+}
+
+// validate_benefit_code (0035_benefit_redemptions.sql) is security definer
+// and reads auth.uid() itself to find the caller's own partner_accounts row
+// — it must be called with the partner's own session (requireUser's cookie
+// client), never the admin client, or auth.uid() would be null inside it.
+export async function validateBenefitCode(code: string) {
+  const { supabase } = await requireUser('/partner')
+  const { data, error } = await supabase.rpc('validate_benefit_code', { p_code: code })
+  const result = (data as { success: boolean; message: string; benefit_label: string | null }[] | null)?.[0]
+  if (error || !result) throw new Error('No se pudo validar el código. Inténtalo de nuevo.')
+  if (!result.success) throw new Error(VALIDATION_MESSAGES[result.message] ?? 'No se pudo validar el código.')
+  return { benefitLabel: result.benefit_label ?? 'Beneficio' }
+}

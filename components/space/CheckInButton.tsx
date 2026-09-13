@@ -20,6 +20,9 @@ interface CheckInRpcResult {
   success: boolean
   message: string
   coins_awarded: number
+  redemption_code: string | null
+  benefit_label: string | null
+  redemption_expires_at: string | null
 }
 
 // "Estuve aquí" backed by real GPS proximity — the checkin_at_space() RPC
@@ -31,8 +34,10 @@ export function CheckInButton({ spaceId, className = '', demoCoordinates, spaceN
   const { user } = useAuthUser()
   const [status, setStatus] = useState<Status>('idle')
   const [coins, setCoins] = useState(0)
-  const [activationCode, setActivationCode] = useState('')
+  const [redemptionCode, setRedemptionCode] = useState<string | null>(null)
+  const [resolvedBenefitLabel, setResolvedBenefitLabel] = useState(benefitLabel)
   const [activatedAt, setActivatedAt] = useState<Date | null>(null)
+  const [expiresAt, setExpiresAt] = useState<Date | null>(null)
 
   if (!user) {
     return (
@@ -76,8 +81,13 @@ export function CheckInButton({ spaceId, className = '', demoCoordinates, spaceN
         }
         if (result.success) {
           setCoins(result.coins_awarded)
-          setActivationCode(String(Math.floor(100000 + Math.random() * 900000)))
+          // Minted server-side by checkin_at_space and stored in
+          // benefit_redemptions — a Partner can actually validate this at
+          // the register (see app/partner/actions.ts validateBenefitCode).
+          setRedemptionCode(result.redemption_code)
+          if (result.benefit_label) setResolvedBenefitLabel(result.benefit_label)
           setActivatedAt(new Date())
+          setExpiresAt(result.redemption_expires_at ? new Date(result.redemption_expires_at) : null)
           setStatus('done')
           window.dispatchEvent(new Event('workcofy:reward-earned'))
           return
@@ -86,14 +96,13 @@ export function CheckInButton({ spaceId, className = '', demoCoordinates, spaceN
   }
 
   if (status === 'done') {
-    const expiresAt = activatedAt ? new Date(activatedAt.getTime() + 60 * 60 * 1000) : null
     const formatTime = (date: Date | null) => date?.toLocaleTimeString('es-PE', { hour: 'numeric', minute: '2-digit' }) ?? '--'
     return <div className="w-full rounded-3xl bg-workcofy-yellow p-5 text-black shadow-lg shadow-workcofy-yellow/20">
       <div className="flex items-center justify-between"><p className="text-[10px] font-extrabold uppercase tracking-[0.2em]">Beneficio activo</p><span className="rounded-full bg-black px-2.5 py-1 text-[10px] font-bold text-white">ACTIVO</span></div>
-      <h3 className="mt-3 text-xl font-extrabold tracking-tight">{benefitLabel}</h3>
+      <h3 className="mt-3 text-xl font-extrabold tracking-tight">{resolvedBenefitLabel}</h3>
       <p className="mt-1 text-sm font-semibold text-black/65">{spaceName}</p>
       <div className="mt-4 grid grid-cols-2 gap-3 border-t border-black/10 pt-3 text-xs"><div><p className="text-black/50">Usuario</p><p className="font-bold">@{user.user_metadata?.user_name ?? user.email?.split('@')[0] ?? 'miembro'}</p></div><div><p className="text-black/50">ID</p><p className="font-bold">WK-{user.id.slice(0, 6).toUpperCase()}</p></div><div><p className="text-black/50">Activado</p><p className="font-bold">{formatTime(activatedAt)}</p></div><div><p className="text-black/50">Válido hasta</p><p className="font-bold">{formatTime(expiresAt)}</p></div></div>
-      <div className="mt-4 rounded-2xl bg-white/75 px-4 py-3 text-center"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Código para validar en caja</p><p className="mt-1 text-2xl font-black tracking-[0.25em]">{activationCode}</p></div>
+      {redemptionCode && <div className="mt-4 rounded-2xl bg-white/75 px-4 py-3 text-center"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Código para validar en caja</p><p className="mt-1 text-2xl font-black tracking-[0.25em]">{redemptionCode}</p></div>}
       {coins > 0 && <p className="mt-3 text-center text-xs font-bold">También ganaste +{coins} W Coins</p>}
     </div>
   }
