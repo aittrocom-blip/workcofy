@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import Link from 'next/link'
 import { COUNTRY_OPTIONS } from '@/lib/countries'
 import { FiltersPanel } from '@/components/discovery/FiltersPanel'
@@ -26,6 +26,7 @@ interface FiltersBarProps {
   hideFiltersPanel?: boolean
   /** Gives the full-screen map its own compact, unified control surface. */
   mapOverlay?: boolean
+  parkingToggle?: ReactNode
 }
 
 export function FiltersBar({
@@ -39,6 +40,7 @@ export function FiltersBar({
   hideSearch = false,
   hideFiltersPanel = false,
   mapOverlay = false,
+  parkingToggle,
 }: FiltersBarProps) {
   const [searchValue, setSearchValue] = useState(filters.search ?? '')
 
@@ -139,6 +141,7 @@ export function FiltersBar({
           )}
           {isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} variant="chip" />}
           <CategoryFilterDropdown selected={filters.category} onChange={(category) => onChange({ category })} />
+          {isMapOverlay && parkingToggle}
           {isMapOverlay && (
             <Link
               href="/espacios/sugerir"

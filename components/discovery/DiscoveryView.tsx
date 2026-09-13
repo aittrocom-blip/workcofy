@@ -29,6 +29,7 @@ import { districtLabel, districtSlugFromValue } from '@/lib/districts'
 import { isOpenNow, isOpenDuring, isOpen24HoursToday } from '@/lib/hours/openingHours'
 import { getLimaNow } from '@/lib/geo/limaTime'
 import { spaceMatchesUseCase } from '@/lib/spaceUseCases'
+import { haversineDistanceKm } from '@/lib/geo/haversine'
 
 interface DiscoveryViewProps {
   spaces: SpaceRecord[]
@@ -72,6 +73,7 @@ export function DiscoveryView({
   const [showParking, setShowParking] = useState(false)
   const [parkingMarkers, setParkingMarkers] = useState<Array<{ id: string; label: string; address: string | null; placeId: string; position: { lat: number; lng: number } }>>([])
   const [parkingLoading, setParkingLoading] = useState(false)
+  const [selectedParkingId, setSelectedParkingId] = useState<string | null>(null)
   const mapRef = useRef<MapViewHandle>(null)
 
   const filters: DiscoveryFilterState = useMemo(() => {
@@ -120,6 +122,17 @@ export function DiscoveryView({
   }, [sorted, filters.open24h, filters.openBetween, filters.verifiedOnly, filters.purpose])
 
   const selectedSpace = filtered.find((space) => space.id === selectedId) ?? null
+  const selectedParking = parkingMarkers.find((parking) => parking.id === selectedParkingId) ?? null
+
+  function handleMarkerSelect(id: string) {
+    if (id.startsWith('parking-')) {
+      setSelectedId(null)
+      setSelectedParkingId(id)
+      return
+    }
+    setSelectedParkingId(null)
+    setSelectedId(id)
+  }
 
   // Scoped to whichever country/district/category is already applied
   // server-side, so the chip list only ever offers zones that currently
@@ -229,7 +242,7 @@ export function DiscoveryView({
     <button
       type="button"
       onClick={() => setShowParking((visible) => !visible)}
-      className={`pointer-events-auto flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold shadow-sm transition ${
+      className={`pointer-events-auto flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full border text-sm font-bold shadow-sm transition ${
         showParking
           ? 'border-blue-600 bg-blue-600 text-white'
           : 'border-white bg-white/95 text-gray-800 hover:border-blue-200'
@@ -237,9 +250,8 @@ export function DiscoveryView({
       aria-pressed={showParking}
       title="Mostrar locales con estacionamiento registrado"
     >
-      <img src="/icons/parking-map-marker-blue.png" alt="" className="h-5 w-5 object-contain" />
-      Estacionamientos
-      {showParking && <span className="rounded-full bg-white/20 px-1.5 py-0.5">{parkingCount}</span>}
+      <span aria-hidden="true" className={`font-extrabold ${showParking ? 'text-white' : 'text-blue-600'}`}>P</span>
+      <span className="sr-only">Estacionamientos</span>
     </button>
   )
 
@@ -255,7 +267,7 @@ export function DiscoveryView({
             zoom={mapZoom}
             markers={mapMarkers}
             selectedMarkerId={selectedId}
-            onMarkerSelect={setSelectedId}
+            onMarkerSelect={handleMarkerSelect}
             userLocation={status === 'granted' ? coordinate : null}
             userAvatarSrc={userAvatarSrc}
             hideNativeZoom
@@ -276,6 +288,7 @@ export function DiscoveryView({
               hideFiltersPanel
               floating
               mapOverlay
+              parkingToggle={parkingToggle}
             />
             {locationUnavailable && (
               <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">
@@ -302,6 +315,7 @@ export function DiscoveryView({
                 hideFiltersPanel
                 floating
                 mapOverlay
+                parkingToggle={parkingToggle}
               />
               {locationUnavailable && (
                 <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">
@@ -314,7 +328,6 @@ export function DiscoveryView({
 
         {/* Desktop-only floating control: zoom. */}
         <div className="pointer-events-none absolute right-4 top-20 z-20 hidden flex-col items-end gap-2 md:flex">
-          {parkingToggle}
           <MapZoomControls
             onZoomIn={() => mapRef.current?.zoomIn()}
             onZoomOut={() => mapRef.current?.zoomOut()}
@@ -349,6 +362,26 @@ export function DiscoveryView({
                 onClose={() => setSelectedId(null)}
                 origin={status === 'granted' ? coordinate : null}
               />
+            </div>
+          </div>
+        )}
+
+        {selectedParking && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-30 hidden w-full max-w-md md:block">
+            <div className="pointer-events-auto h-full bg-white p-6 shadow-2xl">
+              <button type="button" onClick={() => setSelectedParkingId(null)} className="mb-8 text-2xl text-gray-500" aria-label="Cerrar">×</button>
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+                <img src="/icons/parking-map-marker-blue.png" alt="" className="h-11 w-11 object-contain" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Estacionamiento</p>
+              <h2 className="mt-2 text-2xl font-extrabold text-gray-900">{selectedParking.label}</h2>
+              {selectedParking.address && <p className="mt-2 text-sm text-gray-500">{selectedParking.address}</p>}
+              {coordinate && <p className="mt-3 text-sm font-semibold text-gray-700">A {haversineDistanceKm(coordinate, selectedParking.position).toFixed(1)} km de ti</p>}
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`}
+                target="_blank" rel="noreferrer"
+                className="mt-7 flex w-full items-center justify-center rounded-full bg-black px-5 py-3.5 text-sm font-bold text-white"
+              >Cómo llegar</a>
             </div>
           </div>
         )}
@@ -396,11 +429,10 @@ export function DiscoveryView({
             zoom={mapZoom}
             markers={mapMarkers}
             selectedMarkerId={selectedId}
-            onMarkerSelect={setSelectedId}
+            onMarkerSelect={handleMarkerSelect}
             userLocation={status === 'granted' ? coordinate : null}
             userAvatarSrc={userAvatarSrc}
           />
-          <div className="absolute right-3 top-3 z-10 md:hidden">{parkingToggle}</div>
           {selectedSpace && (
             <div className="pointer-events-none absolute inset-0 z-10 hidden items-end justify-end p-4 md:flex">
               <div className="pointer-events-auto w-80">
