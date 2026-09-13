@@ -51,7 +51,7 @@ export const DISCOVER_MENU_ITEMS: DiscoverMenuItem[] = [
 // Put the two engagement loops the team wants to emphasize first. Keep the
 // remaining ecosystem items in their existing order so the drawer remains
 // familiar for current users.
-const DISCOVER_MENU_ORDER = ['Beneficios', 'Retos', 'Trivia', 'Descuentos', 'Suscripciones', 'Eventos', 'Tank Shark', 'Música', 'Reservas']
+const DISCOVER_MENU_ORDER = ['Beneficios', 'Retos', 'Trivia', 'Música', 'Descuentos', 'Suscripciones', 'Eventos', 'Tank Shark', 'Reservas']
 
 export const DISCOVER_MENU_ITEMS_ORDERED = DISCOVER_MENU_ORDER.map((label) =>
   DISCOVER_MENU_ITEMS.find((item) => item.label === label)!
