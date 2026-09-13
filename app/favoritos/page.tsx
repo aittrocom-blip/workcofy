@@ -6,6 +6,7 @@ import { getCoursesByIds } from '@/lib/data/courses'
 import { FavoritesList } from '@/components/discovery/FavoritesList'
 import { CourseCard } from '@/components/courses/CourseCard'
 import { FavoritePlaylistCard } from '@/components/music/FavoritePlaylistCard'
+import { isSafeExternalUrl } from '@/lib/url/safeExternalUrl'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,13 +63,17 @@ export default async function FavoritosPage() {
   const [spaces, courses] = await Promise.all([getSpacesByIds(spaceIds), getCoursesByIds(courseIds)])
 
   // Rows saved before migration 0033 have no denormalized name/url — still
-  // usable via the playlist id, just grouped under a generic label.
+  // usable via the playlist id, just grouped under a generic label. `url`
+  // is only ever written by the user's own browser client (no server-side
+  // validation on that column), so an unsafe scheme here can only be
+  // self-XSS — still worth falling back to the canonical Spotify link
+  // rather than trusting it as-is.
   const playlists = ((playlistFavoriteRows ?? []) as PlaylistFavoriteRow[]).map((row) => ({
     id: row.playlist_id,
     name: row.name ?? 'Playlist guardada',
     image: row.image,
     owner: row.owner,
-    url: row.url ?? `https://open.spotify.com/playlist/${row.playlist_id}`,
+    url: isSafeExternalUrl(row.url) ? row.url : `https://open.spotify.com/playlist/${row.playlist_id}`,
     categoryKey: row.category_key ?? 'otras',
     categoryTitle: row.category_title ?? 'Otras playlists',
   }))
