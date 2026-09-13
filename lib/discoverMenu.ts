@@ -57,14 +57,6 @@ export const DISCOVER_MENU_ITEMS_ORDERED = DISCOVER_MENU_ORDER.map((label) =>
   DISCOVER_MENU_ITEMS.find((item) => item.label === label)!
 )
 
-// Reuse real destinations when these sections ship. Missing routes stay inert.
-export const HOME_QUICK_ACTIONS: DiscoverMenuItem[] = [
-  'Beneficios', 'Descuentos', 'Suscripciones', 'Eventos', 'Trivia', 'Tank Shark', 'Música', 'Retos', 'Reservas',
-].map((label) => {
-  const item = DISCOVER_MENU_ITEMS.find((entry) => entry.label === label)!
-  return {
-    ...item,
-    label: label === 'El Muro' ? 'Muro' : label,
-    comingSoon: item.comingSoon,
-  }
-})
+// Same order as the drawer (DISCOVER_MENU_ITEMS_ORDERED) so "Más para ti" on
+// Explorar and the ☰ drawer never disagree about where things sit.
+export const HOME_QUICK_ACTIONS: DiscoverMenuItem[] = DISCOVER_MENU_ITEMS_ORDERED
