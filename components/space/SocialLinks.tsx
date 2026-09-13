@@ -1,3 +1,5 @@
+import { isSafeExternalUrl } from '@/lib/url/safeExternalUrl'
+
 interface SocialLinksProps {
   instagramUrl: string | null
   tiktokUrl: string | null
@@ -24,7 +26,14 @@ function TikTokIcon() {
   )
 }
 
-export function SocialLinks({ instagramUrl, tiktokUrl }: SocialLinksProps) {
+export function SocialLinks({ instagramUrl: rawInstagramUrl, tiktokUrl: rawTiktokUrl }: SocialLinksProps) {
+  // Defense in depth — the write side (app/partner/actions.ts) already
+  // rejects non-http(s) URLs, but a link rendered as <a href> is exactly
+  // where a javascript: value would execute, so this never trusts stored
+  // data on its own.
+  const instagramUrl = isSafeExternalUrl(rawInstagramUrl) ? rawInstagramUrl : null
+  const tiktokUrl = isSafeExternalUrl(rawTiktokUrl) ? rawTiktokUrl : null
+
   if (!instagramUrl && !tiktokUrl) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3">

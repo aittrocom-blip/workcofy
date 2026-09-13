@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { requireUser } from '@/lib/supabase/serverAuth'
+import { isSafeExternalUrl } from '@/lib/url/safeExternalUrl'
 
 async function ownPartner() {
   const { user } = await requireUser('/partner')
@@ -15,7 +16,15 @@ async function ownPartner() {
 export async function updatePartnerSocials(spaceId: string, instagramUrl: string, tiktokUrl: string) {
   const { admin, account } = await ownPartner()
   if (account.space_id !== spaceId) throw new Error('No autorizado')
-  const clean = (value: string) => value.trim() || null
+  // Rendered straight into <a href> on the public ficha and /virals — only
+  // http(s) links are safe there (a javascript: URL would run in every
+  // visitor's session the moment they clicked it).
+  const clean = (value: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) return null
+    if (!isSafeExternalUrl(trimmed)) throw new Error('El link debe ser una URL http(s) válida.')
+    return trimmed
+  }
   const { error } = await admin.from('spaces').update({ instagram_url: clean(instagramUrl), tiktok_url: clean(tiktokUrl) }).eq('id', spaceId)
   if (error) throw new Error(`No se pudieron guardar las redes: ${error.message}`)
   revalidatePath('/partner')

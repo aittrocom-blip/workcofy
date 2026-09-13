@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { listSpaces } from '@/lib/data/spaces'
 import { districtLabel } from '@/lib/districts'
+import { isSafeExternalUrl } from '@/lib/url/safeExternalUrl'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,7 +32,12 @@ export default async function ViralsPage({ searchParams }: ViralsPageProps) {
     console.warn('ViralsPage: could not load spaces', error)
     return []
   })
-  const withSocial = spaces.filter((space) => space.tiktok_url || space.instagram_url)
+  // Only a validated http(s) link counts — see lib/url/safeExternalUrl:
+  // these values are Partner-editable (app/partner/actions.ts) and get
+  // rendered straight into <a href>, so an unvalidated one is a stored XSS.
+  const withSocial = spaces.filter(
+    (space) => isSafeExternalUrl(space.tiktok_url) || isSafeExternalUrl(space.instagram_url)
+  )
 
   return (
     <main className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 py-8 md:px-8 md:py-14">
@@ -62,8 +68,8 @@ export default async function ViralsPage({ searchParams }: ViralsPageProps) {
       {withSocial.length > 0 ? (
         <div className="mt-10 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {withSocial.map((space) => {
-            const socialUrl = space.tiktok_url ?? space.instagram_url
-            const socialLabel = space.tiktok_url ? 'TikTok' : 'Instagram'
+            const socialUrl = isSafeExternalUrl(space.tiktok_url) ? space.tiktok_url : space.instagram_url
+            const socialLabel = isSafeExternalUrl(space.tiktok_url) ? 'TikTok' : 'Instagram'
             const username = space.instagram_url?.split('/').filter(Boolean).pop()?.replace(/^@/, '').toLowerCase()
             const post = username ? instagramPosts[username] : undefined
             const embedUrl = post ? `${post.url.replace(/\/$/, '')}/embed` : undefined

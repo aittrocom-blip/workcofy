@@ -1,5 +1,6 @@
 'use server'
 
+import { randomBytes } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin/requireAdmin'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
@@ -9,8 +10,10 @@ function makePartnerUsername(slug: string) {
   return `partner-${slug.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 35)}`
 }
 
+// Math.random() isn't a CSPRNG — not safe for anything that guards access,
+// including a one-time password. crypto.randomBytes is.
 function makeTemporaryPassword() {
-  return `Wc-${Math.random().toString(36).slice(2, 8)}-${Math.random().toString(36).slice(2, 6)}`
+  return `Wc-${randomBytes(6).toString('base64url')}-${randomBytes(4).toString('base64url')}`
 }
 
 export async function createPartnerAccess(spaceId: string, slug: string) {
