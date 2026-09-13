@@ -20,7 +20,7 @@ const FEATURED_PLAYLISTS: Record<string, SpotifyPlaylist> = {
 
 function withFeatured(key: string, playlists: SpotifyPlaylist[]): SpotifyPlaylist[] {
   const featured = FEATURED_PLAYLISTS[key]
-  if (!featured) return playlists
+  if (!featured) return playlists.slice(0, 10)
   return [featured, ...playlists.filter((p) => p.id !== featured.id)].slice(0, 10)
 }
 
@@ -55,13 +55,26 @@ async function token() {
 
 export type MusicCategory = { key: string; title: string; query: string; playlists: SpotifyPlaylist[] }
 
+// limit=10 is the max Spotify accepts for a playlist search (limit=20
+// returns 400 "Invalid limit"). One page's results routinely include a few
+// null slots (deleted/private playlists), so a single page often falls
+// short of 10 once those are filtered out — offset=10 pages in a top-up.
+async function searchPlaylists(query: string, accessToken: string, offset: number): Promise<SpotifyPlaylist[]> {
+  const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10&offset=${offset}&market=PE`, { headers: { Authorization: `Bearer ${accessToken}` }, next: { revalidate: 21_600 } })
+  if (!response.ok) return []
+  const data = await response.json()
+  return (data.playlists?.items ?? []).filter((item: any) => item != null).map((item: any) => ({ id: item.id, name: item.name, url: item.external_urls?.spotify, image: item.images?.[0]?.url ?? null, owner: item.owner?.display_name ?? null } as SpotifyPlaylist))
+}
+
 export async function getSpotifyPlaylists(): Promise<MusicCategory[]> {
   const accessToken = await token()
   return Promise.all(SEARCHES.map(async (category) => {
-    const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(category.query)}&type=playlist&limit=10&market=PE`, { headers: { Authorization: `Bearer ${accessToken}` }, next: { revalidate: 21_600 } })
-    if (!response.ok) return { ...category, playlists: withFeatured(category.key, []) }
-    const data = await response.json()
-    const playlists = (data.playlists?.items ?? []).filter((item: any) => item != null).map((item: any) => ({ id: item.id, name: item.name, url: item.external_urls?.spotify, image: item.images?.[0]?.url ?? null, owner: item.owner?.display_name ?? null } as SpotifyPlaylist))
+    let playlists = await searchPlaylists(category.query, accessToken, 0)
+    if (playlists.length < 10) {
+      const extra = await searchPlaylists(category.query, accessToken, 10)
+      const seen = new Set(playlists.map((p) => p.id))
+      playlists = [...playlists, ...extra.filter((p) => !seen.has(p.id))]
+    }
     return { ...category, playlists: withFeatured(category.key, playlists) }
   }))
 }
