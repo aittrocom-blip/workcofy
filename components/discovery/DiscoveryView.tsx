@@ -219,10 +219,15 @@ export function DiscoveryView({
   const parkingCount = spaces.filter((space) => space.amenities.servicios.estacionamiento === true).length
 
   useEffect(() => {
-    if (!showParking || !coordinate) return
+    if (!showParking) return
+    const parkingLocations = filtered
+      .filter((space) => space.latitude != null && space.longitude != null)
+      .slice(0, 30)
+      .map((space) => `${space.latitude},${space.longitude}`)
+    if (parkingLocations.length === 0) return
     let cancelled = false
     setParkingLoading(true)
-    fetch(`/api/parking?lat=${coordinate.lat}&lng=${coordinate.lng}`)
+    fetch(`/api/parking?locations=${encodeURIComponent(parkingLocations.join('|'))}`)
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('parking')))
       .then((data) => { if (!cancelled) setParkingMarkers(data.parking ?? []) })
       .catch(() => { if (!cancelled) setParkingMarkers([]) })
