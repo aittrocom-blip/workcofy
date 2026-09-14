@@ -188,7 +188,9 @@ async function main() {
       const details = await fetchPlaceDetails(placeId, apiKey)
       const districtSlug = normalizeDistrict(target.localidad)
       const slug = generateSpaceSlug(target.name, `${target.country}-${target.localidad}`)
-      const photos = await downloadPhotos(details.photos, apiKey, slug, supabase)
+      const photos = process.env.SKIP_PHOTOS === '1'
+        ? []
+        : await downloadPhotos(details.photos, apiKey, slug, supabase)
 
       // Only the Banco Santander-branded "Work/Café" locations are the
       // work_cafe category — every other legacy target is a regular café.
