@@ -74,6 +74,7 @@ export const LEGACY_TARGETS: LegacyTarget[] = [
   { name: 'Rami Coffee Shop', localidad: 'Garcilaso de la Vega 2588, Lince, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Nae Caffè', localidad: 'Arequipa, Lince, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'La Suculenta Café', localidad: 'Jirón Soledad 561, Lince, Lima', country: 'pe', allowManualPlaceMatch: true },
+  { name: 'El Pan de la Chola El Polo', localidad: 'Centro Comercial El Polo, Surco, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Blue Bird Cafe', localidad: 'Vitacura', country: 'cl' },
   { name: 'Café de Lima - 28 de Julio', localidad: 'Miraflores', country: 'pe' },
   { name: 'Coleccionista Coffee Barranco', localidad: 'Barranco', country: 'pe' },
