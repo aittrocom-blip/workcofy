@@ -70,6 +70,7 @@ export const LEGACY_TARGETS: LegacyTarget[] = [
   { name: 'Puku Puku Puente de los Suspiros', localidad: 'Jirón Mariscal José Antonio de Sucre 403, Barranco, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Cabina Lima', localidad: 'Av. La Encalada 398, Surco, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Puku Puku La Molina', localidad: 'Av. La Molina 2448, La Molina, Lima', country: 'pe', allowManualPlaceMatch: true },
+  { name: 'El Pan de la Chola La Molina', localidad: 'Santiago de Compostela 167, La Molina, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'And Coffee', localidad: 'Av. Ignacio Merino 2595, Lince, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Rami Coffee Shop', localidad: 'Garcilaso de la Vega 2588, Lince, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Nae Caffè', localidad: 'Arequipa, Lince, Lima', country: 'pe', allowManualPlaceMatch: true },
