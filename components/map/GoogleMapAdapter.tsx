@@ -103,7 +103,7 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
                     yellow for Workcofy Verified, white otherwise — favorited
                     status gets its own heart badge instead of touching color. */}
                 <div
-                  className={`relative flex h-9 w-9 items-center justify-center rounded-full border-[3px] shadow transition-transform duration-150 ${marker.partner ? 'overflow-visible' : 'overflow-hidden'} ${
+                  className={`relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-[3px] shadow transition-transform duration-150 ${
                     isSelected ? 'scale-[1.18] shadow-lg' : ''
                   } ${marker.partner ? 'partner-signal shadow-[0_0_0_4px_rgba(244,185,66,0.16),0_0_14px_rgba(244,185,66,0.55)]' : ''} ${marker.partner || marker.verified ? 'border-workcofy-yellow' : 'border-white'}`}
                 >

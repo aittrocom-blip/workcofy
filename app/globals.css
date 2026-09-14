@@ -118,22 +118,14 @@ body {
   }
 }
 
-/* Señal visual suave para identificar Partners sin competir con el mapa. */
-.partner-signal::before {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  z-index: -1;
-  border-radius: 9999px;
-  border: 2px solid rgba(244, 185, 66, 0.65);
+/* Señal visual suave para identificar Partners sin sacar la foto del círculo. */
+.partner-signal {
   animation: workcofy-partner-signal 2.4s ease-out infinite;
-  pointer-events: none;
 }
 
 @keyframes workcofy-partner-signal {
-  0% { transform: scale(0.82); opacity: 0.75; }
-  70% { transform: scale(1.35); opacity: 0; }
-  100% { transform: scale(1.35); opacity: 0; }
+  0%, 100% { box-shadow: 0 0 0 3px rgba(244,185,66,0.12), 0 0 8px rgba(244,185,66,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(244,185,66,0.2), 0 0 16px rgba(244,185,66,0.65); }
 }
 
 @keyframes fade-in {
