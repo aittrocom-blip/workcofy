@@ -67,6 +67,7 @@ export const LEGACY_TARGETS: LegacyTarget[] = [
   { name: 'Biblioteca Municipal de San Isidro', localidad: 'San Isidro, Lima', country: 'pe', category: 'library' },
   { name: 'Biblioteca Municipal Carlos Tinnig', localidad: 'Magdalena del Mar, Lima', country: 'pe', category: 'library' },
   { name: 'Finca Rosal', localidad: 'Jr. Tacna 942, Magdalena del Mar, Lima', country: 'pe', allowManualPlaceMatch: true },
+  { name: 'Puku Puku Puente de los Suspiros', localidad: 'Jirón Mariscal José Antonio de Sucre 403, Barranco, Lima', country: 'pe', allowManualPlaceMatch: true },
   { name: 'Blue Bird Cafe', localidad: 'Vitacura', country: 'cl' },
   { name: 'Café de Lima - 28 de Julio', localidad: 'Miraflores', country: 'pe' },
   { name: 'Coleccionista Coffee Barranco', localidad: 'Barranco', country: 'pe' },
