@@ -306,7 +306,7 @@ export function DiscoveryView({
         {/* Mobile uses the same compact controls as desktop, but docked at the
             top. This preserves the lower half of the map for pins and keeps
             the toolbar out of the way of the space detail sheet. */}
-        {!selectedSpace && (
+        {!selectedSpace && !selectedParking && (
           <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:hidden">
             <div className="pointer-events-auto">
               <FiltersBar
@@ -393,7 +393,7 @@ export function DiscoveryView({
 
         <div
           className={`absolute inset-y-0 right-0 z-30 w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ease-out md:hidden ${
-            selectedSpace ? 'translate-x-0' : 'translate-x-full'
+            selectedSpace || selectedParking ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
           {selectedSpace && (
@@ -402,6 +402,19 @@ export function DiscoveryView({
               onClose={() => setSelectedId(null)}
               origin={status === 'granted' ? coordinate : null}
             />
+          )}
+          {selectedParking && (
+            <div className="h-full overflow-y-auto p-5">
+              <button type="button" onClick={() => setSelectedParkingId(null)} className="mb-6 flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-2xl text-gray-500" aria-label="Cerrar">×</button>
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+                <img src="/icons/parking-map-marker-blue.png" alt="" className="h-11 w-11 object-contain" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Estacionamiento</p>
+              <h2 className="mt-2 text-2xl font-extrabold text-gray-900">{selectedParking.label}</h2>
+              {selectedParking.address && <p className="mt-2 text-sm leading-relaxed text-gray-500">{selectedParking.address}</p>}
+              {coordinate && <p className="mt-3 text-sm font-semibold text-gray-700">A {haversineDistanceKm(coordinate, selectedParking.position).toFixed(1)} km de ti</p>}
+              <a href={`https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`} target="_blank" rel="noreferrer" className="mt-7 flex w-full items-center justify-center rounded-full bg-black px-5 py-3.5 text-sm font-bold text-white">Cómo llegar</a>
+            </div>
           )}
         </div>
       </div>

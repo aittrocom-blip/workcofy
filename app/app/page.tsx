@@ -48,6 +48,28 @@ export default async function ExplorarPage() {
       listPublishedTips(),
     ])
 
+  let catalogQuery: { data: Array<{ id: string; category_key: string; category_title: string; name: string; owner: string | null; image_url: string | null; spotify_url: string }> | null } = { data: null }
+  try {
+    catalogQuery = await supabase
+      .from('music_playlists')
+      .select('id, category_key, category_title, name, owner, image_url, spotify_url')
+      .eq('active', true)
+  } catch {
+    // The catalog is optional; the hand-picked fallback below keeps Explorar usable.
+  }
+  const catalogPlaylists = (catalogQuery.data ?? []).map((playlist) => ({
+    id: playlist.id,
+    categoryKey: playlist.category_key,
+    categoryTitle: playlist.category_title,
+    name: playlist.name,
+    owner: playlist.owner,
+    image: playlist.image_url,
+    url: playlist.spotify_url,
+  }))
+  const musicPlaylists = (catalogPlaylists.length > 0 ? catalogPlaylists : getFeaturedPlaylists())
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 8)
+
   return (
     <ExplorarHome
       holder={passHolderFrom(user, profile)}
@@ -56,7 +78,7 @@ export default async function ExplorarPage() {
       opportunities={opportunities}
       courses={courses}
       tips={tipsOfTheDay(tips)}
-      playlists={getFeaturedPlaylists()}
+      playlists={musicPlaylists}
       counts={{ opportunities: opportunityCount, courses: courseCount, certificates: certificateCount ?? 0 }}
       stats={{
         coins: rewardsBalanceFrom(events),
