@@ -18,7 +18,7 @@ export interface LegacyTarget {
   localidad: string
   country: 'pe' | 'cl' | 'co'
   instagramUrl?: string
-  category?: 'cafe' | 'work_cafe'
+  category?: 'cafe' | 'work_cafe' | 'library'
 }
 
 export const LEGACY_TARGETS: LegacyTarget[] = [
@@ -48,6 +48,16 @@ export const LEGACY_TARGETS: LegacyTarget[] = [
   { name: 'Amor Perfecto', localidad: 'Chapinero', country: 'co' },
   { name: 'Bourbon Coffee Roasters', localidad: 'Bogotá', country: 'co' },
   { name: 'Tea Temple', localidad: 'Bogotá', country: 'co' },
+  // Public libraries: curated flagship locations in the three active cities.
+  { name: 'Biblioteca Luis Ángel Arango', localidad: 'La Candelaria, Bogotá', country: 'co', category: 'library' },
+  { name: 'Biblioteca Nacional de Colombia', localidad: 'Bogotá', country: 'co', category: 'library' },
+  { name: 'Biblioteca Pública Virgilio Barco', localidad: 'Bogotá', country: 'co', category: 'library' },
+  { name: 'Biblioteca Pública Julio Mario Santo Domingo', localidad: 'Bogotá', country: 'co', category: 'library' },
+  { name: 'Gran Biblioteca Pública de Lima', localidad: 'Lima', country: 'pe', category: 'library' },
+  { name: 'Biblioteca Nacional del Perú', localidad: 'San Borja, Lima', country: 'pe', category: 'library' },
+  { name: 'Biblioteca de Santiago', localidad: 'Santiago', country: 'cl', category: 'library' },
+  { name: 'Biblioteca Nacional de Chile', localidad: 'Santiago', country: 'cl', category: 'library' },
+  { name: 'Biblioteca Pública de Providencia', localidad: 'Providencia, Santiago', country: 'cl', category: 'library' },
   { name: 'Blue Bird Cafe', localidad: 'Vitacura', country: 'cl' },
   { name: 'Café de Lima - 28 de Julio', localidad: 'Miraflores', country: 'pe' },
   { name: 'Coleccionista Coffee Barranco', localidad: 'Barranco', country: 'pe' },

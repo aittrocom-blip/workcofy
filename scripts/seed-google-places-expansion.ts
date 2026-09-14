@@ -144,7 +144,7 @@ async function downloadPhotos(
 interface ExpansionSeedInput {
   name: string
   slug: string
-  category: 'cafe' | 'work_cafe'
+  category: 'cafe' | 'work_cafe' | 'library'
   country: LegacyTarget['country']
   district: string
   address: string | null
@@ -176,7 +176,11 @@ async function main() {
   const skipped: string[] = []
 
   const requestedCountry = process.env.EXPANSION_COUNTRY as LegacyTarget['country'] | undefined
-  const targets = requestedCountry ? LEGACY_TARGETS.filter((target) => target.country === requestedCountry) : LEGACY_TARGETS
+  const requestedCategory = process.env.EXPANSION_CATEGORY as LegacyTarget['category'] | undefined
+  const targets = LEGACY_TARGETS.filter((target) =>
+    (!requestedCountry || target.country === requestedCountry) &&
+    (!requestedCategory || target.category === requestedCategory)
+  )
 
   for (const target of targets) {
     try {
