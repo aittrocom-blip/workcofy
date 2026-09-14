@@ -94,7 +94,9 @@ function createMarkerElement(
   el.style.transform = isSelected ? 'scale(1.18)' : 'scale(1)'
   el.style.boxShadow = isSelected
     ? '0 6px 10px rgba(0,0,0,0.35)'
-    : '0 2px 4px rgba(0,0,0,0.25)'
+    : partner
+      ? '0 0 0 4px rgba(244,185,66,0.16), 0 0 14px rgba(244,185,66,0.55)'
+      : '0 2px 4px rgba(0,0,0,0.25)'
 
   if (photoUrl) {
     const img = document.createElement('img')

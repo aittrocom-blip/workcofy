@@ -71,9 +71,11 @@ export function DiscoveryView({
   const userAvatarSrc = chosenAvatarId ? avatarFor(chosenAvatarId).src : '/icons/worky-location.png'
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showParking, setShowParking] = useState(false)
+  const [showPartners, setShowPartners] = useState(false)
   const [parkingMarkers, setParkingMarkers] = useState<Array<{ id: string; label: string; address: string | null; placeId: string; position: { lat: number; lng: number } }>>([])
   const [parkingLoading, setParkingLoading] = useState(false)
   const [selectedParkingId, setSelectedParkingId] = useState<string | null>(null)
+  const [parkingShareFeedback, setParkingShareFeedback] = useState(false)
   const mapRef = useRef<MapViewHandle>(null)
 
   const filters: DiscoveryFilterState = useMemo(() => {
@@ -123,6 +125,25 @@ export function DiscoveryView({
 
   const selectedSpace = filtered.find((space) => space.id === selectedId) ?? null
   const selectedParking = parkingMarkers.find((parking) => parking.id === selectedParkingId) ?? null
+
+  async function shareParking() {
+    if (!selectedParking) return
+    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`
+    const shareText = [selectedParking.label, selectedParking.address, directionsUrl].filter(Boolean).join('\n')
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: selectedParking.label, text: shareText, url: directionsUrl })
+      } catch {
+        // El usuario canceló el menú nativo.
+      }
+      return
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(shareText)
+      setParkingShareFeedback(true)
+      window.setTimeout(() => setParkingShareFeedback(false), 2200)
+    }
+  }
 
   function handleMarkerSelect(id: string) {
     if (id.startsWith('parking-')) {
@@ -204,6 +225,7 @@ export function DiscoveryView({
   }
 
   const markers = filtered
+    .filter((space) => !showPartners || space.partner_status === 'partner')
     .filter((space) => space.latitude != null && space.longitude != null)
     .map((space) => ({
       id: space.id,
@@ -260,6 +282,23 @@ export function DiscoveryView({
     </button>
   )
 
+  const partnerToggle = (
+    <button
+      type="button"
+      onClick={() => { setShowPartners((visible) => !visible); setSelectedId(null) }}
+      className={`pointer-events-auto flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full border text-sm shadow-sm transition ${
+        showPartners
+          ? 'border-workcofy-yellow bg-workcofy-yellow'
+          : 'border-white bg-white/95 hover:border-workcofy-yellow'
+      }`}
+      aria-pressed={showPartners}
+      title="Mostrar locales Partner"
+    >
+      <img src="/icons/logo-partner.png" alt="" className="h-7 w-7 object-contain" />
+      <span className="sr-only">Partners</span>
+    </button>
+  )
+
   if (fullScreen) {
     // --app-bottom-nav-height is only set inside the authenticated shell
     // (fixed tab bar); on the public site it falls back to 0.
@@ -293,6 +332,7 @@ export function DiscoveryView({
               hideFiltersPanel
               floating
               mapOverlay
+              partnerToggle={partnerToggle}
               parkingToggle={parkingToggle}
             />
             {locationUnavailable && (
@@ -320,6 +360,7 @@ export function DiscoveryView({
                 hideFiltersPanel
                 floating
                 mapOverlay
+                partnerToggle={partnerToggle}
                 parkingToggle={parkingToggle}
               />
               {locationUnavailable && (
@@ -382,11 +423,10 @@ export function DiscoveryView({
               <h2 className="mt-2 text-2xl font-extrabold text-gray-900">{selectedParking.label}</h2>
               {selectedParking.address && <p className="mt-2 text-sm text-gray-500">{selectedParking.address}</p>}
               {coordinate && <p className="mt-3 text-sm font-semibold text-gray-700">A {haversineDistanceKm(coordinate, selectedParking.position).toFixed(1)} km de ti</p>}
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`}
-                target="_blank" rel="noreferrer"
-                className="mt-7 flex w-full items-center justify-center rounded-full bg-black px-5 py-3.5 text-sm font-bold text-white"
-              >Cómo llegar</a>
+              <div className="mt-7 grid grid-cols-2 gap-2">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`} target="_blank" rel="noreferrer" className="flex w-full items-center justify-center rounded-full bg-black px-4 py-3.5 text-sm font-bold text-white">Cómo llegar</a>
+                <button type="button" onClick={shareParking} className="rounded-full border border-gray-200 px-4 py-3.5 text-sm font-bold text-gray-900">{parkingShareFeedback ? 'Enlace copiado' : 'Compartir'}</button>
+              </div>
             </div>
           </div>
         )}
@@ -413,7 +453,10 @@ export function DiscoveryView({
               <h2 className="mt-2 text-2xl font-extrabold text-gray-900">{selectedParking.label}</h2>
               {selectedParking.address && <p className="mt-2 text-sm leading-relaxed text-gray-500">{selectedParking.address}</p>}
               {coordinate && <p className="mt-3 text-sm font-semibold text-gray-700">A {haversineDistanceKm(coordinate, selectedParking.position).toFixed(1)} km de ti</p>}
-              <a href={`https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`} target="_blank" rel="noreferrer" className="mt-7 flex w-full items-center justify-center rounded-full bg-black px-5 py-3.5 text-sm font-bold text-white">Cómo llegar</a>
+              <div className="mt-7 grid grid-cols-2 gap-2">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination_place_id=${selectedParking.placeId}`} target="_blank" rel="noreferrer" className="flex w-full items-center justify-center rounded-full bg-black px-4 py-3.5 text-sm font-bold text-white">Cómo llegar</a>
+                <button type="button" onClick={shareParking} className="rounded-full border border-gray-200 px-4 py-3.5 text-sm font-bold text-gray-900">{parkingShareFeedback ? 'Enlace copiado' : 'Compartir'}</button>
+              </div>
             </div>
           )}
         </div>

@@ -26,6 +26,7 @@ interface FiltersBarProps {
   hideFiltersPanel?: boolean
   /** Gives the full-screen map its own compact, unified control surface. */
   mapOverlay?: boolean
+  partnerToggle?: ReactNode
   parkingToggle?: ReactNode
 }
 
@@ -40,6 +41,7 @@ export function FiltersBar({
   hideSearch = false,
   hideFiltersPanel = false,
   mapOverlay = false,
+  partnerToggle,
   parkingToggle,
 }: FiltersBarProps) {
   const [searchValue, setSearchValue] = useState(filters.search ?? '')
@@ -141,6 +143,7 @@ export function FiltersBar({
           )}
           {isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} variant="chip" />}
           <CategoryFilterDropdown selected={filters.category} onChange={(category) => onChange({ category })} />
+          {isMapOverlay && partnerToggle}
           {isMapOverlay && parkingToggle}
           {isMapOverlay && (
             <Link

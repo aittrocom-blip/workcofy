@@ -45,7 +45,7 @@ export function SpaceCard({ space, isSelected, onSelect, origin = null, onViewDe
       onClick={onSelect}
       className={`group cursor-pointer rounded-2xl border bg-white p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.14)] ${
         isSelected ? 'border-black' : 'border-transparent'
-      } ${dimmed ? 'opacity-45 hover:opacity-100' : ''}`}
+      } ${space.partner_status === 'partner' ? 'ring-1 ring-workcofy-yellow/35 shadow-[0_8px_26px_rgba(244,185,66,0.18)]' : ''} ${dimmed ? 'opacity-45 hover:opacity-100' : ''}`}
     >
       <div className="relative h-32 w-full overflow-hidden rounded-xl bg-gray-100 transition-transform duration-200 group-hover:scale-[1.02]">
         {coverPhoto && (
