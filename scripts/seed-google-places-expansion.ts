@@ -169,6 +169,7 @@ interface ExpansionSeedInput {
   description: null
   data_source: 'google'
   instagram_url: string | null
+  amenities?: { servicios: { cafe: boolean; agua: boolean } }
 }
 
 async function main() {
@@ -230,6 +231,7 @@ async function main() {
         description: null,
         data_source: 'google',
         instagram_url: target.instagramUrl ?? null,
+        ...(target.category === 'library' ? { amenities: { servicios: { cafe: false, agua: false } } } : {}),
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
