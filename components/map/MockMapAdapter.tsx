@@ -53,6 +53,7 @@ function createMarkerElement(
   kind: 'space' | 'parking' | undefined,
   label: string,
   verified: boolean,
+  partner: boolean | undefined,
   photoUrl: string | null,
   favorited: boolean,
   dimmed: boolean,
@@ -88,7 +89,7 @@ function createMarkerElement(
   // Border color keeps its one existing meaning — yellow for Workcofy
   // Verified, white otherwise. Favorited gets its own heart badge below,
   // never a color change.
-  el.style.border = `3px solid ${verified ? '#F4B942' : '#ffffff'}`
+  el.style.border = `3px solid ${partner || verified ? '#F4B942' : '#ffffff'}`
   el.style.transition = 'transform 0.15s ease, box-shadow 0.15s ease'
   el.style.transform = isSelected ? 'scale(1.18)' : 'scale(1)'
   el.style.boxShadow = isSelected
@@ -104,7 +105,7 @@ function createMarkerElement(
     img.style.objectFit = 'cover'
     el.appendChild(img)
   } else {
-    el.style.backgroundColor = verified ? '#F4B942' : '#ffffff'
+    el.style.backgroundColor = partner || verified ? '#F4B942' : '#ffffff'
     const img = document.createElement('img')
     img.src = MARK_SRC
     img.alt = 'Workcofy'
@@ -118,20 +119,19 @@ function createMarkerElement(
   if (favorited) {
     const heart = document.createElement('span')
     heart.style.position = 'absolute'
-    heart.style.bottom = '-2px'
-    heart.style.right = '-2px'
+    heart.style.bottom = '-3px'
+    heart.style.right = '-3px'
     heart.style.display = 'flex'
     heart.style.alignItems = 'center'
     heart.style.justifyContent = 'center'
-    heart.style.width = '16px'
-    heart.style.height = '16px'
+    heart.style.width = '10px'
+    heart.style.height = '10px'
     heart.style.borderRadius = '9999px'
-    heart.style.backgroundColor = '#ffffff'
+    heart.style.backgroundColor = '#F4B942'
+    heart.style.border = '2px solid #ffffff'
     heart.style.boxShadow = '0 1px 3px rgba(0,0,0,0.3)'
     // Same heart path as FavoriteButton.tsx's HeartIcon and
     // GoogleMapAdapter's marker, so it reads as the same icon everywhere.
-    heart.innerHTML =
-      '<svg viewBox="0 0 24 24" width="12" height="12" fill="#ef4444"><path d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z"/></svg>'
     wrapper.appendChild(heart)
   }
 
@@ -190,6 +190,7 @@ export const MockMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function M
         markerData.kind,
         markerData.label,
         markerData.verified,
+        markerData.partner,
         markerData.photoUrl,
         markerData.favorited,
         markerData.dimmed,

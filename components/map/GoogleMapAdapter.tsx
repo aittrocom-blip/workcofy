@@ -105,7 +105,7 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
                 <div
                   className={`flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-[3px] shadow transition-transform duration-150 ${
                     isSelected ? 'scale-[1.18] shadow-lg' : ''
-                  } ${marker.verified ? 'border-workcofy-yellow' : 'border-white'}`}
+                  } ${marker.partner || marker.verified ? 'border-workcofy-yellow' : 'border-white'}`}
                 >
                   {marker.photoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -113,20 +113,14 @@ export const GoogleMapAdapter = forwardRef<MapViewHandle, MapViewProps>(function
                   ) : (
                     <div
                       className={`flex h-full w-full items-center justify-center ${
-                        marker.verified ? 'bg-workcofy-yellow' : 'bg-white'
+                        marker.partner || marker.verified ? 'bg-workcofy-yellow' : 'bg-white'
                       }`}
                     >
                       <img src="/logo-solo-alpha.png" alt="Workcofy" className="h-[26px] w-auto" />
                     </div>
                   )}
                 </div>
-                {marker.favorited && (
-                  <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white shadow">
-                    <svg viewBox="0 0 24 24" className="h-3 w-3 text-red-500" fill="currentColor">
-                      <path d="M12 20.5s-7.5-4.6-10-9.2C.5 8 2 4.5 5.5 4c2.1-.3 4 .8 6.5 3.3C14.5 4.8 16.4 3.7 18.5 4c3.5.5 5 4 3.5 7.3-2.5 4.6-10 9.2-10 9.2z" />
-                    </svg>
-                  </span>
-                )}
+                {marker.favorited && <span className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full border-2 border-white bg-workcofy-yellow shadow" aria-label="Favorito" />}
                 </>
                 )}
               </div>

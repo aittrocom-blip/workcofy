@@ -212,6 +212,7 @@ export function DiscoveryView({
       verified: space.verified,
       photoUrl: space.photos?.find((photo) => photo.url)?.url ?? null,
       favorited: isFavorited(space.id),
+      partner: space.partner_status === 'partner',
       dimmed: filters.openNow && !isOpenNow(space.opening_hours, getLimaNow()),
       kind: showParking && space.amenities.servicios.estacionamiento === true ? 'parking' as const : 'space' as const,
     }))
