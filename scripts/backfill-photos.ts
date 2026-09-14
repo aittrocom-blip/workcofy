@@ -38,11 +38,13 @@ async function main() {
   }
 
   const supabase = createServiceRoleClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('spaces')
     .select('id, slug, name, google_place_id, photos')
     .eq('data_source', 'google')
     .not('google_place_id', 'is', null)
+  if (process.env.BACKFILL_COUNTRY) query = query.eq('country', process.env.BACKFILL_COUNTRY)
+  const { data, error } = await query
 
   if (error) throw new Error(`Failed to list spaces: ${error.message}`)
 
