@@ -18,10 +18,16 @@ const FEATURED_PLAYLISTS: Record<string, SpotifyPlaylist> = {
   coffee: { id: '1vmPeUv7I9SbldjHpfuXWu', name: 'WORK CAFÉ', url: 'https://open.spotify.com/playlist/1vmPeUv7I9SbldjHpfuXWu', image: 'https://image-cdn-fa.spotifycdn.com/image/ab67706c0000d72c22c6f68b70ac02c2f84979aa', owner: 'Santander España' },
 }
 
+// Was capped at 10 to match a single Spotify search request — now that
+// results are cached in our own `music_playlists` table (see
+// lib/music/refreshCache.ts) instead of being fetched live per page view,
+// nothing forces that ceiling anymore.
+const DISPLAY_LIMIT = 20
+
 function withFeatured(key: string, playlists: SpotifyPlaylist[]): SpotifyPlaylist[] {
   const featured = FEATURED_PLAYLISTS[key]
-  if (!featured) return playlists.slice(0, 10)
-  return [featured, ...playlists.filter((p) => p.id !== featured.id)].slice(0, 10)
+  if (!featured) return playlists.slice(0, DISPLAY_LIMIT)
+  return [featured, ...playlists.filter((p) => p.id !== featured.id)].slice(0, DISPLAY_LIMIT)
 }
 
 // The hand-picked set, with each one's category label attached — for
@@ -69,11 +75,21 @@ async function searchPlaylists(query: string, accessToken: string, offset: numbe
 export async function getSpotifyPlaylists(): Promise<MusicCategory[]> {
   const accessToken = await token()
   return Promise.all(SEARCHES.map(async (category) => {
-    let playlists = await searchPlaylists(category.query, accessToken, 0)
-    if (playlists.length < 10) {
-      const extra = await searchPlaylists(category.query, accessToken, 10)
-      const seen = new Set(playlists.map((p) => p.id))
-      playlists = [...playlists, ...extra.filter((p) => !seen.has(p.id))]
+    const playlists: SpotifyPlaylist[] = []
+    const seen = new Set<string>()
+    // Page until DISPLAY_LIMIT is covered or Spotify runs out of results for
+    // this query — each page can come back short (null slots filtered out
+    // above), so plain offset += 10 without a page cap would loop forever
+    // once results genuinely run dry.
+    for (let offset = 0; playlists.length < DISPLAY_LIMIT && offset < DISPLAY_LIMIT * 2; offset += 10) {
+      const page = await searchPlaylists(category.query, accessToken, offset)
+      if (page.length === 0) break
+      for (const item of page) {
+        if (!seen.has(item.id)) {
+          seen.add(item.id)
+          playlists.push(item)
+        }
+      }
     }
     return { ...category, playlists: withFeatured(category.key, playlists) }
   }))

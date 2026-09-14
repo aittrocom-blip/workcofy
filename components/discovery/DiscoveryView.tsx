@@ -223,7 +223,6 @@ export function DiscoveryView({
     if (!showParking) return
     const parkingLocations = filtered
       .filter((space) => space.latitude != null && space.longitude != null)
-      .slice(0, 30)
       .map((space) => `${space.latitude},${space.longitude}`)
     if (parkingLocations.length === 0) return
     let cancelled = false

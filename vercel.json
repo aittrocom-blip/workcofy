@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/seed-opportunities", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/refresh-espacios", "schedule": "0 6 1 * *" }
+    { "path": "/api/cron/refresh-espacios", "schedule": "0 6 1 * *" },
+    { "path": "/api/cron/refresh-music", "schedule": "30 6 * * *" }
   ]
 }

@@ -69,6 +69,38 @@ export async function createSpaceAction(input: NewSpaceInput): Promise<CreateSpa
       dataSource: googleFields ? 'google' : 'mock',
     })
 
+    // Keep the parking catalog warm as soon as a new location is created.
+    // This is best-effort: creating the Workcofy space must not fail if Google
+    // Places is temporarily unavailable or the optional table is not migrated yet.
+    if (googleFields?.latitude != null && googleFields?.longitude != null) {
+      try {
+        const apiKey = process.env.GOOGLE_MAPS_SERVER_API_KEY
+        if (apiKey) {
+          const url = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
+          url.searchParams.set('location', `${googleFields.latitude},${googleFields.longitude}`)
+          url.searchParams.set('radius', '700')
+          url.searchParams.set('keyword', 'estacionamiento parking')
+          url.searchParams.set('key', apiKey)
+          const response = await fetch(url)
+          const body = await response.json()
+          const places = (body.results ?? []).filter((place: any) => place.place_id && place.geometry?.location)
+          if (places.length > 0) {
+            const admin = createAdminSupabaseClient()
+            await admin.from('parking_locations').upsert(
+              places.map((place: any) => ({
+                google_place_id: place.place_id, name: place.name, address: place.vicinity ?? null,
+                latitude: place.geometry.location.lat, longitude: place.geometry.location.lng,
+                last_synced_at: new Date().toISOString(),
+              })),
+              { onConflict: 'google_place_id' }
+            )
+          }
+        }
+      } catch (error) {
+        console.warn(`No se pudieron sincronizar estacionamientos para "${space.slug}":`, error)
+      }
+    }
+
     // Photos need the space's final slug (for the storage path), so this can
     // only happen after createSpace() — a failure here shouldn't undo an
     // otherwise-successful creation, just leave it with no photos for now.
