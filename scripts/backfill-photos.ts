@@ -45,6 +45,7 @@ async function main() {
     .not('google_place_id', 'is', null)
   if (process.env.BACKFILL_COUNTRY) query = query.eq('country', process.env.BACKFILL_COUNTRY)
   if (process.env.BACKFILL_NAME) query = query.eq('name', process.env.BACKFILL_NAME)
+  if (process.env.BACKFILL_NAMES) query = query.in('name', process.env.BACKFILL_NAMES.split(',').filter(Boolean))
   const { data, error } = await query
 
   if (error) throw new Error(`Failed to list spaces: ${error.message}`)

@@ -186,10 +186,12 @@ async function main() {
   const requestedCountry = process.env.EXPANSION_COUNTRY as LegacyTarget['country'] | undefined
   const requestedCategory = process.env.EXPANSION_CATEGORY as LegacyTarget['category'] | undefined
   const requestedName = process.env.EXPANSION_NAME?.toLowerCase()
+  const requestedNames = process.env.EXPANSION_NAMES?.toLowerCase().split(',').filter(Boolean)
   const targets = LEGACY_TARGETS.filter((target) =>
     (!requestedCountry || target.country === requestedCountry) &&
     (!requestedCategory || target.category === requestedCategory) &&
-    (!requestedName || target.name.toLowerCase() === requestedName)
+    (!requestedName || target.name.toLowerCase() === requestedName) &&
+    (!requestedNames || requestedNames.includes(target.name.toLowerCase()))
   )
 
   for (const target of targets) {
