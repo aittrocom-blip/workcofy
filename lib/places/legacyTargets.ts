@@ -1,6 +1,6 @@
 // Cafés carried over from the old Workcofy app's database backup
 // (data-antigua/db_cluster-10-08-2026@00-46-49.backup.gz, table `cafes`,
-// es_activa = true), scoped to Chile and Perú for the Fase 2 expansion.
+// es_activa = true), scoped to Chile, Perú and Colombia for the expansion.
 //
 // Coordinates from that backup are NOT used — about a quarter of the Chile
 // rows were off by 90-220km (see docs/superpowers/specs — Radar de
@@ -16,10 +16,35 @@
 export interface LegacyTarget {
   name: string
   localidad: string
-  country: 'pe' | 'cl'
+  country: 'pe' | 'cl' | 'co'
+  instagramUrl?: string
+  category?: 'cafe' | 'work_cafe'
 }
 
 export const LEGACY_TARGETS: LegacyTarget[] = [
+  // Bogotá: recovered from the old database backup and selected from the
+  // Revista Diners telework-café guide (Starbucks intentionally excluded).
+  { name: 'Casa Café Cultor', localidad: 'Chapinero', country: 'co' },
+  { name: 'Azahar Café', localidad: 'Chapinero', country: 'co' },
+  { name: 'Café Del Eje - Usaquen', localidad: 'Usaquen', country: 'co' },
+  { name: 'Brot Bakery Cafe', localidad: 'Bogotá', country: 'co' },
+  { name: 'Masa', localidad: 'Bogotá', country: 'co' },
+  { name: 'Libertario Coffee Roasters', localidad: 'Chapinero', country: 'co' },
+  { name: 'Varietale', localidad: 'Chapinero', country: 'co' },
+  { name: 'Mistral', localidad: 'Bogotá', country: 'co', instagramUrl: 'https://www.instagram.com/mistral.co/' },
+  { name: 'Noble', localidad: 'Bogotá', country: 'co', instagramUrl: 'https://www.instagram.com/somos.noble/' },
+  { name: 'Sereno', localidad: 'Bogotá', country: 'co', instagramUrl: 'https://www.instagram.com/serenobog/' },
+  { name: 'Tropicalia Coffee', localidad: 'Bogotá', country: 'co', instagramUrl: 'https://www.instagram.com/tropicaliacoffee/' },
+  { name: 'Topis', localidad: 'Bogotá', country: 'co', instagramUrl: 'https://www.instagram.com/topis.col/' },
+  { name: 'Rico Café Rico', localidad: 'Bogotá', country: 'co', instagramUrl: 'https://www.instagram.com/ricocaferico/' },
+  { name: 'Café Colo', localidad: 'Bogotá', country: 'co' },
+  { name: 'Tostadores de Café de Bogotá', localidad: 'Bogotá', country: 'co' },
+  { name: 'Café Banna', localidad: 'Bogotá', country: 'co' },
+  { name: 'Café Monstruo', localidad: 'Bogotá', country: 'co' },
+  { name: 'Craneo Sacral', localidad: 'Bogotá', country: 'co' },
+  { name: 'Cécile', localidad: 'Bogotá', country: 'co' },
+  { name: 'Arte y Pasión', localidad: 'Bogotá', country: 'co' },
+  { name: 'Excels(o) Café Comida Coworking', localidad: 'Bogotá', country: 'co', category: 'work_cafe' },
   { name: 'Blue Bird Cafe', localidad: 'Vitacura', country: 'cl' },
   { name: 'Café de Lima - 28 de Julio', localidad: 'Miraflores', country: 'pe' },
   { name: 'Coleccionista Coffee Barranco', localidad: 'Barranco', country: 'pe' },

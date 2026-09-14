@@ -10,8 +10,9 @@ const PLACE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/js
 const PLACE_PHOTO_URL = 'https://maps.googleapis.com/maps/api/place/photo'
 const PHOTO_BUCKET = 'space-photos'
 const MAX_PHOTOS_PER_SPACE = 10
+const PARKING_RADIUS_METERS = 700
 
-const COUNTRY_LABEL: Record<LegacyTarget['country'], string> = { pe: 'Perú', cl: 'Chile' }
+const COUNTRY_LABEL: Record<LegacyTarget['country'], string> = { pe: 'Perú', cl: 'Chile', co: 'Colombia' }
 
 async function findPlaceId(target: LegacyTarget, apiKey: string): Promise<string | null> {
   const countryLabel = COUNTRY_LABEL[target.country]
@@ -66,6 +67,35 @@ async function fetchPlaceDetails(placeId: string, apiKey: string): Promise<Googl
     throw new Error(`Place Details failed for ${placeId}: ${body.status}`)
   }
   return body.result
+}
+
+async function syncNearbyParking(
+  latitude: number | null,
+  longitude: number | null,
+  apiKey: string,
+  supabase: ReturnType<typeof createAdminSupabaseClient>
+) {
+  if (latitude == null || longitude == null) return
+  const url = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
+  url.searchParams.set('location', `${latitude},${longitude}`)
+  url.searchParams.set('radius', String(PARKING_RADIUS_METERS))
+  url.searchParams.set('keyword', 'estacionamiento parking')
+  url.searchParams.set('key', apiKey)
+  const response = await fetch(url)
+  if (!response.ok) return
+  const body = await response.json()
+  const parking = (body.results ?? []).filter((place: any) => place.place_id && place.geometry?.location).map((place: any) => ({
+    google_place_id: place.place_id,
+    name: place.name,
+    address: place.vicinity ?? null,
+    latitude: place.geometry.location.lat,
+    longitude: place.geometry.location.lng,
+    last_synced_at: new Date().toISOString(),
+  }))
+  if (parking.length) {
+    const { error } = await supabase.from('parking_locations').upsert(parking, { onConflict: 'google_place_id' })
+    if (error) console.warn(`  Parking no se pudo guardar: ${error.message}`)
+  }
 }
 
 // Google's photo_reference isn't directly renderable and can expire, so we
@@ -124,6 +154,7 @@ interface ExpansionSeedInput {
   photos: SpacePhoto[] | null
   description: null
   data_source: 'google'
+  instagram_url: string | null
 }
 
 async function main() {
@@ -151,7 +182,7 @@ async function main() {
 
       // Only the Banco Santander-branded "Work/Café" locations are the
       // work_cafe category — every other legacy target is a regular café.
-      const category = target.name.toLowerCase().includes('santander') ? 'work_cafe' : 'cafe'
+      const category = target.category ?? (target.name.toLowerCase().includes('santander') ? 'work_cafe' : 'cafe')
 
       resolved.push({
         name: target.name,
@@ -173,6 +204,7 @@ async function main() {
         photos: photos.length ? photos : null,
         description: null,
         data_source: 'google',
+        instagram_url: target.instagramUrl ?? null,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
@@ -204,6 +236,10 @@ async function main() {
     if (contactError) {
       console.warn(`  Could not create internal contact row for "${record.name}": ${contactError.message}`)
     }
+
+    // Bogotá and future expansion cities get their nearby parking catalogued
+    // during the same import, so the map is useful immediately after launch.
+    await syncNearbyParking(record.latitude, record.longitude, apiKey, supabase)
   }
 
   console.log(`Resolved and seeded ${seeded}/${LEGACY_TARGETS.length} spaces.`)
