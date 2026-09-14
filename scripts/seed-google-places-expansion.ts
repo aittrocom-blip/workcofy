@@ -1,9 +1,16 @@
-import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import { createClient } from '@supabase/supabase-js'
 import { generateSpaceSlug } from '@/lib/slug'
 import { normalizeDistrict } from '@/lib/geo/normalizeDistrict'
 import { LEGACY_TARGETS, type LegacyTarget } from '@/lib/places/legacyTargets'
 import type { SpacePhoto } from '@/lib/data/spaceTypes'
 import type { OpeningPeriod } from '@/lib/hours/openingHours'
+
+function createAdminSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceRoleKey) throw new Error('Missing Supabase admin environment variables')
+  return createClient(url, serviceRoleKey)
+}
 
 const PLACES_TEXT_SEARCH_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
 const PLACE_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json'
@@ -168,7 +175,10 @@ async function main() {
   const resolved: ExpansionSeedInput[] = []
   const skipped: string[] = []
 
-  for (const target of LEGACY_TARGETS) {
+  const requestedCountry = process.env.EXPANSION_COUNTRY as LegacyTarget['country'] | undefined
+  const targets = requestedCountry ? LEGACY_TARGETS.filter((target) => target.country === requestedCountry) : LEGACY_TARGETS
+
+  for (const target of targets) {
     try {
       const placeId = await findPlaceId(target, apiKey)
       if (!placeId) {
@@ -242,7 +252,7 @@ async function main() {
     await syncNearbyParking(record.latitude, record.longitude, apiKey, supabase)
   }
 
-  console.log(`Resolved and seeded ${seeded}/${LEGACY_TARGETS.length} spaces.`)
+  console.log(`Resolved and seeded ${seeded}/${targets.length} spaces.`)
   if (skipped.length > 0) {
     console.warn(`Skipped (no confident match, resolve manually): ${skipped.join(', ')}`)
   }

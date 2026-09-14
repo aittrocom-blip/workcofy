@@ -15,11 +15,11 @@ export interface CategoryOption {
 
 export const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'cafe', label: 'Café Workfriendly', active: true },
-  { value: 'work_cafe', label: 'Cowork Café', active: true },
+  { value: 'work_cafe', label: 'Café Coworking', active: true },
   { value: 'coworking', label: 'Coworking', active: true },
-  { value: 'meeting_room', label: 'Sala de reunión', active: false },
+  { value: 'meeting_room', label: 'Sala de reuniones', active: true },
   { value: 'hotel', label: 'Lobby Café', active: true },
-  { value: 'library', label: 'Biblioteca', active: false },
+  { value: 'library', label: 'Biblioteca', active: true },
 ]
 
 export const ACTIVE_CATEGORY_VALUES: CategoryValue[] = CATEGORY_OPTIONS.filter(
@@ -52,7 +52,7 @@ export const SPACE_CATEGORY_SLUGS: SpaceCategorySlug[] = [
   {
     slug: 'work-cafe',
     value: 'work_cafe',
-    title: 'Work cafés',
+    title: 'Cafés Coworking',
     description: 'Cafés pensados para trabajar: mesas amplias, enchufes y zonas tranquilas.',
   },
   {
@@ -72,6 +72,12 @@ export const SPACE_CATEGORY_SLUGS: SpaceCategorySlug[] = [
     value: 'library',
     title: 'Bibliotecas',
     description: 'Bibliotecas y salas de lectura silenciosas para concentrarte.',
+  },
+  {
+    slug: 'salas-de-reuniones',
+    value: 'meeting_room',
+    title: 'Salas de reuniones',
+    description: 'Salas privadas para reuniones, videollamadas y encuentros de trabajo.',
   },
 ]
 
