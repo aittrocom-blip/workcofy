@@ -10,6 +10,7 @@ import { optionLabel } from '@/lib/optionLabel'
 import { professionLabel } from '@/lib/professions'
 import { formatRelativeDays } from '@/lib/text/relativeDays'
 import { ShareButton } from '@/components/ui/ShareButton'
+import { FavoriteIcon } from '@/components/ui/FavoriteIcon'
 
 interface OpportunityCardProps {
   opportunity: OpportunityRecord
@@ -112,7 +113,7 @@ export function OpportunityCard({ opportunity, now = new Date() }: OpportunityCa
             title="Guardar no está disponible todavía"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-lg text-gray-300"
           >
-            ♡
+            <FavoriteIcon filled={false} className="h-5 w-5" />
           </span>
           <ShareButton
             title={opportunity.title}
