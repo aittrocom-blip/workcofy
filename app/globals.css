@@ -118,6 +118,24 @@ body {
   }
 }
 
+/* Señal visual suave para identificar Partners sin competir con el mapa. */
+.partner-signal::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  border-radius: 9999px;
+  border: 2px solid rgba(244, 185, 66, 0.65);
+  animation: workcofy-partner-signal 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes workcofy-partner-signal {
+  0% { transform: scale(0.82); opacity: 0.75; }
+  70% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -97,6 +97,7 @@ function createMarkerElement(
     : partner
       ? '0 0 0 4px rgba(244,185,66,0.16), 0 0 14px rgba(244,185,66,0.55)'
       : '0 2px 4px rgba(0,0,0,0.25)'
+  if (partner) el.classList.add('partner-signal')
 
   if (photoUrl) {
     const img = document.createElement('img')
