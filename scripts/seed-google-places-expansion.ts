@@ -37,7 +37,7 @@ async function findPlaceId(target: LegacyTarget, apiKey: string): Promise<string
     result.formatted_address?.toLowerCase().includes(target.localidad.toLowerCase())
   )
 
-  if (!bestMatch && target.category === 'library') {
+  if (!bestMatch && (target.category === 'library' || target.allowManualPlaceMatch)) {
     // Library listings often use a civic/central address without the comuna
     // name in Google's formatted address; the exact institution name is the
     // stronger match in this curated catalog.
@@ -184,9 +184,11 @@ async function main() {
 
   const requestedCountry = process.env.EXPANSION_COUNTRY as LegacyTarget['country'] | undefined
   const requestedCategory = process.env.EXPANSION_CATEGORY as LegacyTarget['category'] | undefined
+  const requestedName = process.env.EXPANSION_NAME?.toLowerCase()
   const targets = LEGACY_TARGETS.filter((target) =>
     (!requestedCountry || target.country === requestedCountry) &&
-    (!requestedCategory || target.category === requestedCategory)
+    (!requestedCategory || target.category === requestedCategory) &&
+    (!requestedName || target.name.toLowerCase() === requestedName)
   )
 
   for (const target of targets) {
