@@ -58,6 +58,8 @@ export const LEGACY_TARGETS: LegacyTarget[] = [
   { name: 'Biblioteca de Santiago', localidad: 'Santiago', country: 'cl', category: 'library' },
   { name: 'Biblioteca Nacional de Chile', localidad: 'Santiago', country: 'cl', category: 'library' },
   { name: 'Biblioteca Pública de Providencia', localidad: 'Providencia, Santiago', country: 'cl', category: 'library' },
+  { name: 'Biblioteca Corporación Cultural Las Condes', localidad: 'Las Condes, Santiago', country: 'cl', category: 'library' },
+  { name: 'Biblioteca de Vitacura', localidad: 'Vitacura, Santiago', country: 'cl', category: 'library' },
   { name: 'Blue Bird Cafe', localidad: 'Vitacura', country: 'cl' },
   { name: 'Café de Lima - 28 de Julio', localidad: 'Miraflores', country: 'pe' },
   { name: 'Coleccionista Coffee Barranco', localidad: 'Barranco', country: 'pe' },

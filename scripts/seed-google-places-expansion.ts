@@ -37,6 +37,13 @@ async function findPlaceId(target: LegacyTarget, apiKey: string): Promise<string
     result.formatted_address?.toLowerCase().includes(target.localidad.toLowerCase())
   )
 
+  if (!bestMatch && target.category === 'library') {
+    // Library listings often use a civic/central address without the comuna
+    // name in Google's formatted address; the exact institution name is the
+    // stronger match in this curated catalog.
+    return body.results[0].place_id
+  }
+
   if (!bestMatch) {
     console.warn(
       `Found results for "${target.name}" but none confirm a ${target.localidad} address — skipping for manual review.`
