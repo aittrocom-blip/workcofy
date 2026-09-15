@@ -11,14 +11,14 @@ interface Pillar {
 // Master spec §7. Eventos is listed but not linked (out of the validation MVP).
 const PILLARS: Pillar[] = [
   {
-    icon: '/icons/nav-explorar.png',
+    icon: '/icons/sidebar-explorar.png',
     title: 'Espacios',
     text: 'Descubre cafeterías, coworkings, hoteles, bibliotecas y otros lugares donde puedes trabajar.',
     cta: 'Encontrar un espacio',
     href: '/espacios',
   },
   {
-    icon: '/icons/nav-equipos.png',
+    icon: '/icons/sidebar-equipo.png',
     title: 'Trabajos remotos',
     text: 'Encuentra trabajos remotos, proyectos, oportunidades freelance y nuevas formas de trabajar.',
     cta: 'Explorar oportunidades',
@@ -32,7 +32,7 @@ const PILLARS: Pillar[] = [
     href: '/aprende',
   },
   {
-    icon: '/icons/nav-eventos.png',
+    icon: '/icons/sidebar-eventos.png',
     title: 'Eventos',
     text: 'Participa en workshops, AI Sessions, networking y encuentros para aprender y conectar.',
     cta: 'Ver eventos',

@@ -93,7 +93,7 @@ function LoginForm() {
           disabled={loading}
           className="rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-md active:scale-[0.97] disabled:opacity-50"
         >
-          {loading ? 'Ingresando...' : 'Ingresar'}
+          {loading ? <span className="inline-flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />Ingresando...</span> : 'Ingresar'}
         </button>
       </form>
       <p className="mt-4 text-sm text-gray-500">

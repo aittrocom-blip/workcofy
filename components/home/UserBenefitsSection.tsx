@@ -22,7 +22,7 @@ export function UserBenefitsSection() {
       <div className="mx-auto mt-10 grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {BENEFITS.map(([icon, title, text]) => (
           <div key={title} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-workcofy-yellow/20 p-2" aria-hidden="true"><img src={icon} alt="" className="h-full w-full object-contain" /></span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white p-2" aria-hidden="true"><img src={icon} alt="" className="h-full w-full object-contain" /></span>
             <h3 className="mt-4 font-bold">{title}</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{text}</p>
           </div>
