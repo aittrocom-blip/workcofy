@@ -23,6 +23,7 @@ interface CoursesListingProps {
   compactSearch?: boolean
   /** Anchor id so hero CTAs can scroll here. */
   id?: string
+  publicPreview?: boolean
 }
 
 const CERTIFICATE_OPTIONS = [{ value: '1', label: 'Con certificado' }]
@@ -30,11 +31,12 @@ const CERTIFICATE_OPTIONS = [{ value: '1', label: 'Con certificado' }]
 // Results block shared by /aprende and /aprende/[slug]: count, sort,
 // compact filters and the grid. Search, categories and the discovery
 // sections live in the page components around it.
-export async function CoursesListing({ basePath, fixed, searchParams, compactSearch = false, id }: CoursesListingProps) {
+export async function CoursesListing({ basePath, fixed, searchParams, compactSearch = false, id, publicPreview = false }: CoursesListingProps) {
   const filters = parseCourseFilters(searchParams)
   const effective: CourseFilters = { ...filters, ...fixed }
   const current = courseFiltersToParams(filters)
   const courses = await listPublishedCourses(effective)
+  const visibleCourses = publicPreview ? courses.slice(0, 5) : courses
 
   const groups: ChipGroup[] = []
   if (!fixed.category) groups.push({ label: 'Categoría', param: 'categoria', options: COURSE_CATEGORIES, allLabel: 'Todas' })
@@ -94,18 +96,19 @@ export async function CoursesListing({ basePath, fixed, searchParams, compactSea
         <FilterDropdowns basePath={basePath} current={current} groups={groups} clearHref={clearHref} />
       </div>
 
-      {courses.length === 0 ? (
+      {visibleCourses.length === 0 ? (
         <div className="mt-8 rounded-[28px] border border-dashed border-gray-200 bg-gray-50 py-16 text-center">
           <p className="text-sm font-semibold">No encontramos cursos con esa búsqueda</p>
           <p className="mt-1 text-sm text-gray-500">Prueba con otra palabra o con menos filtros.</p>
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {courses.map((course) => (
+          {visibleCourses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
         </div>
       )}
+      {publicPreview && courses.length > 5 && <p className="mt-6 rounded-2xl bg-workcofy-yellow/15 px-4 py-3 text-center text-sm font-semibold text-gray-700">Regístrate gratis para ver todos los cursos.</p>}
     </section>
   )
 }

@@ -27,6 +27,7 @@ interface OpportunitiesListingProps {
   searchParams: SearchParamsInput
   /** Anchor id so hero/category links can scroll here. */
   id?: string
+  publicPreview?: boolean
 }
 
 const AI_OPTIONS = [
@@ -42,7 +43,7 @@ const SORT_OPTIONS = [
 // Results block shared by /oportunidades and /oportunidades/[categoria]:
 // count, sort, compact filters, the IA highlight, and the grid. The hero and
 // quick categories live in the page components around it (redesign brief).
-export async function OpportunitiesListing({ basePath, category, searchParams, id }: OpportunitiesListingProps) {
+export async function OpportunitiesListing({ basePath, category, searchParams, id, publicPreview = false }: OpportunitiesListingProps) {
   const filters = parseOpportunityFilters(searchParams)
   // A category page bakes its own constraint in; the URL params refine within it.
   const fixed: OpportunityFilters = {
@@ -54,6 +55,7 @@ export async function OpportunitiesListing({ basePath, category, searchParams, i
   const current = opportunityFiltersToParams(filters)
   const result = await listPublishedOpportunities(effective)
   const now = new Date()
+  const visibleItems = publicPreview ? result.items.slice(0, 5) : result.items
 
   const groups: ChipGroup[] = []
   if (!category?.filter.type) groups.push({ label: 'Tipo', param: 'tipo', options: OPPORTUNITY_TYPES })
@@ -141,18 +143,20 @@ export async function OpportunitiesListing({ basePath, category, searchParams, i
         </div>
       )}
 
-      {result.items.length === 0 ? (
+      {visibleItems.length === 0 ? (
         <div className="mt-8 rounded-[28px] border border-dashed border-gray-200 bg-gray-50 py-16 text-center">
           <p className="text-sm font-semibold">No encontramos oportunidades con estos filtros</p>
           <p className="mt-1 text-sm text-gray-500">Prueba con menos filtros o con otra búsqueda.</p>
         </div>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {result.items.map((opportunity) => (
+          {visibleItems.map((opportunity) => (
             <OpportunityCard key={opportunity.id} opportunity={opportunity} now={now} />
           ))}
         </div>
       )}
+
+      {publicPreview && result.total > 5 && <p className="mt-6 rounded-2xl bg-workcofy-yellow/15 px-4 py-3 text-center text-sm font-semibold text-gray-700">Regístrate gratis para ver todas las oportunidades.</p>}
 
       <Pagination basePath={basePath} current={current} page={result.page} total={result.total} pageSize={result.pageSize} />
     </section>

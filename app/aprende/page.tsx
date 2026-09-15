@@ -14,14 +14,15 @@ export const metadata: Metadata = {
     'Descubre cursos, herramientas y certificaciones para aprender inteligencia artificial y desarrollar nuevas habilidades para el trabajo.',
 }
 
-export default function AprendePage({ searchParams }: { searchParams: SearchParamsInput }) {
+export default async function AprendePage({ searchParams }: { searchParams: SearchParamsInput }) {
+  const { data: { user } } = await (await import('@/lib/supabase/server')).createServerSupabaseClient().auth.getUser()
   return (
     <div>
       <AprendeHero currentQuery={firstParam(searchParams.q)} />
       <CategoryCards activeHref="/aprende" />
       <PopularTopics />
       <div className="mx-auto max-w-7xl px-4 pt-12 md:px-8">
-        <CoursesListing id="cursos" basePath="/aprende" fixed={{}} searchParams={searchParams} />
+        <CoursesListing id="cursos" basePath="/aprende" fixed={{}} searchParams={searchParams} publicPreview={!user} />
       </div>
       <LearningPaths />
     </div>

@@ -11,12 +11,14 @@ export const metadata: Metadata = {
   description: 'Descubre trabajos remotos, oportunidades freelance, proyectos y prácticas de Perú, Latinoamérica y el mundo.',
 }
 
-export default function OportunidadesPage({ searchParams }: { searchParams: SearchParamsInput }) {
+export default async function OportunidadesPage({ searchParams }: { searchParams: SearchParamsInput }) {
+  const { data: { user } } = await (await import('@/lib/supabase/server')).createServerSupabaseClient().auth.getUser()
+  const publicPreview = !user
   return (
     <div>
       <OportunidadesHero currentQuery={firstParam(searchParams.q)} />
       <QuickCategories activeHref="/oportunidades" />
-      <OpportunitiesListing id="oportunidades" basePath="/oportunidades" category={null} searchParams={searchParams} />
+      <OpportunitiesListing id="oportunidades" basePath="/oportunidades" category={null} searchParams={searchParams} publicPreview={publicPreview} />
     </div>
   )
 }

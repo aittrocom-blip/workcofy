@@ -65,6 +65,7 @@ export function DiscoveryView({
   const { coordinate, status, requestLocation } = useUserLocation()
   const { isFavorited } = useFavorites()
   const { user } = useAuthUser()
+  const publicRestricted = fullScreen && !user
   // Falls back to Worky (avatarFor's own default) while logged out or before
   // the user has chosen one — only a genuinely chosen avatar overrides it.
   const chosenAvatarId = useUserAvatar()
@@ -268,16 +269,18 @@ export function DiscoveryView({
   const parkingToggle = (
     <button
       type="button"
-      onClick={() => setShowParking((visible) => !visible)}
+      onClick={() => !publicRestricted && setShowParking((visible) => !visible)}
       className={`pointer-events-auto flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full border text-sm font-bold shadow-sm transition ${
-        showParking
+        publicRestricted
+          ? 'border-gray-200 bg-gray-100 text-gray-400'
+          : showParking
           ? 'border-blue-600 bg-blue-600 text-white'
           : 'border-white bg-white/95 text-gray-800 hover:border-blue-200'
       }`}
       aria-pressed={showParking}
       title="Mostrar locales con estacionamiento registrado"
     >
-      <span aria-hidden="true" className={`font-extrabold ${showParking ? 'text-white' : 'text-blue-600'}`}>P</span>
+      <span aria-hidden="true" className={`font-extrabold ${publicRestricted ? 'text-gray-400' : showParking ? 'text-white' : 'text-blue-600'}`}>P</span>
       <span className="sr-only">Estacionamientos</span>
     </button>
   )
@@ -285,16 +288,18 @@ export function DiscoveryView({
   const partnerToggle = (
     <button
       type="button"
-      onClick={() => { setShowPartners((visible) => !visible); setSelectedId(null) }}
+      onClick={() => { if (publicRestricted) return; setShowPartners((visible) => !visible); setSelectedId(null) }}
       className={`pointer-events-auto flex h-[42px] w-[42px] flex-none items-center justify-center rounded-full border text-sm shadow-sm transition ${
-        showPartners
+        publicRestricted
+          ? 'border-gray-200 bg-gray-100'
+          : showPartners
           ? 'border-workcofy-yellow bg-workcofy-yellow'
           : 'border-white bg-white/95 hover:border-workcofy-yellow'
       }`}
       aria-pressed={showPartners}
       title="Mostrar locales Partner"
     >
-      <img src="/icons/logo-partner.png" alt="" className="h-7 w-7 object-contain" />
+      <img src="/icons/logo-partner.png" alt="" className={`h-7 w-7 object-contain ${publicRestricted ? 'grayscale opacity-50' : showPartners ? 'brightness-0 invert' : ''}`} />
       <span className="sr-only">Partners</span>
     </button>
   )
@@ -334,6 +339,7 @@ export function DiscoveryView({
               mapOverlay
               partnerToggle={partnerToggle}
               parkingToggle={parkingToggle}
+              publicRestricted={publicRestricted}
             />
             {locationUnavailable && (
               <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">
@@ -362,6 +368,7 @@ export function DiscoveryView({
                 mapOverlay
                 partnerToggle={partnerToggle}
                 parkingToggle={parkingToggle}
+                publicRestricted={publicRestricted}
               />
               {locationUnavailable && (
                 <p className="mt-2 rounded-xl bg-black/80 px-3 py-2 text-center text-xs text-white">

@@ -4,6 +4,7 @@ import { OpportunitiesHomeSection } from '@/components/home/OpportunitiesHomeSec
 import { AiSection } from '@/components/home/AiSection'
 import { ExplorarSection } from '@/components/home/ExplorarSection'
 import { CoursesHomeSection } from '@/components/home/CoursesHomeSection'
+import { UserBenefitsSection } from '@/components/home/UserBenefitsSection'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,7 @@ export default function HomePage() {
     <div>
       <Hero />
       <PillarsSection />
+      <UserBenefitsSection />
       <OpportunitiesHomeSection />
       <AiSection />
       <ExplorarSection />

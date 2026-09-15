@@ -7,12 +7,13 @@ import { CategoryIcon } from '@/components/discovery/CategoryIcon'
 interface CategoryFilterDropdownProps {
   selected: string[]
   onChange: (categories: string[]) => void
+  disabled?: boolean
 }
 
 // Consolidates what used to be a row of one pill per space type into a
 // single "Espacio" dropdown — a multi-select checklist instead of always
 // showing every type at once. Empty selection means "todos".
-export function CategoryFilterDropdown({ selected, onChange }: CategoryFilterDropdownProps) {
+export function CategoryFilterDropdown({ selected, onChange, disabled = false }: CategoryFilterDropdownProps) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const active = selected.length > 0
@@ -33,10 +34,11 @@ export function CategoryFilterDropdown({ selected, onChange }: CategoryFilterDro
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => !disabled && setOpen((value) => !value)}
+        disabled={disabled}
         aria-expanded={open}
         className={`flex h-[42px] flex-none items-center gap-2 rounded-full px-4 text-sm font-medium transition-all ${
-          active ? 'bg-black text-white shadow-sm' : 'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
+          disabled ? 'border border-gray-200 bg-gray-100 text-gray-400' : active ? 'bg-black text-white shadow-sm' : 'border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-black hover:text-black'
         }`}
       >
         <CategoryIcon name="todos" className="h-5 w-5" active={active} />

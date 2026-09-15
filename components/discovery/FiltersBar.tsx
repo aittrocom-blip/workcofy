@@ -28,6 +28,7 @@ interface FiltersBarProps {
   mapOverlay?: boolean
   partnerToggle?: ReactNode
   parkingToggle?: ReactNode
+  publicRestricted?: boolean
 }
 
 export function FiltersBar({
@@ -43,6 +44,7 @@ export function FiltersBar({
   mapOverlay = false,
   partnerToggle,
   parkingToggle,
+  publicRestricted = false,
 }: FiltersBarProps) {
   const [searchValue, setSearchValue] = useState(filters.search ?? '')
 
@@ -142,7 +144,7 @@ export function FiltersBar({
             </button>
           )}
           {isMapOverlay && <OpenHoursFilter filters={filters} onChange={onChange} variant="chip" />}
-          <CategoryFilterDropdown selected={filters.category} onChange={(category) => onChange({ category })} />
+          <CategoryFilterDropdown selected={filters.category} onChange={(category) => onChange({ category })} disabled={publicRestricted} />
           {isMapOverlay && partnerToggle}
           {isMapOverlay && parkingToggle}
           {isMapOverlay && (
