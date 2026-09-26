@@ -6,9 +6,11 @@ import { refreshMusicPlaylistsCache } from '@/lib/music/refreshCache'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
-// Daily cron (see vercel.json) — replaces music_playlists' contents with
-// fresh Spotify search results, category by category. /musica reads that
-// table directly, so a visitor's page load never calls Spotify itself.
+// Manual trigger — the scheduled run lives inside /api/cron/seed-opportunities
+// (Mondays) because Vercel Hobby caps how many cron entries a project can
+// have. Replaces music_playlists' contents with fresh Spotify search
+// results, category by category. /musica reads that table directly, so a
+// visitor's page load never calls Spotify itself.
 export async function GET(request: Request) {
   if (!verifyCronSecret(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

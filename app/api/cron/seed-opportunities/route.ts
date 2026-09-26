@@ -7,6 +7,7 @@ import { sendDailySignupDigest } from '@/lib/reports/signupDigest'
 import { sendWeeklyContentDigest } from '@/lib/reports/weeklyContentDigest'
 import { runOpportunityAlerts } from '@/lib/reports/opportunityAlerts'
 import { generateDailyTips } from '@/lib/tips/generateTips'
+import { refreshMusicPlaylistsCache } from '@/lib/music/refreshCache'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -63,6 +64,16 @@ export async function GET(request: Request) {
     results.tipsGenerated = await generateDailyTips(supabase)
   } catch (error) {
     results.tipsGenerated = { error: error instanceof Error ? error.message : String(error) }
+  }
+
+  try {
+    // Last on purpose (least critical if the 60s budget runs short) and
+    // weekly like the digest above — playlists barely move, and a separate
+    // cron entry would exceed Vercel Hobby's cron-count cap. The standalone
+    // /api/cron/refresh-music route stays for manual runs.
+    results.musicCatalog = new Date().getUTCDay() === 1 ? await refreshMusicPlaylistsCache(supabase) : { skipped: 'not Monday' }
+  } catch (error) {
+    results.musicCatalog = { error: error instanceof Error ? error.message : String(error) }
   }
 
   return NextResponse.json(results)
