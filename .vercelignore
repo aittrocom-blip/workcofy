@@ -1,0 +1,15 @@
+.git
+node_modules
+.next
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+.superpowers
+.claude/
+.worktrees/
+supabase/.temp/
+graphify-out/
+output/
+media/
+docs/
